@@ -24,6 +24,10 @@
    (exp1 expression?)
    (exp2 expression?)
    )
+  (equal?-exp
+   (exp1 expression?)
+   (exp2 expression?)
+   )
   (minus-exp
    (exp1 expression?)
    )
