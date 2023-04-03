@@ -30,6 +30,13 @@
                   )
                 )
               )
+    (minus-exp (exp1)
+               (let ((val1 (value-of-exp exp1 env)))
+                 (let ((num1 (expval->num val1)))
+                   (num-val (- 0 num1))
+                   )
+                 )
+               )
     ; true only if exp1 is number 0
     (zero?-exp (exp1)
                (let ((val (value-of-exp exp1 env)))
