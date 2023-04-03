@@ -30,3 +30,19 @@
     (else (report-expval-extractor-error 'bool val))
     )
   )
+
+(define (cell-val->first val)
+  (cases expval val
+    (cell-val (first second) first)
+    (null-val () (null-val))
+    (else "error")
+    )
+  )
+
+(define (cell-val->second val)
+  (cases expval val
+    (cell-val (first second) second)
+    (null-val () (null-val))
+    (else "error")
+    )
+  )
