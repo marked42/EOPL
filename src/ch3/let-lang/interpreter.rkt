@@ -16,6 +16,11 @@
     )
   )
 
+; get value of a list of exp
+(define (value-of-exps exps env)
+  (map (lambda (exp) (value-of-exp exp env)) exps)
+  )
+
 (define (value-of-exp exp env)
   (cases expression exp
     ; number constant
@@ -114,7 +119,7 @@
              (apply-env env var)
              )
     (let-exp (vars exps body)
-             (let ((vals (map (lambda (exp) (value-of-exp exp env)) exps)))
+             (let ((vals (value-of-exps exps env)))
                (value-of-exp body (extend-mul-env vars vals env))
                )
              )
@@ -155,7 +160,7 @@
     (list-exp (exp1 exps)
               (let (
                     (val1 (value-of-exp exp1 env))
-                    (vals (map (lambda (exp) (value-of-exp exp env)) exps)))
+                    (vals (value-of-exps exps env)))
                 (letrec ((loop (lambda (vals)
                                  (if (null? vals)
                                      (null-val)
@@ -169,8 +174,8 @@
                 )
               )
     (cond-exp (cond-exps act-exps)
-              (let ((cond-vals (map (lambda (exp) (value-of-exp exp env)) cond-exps))
-                    (act-vals (map (lambda (exp) (value-of-exp exp env)) act-exps))
+              (let ((cond-vals (value-of-exps cond-exps env))
+                    (act-vals (value-of-exps act-exps env))
                     )
                 (letrec ((return-first-true-cond
                           (lambda (cond-vals act-vals)
