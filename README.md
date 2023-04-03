@@ -26,16 +26,36 @@ $n$ 是 denoted value，$\lceil n \rceil$ 代表 expressed value 中对应的值
 
 $n$ 是 expressed value，$\lfloor n \rfloor$ 代表 denoted value 中对应的值。
 
-### TODO & FIXME
+### let-lang
 
-1. let-lang/parser.rkt sllgen:make-string-parser 隐式依赖 a-program 问题
-1. `(provide (all-defined-out))` 还会有没使用但是导出了的符号提示
-1. re-export imported symbols
-1. display 换行
-1. list-exp 的语法定义 `(arbno ',' expression)`
-1. unittest for exception
-1. let语句
-    1. let定义的若干个变量中，前边的变量对后续变量的初始化语句不可见，变量初始化语句不能使用let中定义的变量，只能使用外层变量
-    1. let*定义的若干个变量中，前边的变量对后续变量的初始化语句可见。
-    1. 使用 named let或者 letrec 编写递归函数
-1. unpack语句类似于ES 6的解构
+**let 语句** 定义的若干个变量中，前边的变量对后续变量的初始化语句不可见，变量初始化语句不能使用 let 中定义的变量，只能使用外层变量。
+
+```rkt
+let x = 30
+    in let x = -(x,1)
+           y = -(x,2)
+        in -(x,y)
+```
+
+`y = -(x,1)`中的`x`是外层的`x`，所以结果是`1`。
+
+**`let*`**语句定义的若干个变量中，前边的变量对后续变量的初始化语句可见。
+
+```rkt
+let x = 30
+    in let* x = -(x,1)
+            y = -(x,2)
+        in -(x,y)
+```
+
+`y = -(x,1)`中的`x`是内层的`x`，所以结果是`1`。
+
+**unpack**类似于 ES 6 的解构，将一个列表中的元素绑定绑定到多个变量上。
+
+```
+let u = 7
+    in unpack x y = cons(u,cons(3,emptylist))
+        in -(x,y)
+```
+
+计算结果是`4`。
