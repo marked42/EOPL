@@ -33,6 +33,10 @@
      greater?-exp)
 
     (expression
+     ("less?" "(" expression "," expression ")")
+     less?-exp)
+
+    (expression
      ("minus" "(" expression  ")")
      minus-exp)
 

@@ -47,3 +47,7 @@
 (equal-answer? (run "greater?(3, 2)") #t "greater?-exp")
 (equal-answer? (run "greater?(3, 3)") #f "greater?-exp")
 (equal-answer? (run "greater?(3, 4)") #f "greater?-exp")
+
+(equal-answer? (run "less?(3, 2)") #f "less?-exp")
+(equal-answer? (run "less?(3, 3)") #f "less?-exp")
+(equal-answer? (run "less?(3, 4)") #t "less?-exp")
