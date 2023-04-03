@@ -4,6 +4,7 @@
 (require "expression.rkt")
 (require "environment.rkt")
 (require "value.rkt")
+(require "procedure.rkt")
 (provide (all-defined-out))
 
 (define (run str)
@@ -41,6 +42,11 @@
     (else (report-unpack-unequal-vars-list-count val))
     )
   )
+
+(define (procedure var body env)
+  (lambda (val)
+    (value-of-exp body (extend-env var val env))
+    ))
 
 ; get value of a list of exp
 (define (value-of-exps exps env)
@@ -234,6 +240,16 @@
                  (num-val 1)
                  )
                )
+    (proc-exp (name body)
+              (proc-val (procedure name body env))
+              )
+    (call-exp (rator rand)
+              (let ((rator-val (value-of-exp rator env)) (rand-val (value-of-exp rand env)))
+                (let ((proc (expval->proc rator-val)))
+                  (apply-procedure proc rand-val)
+                  )
+                )
+              )
     (else 42)
     )
   )

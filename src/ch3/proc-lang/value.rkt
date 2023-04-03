@@ -1,6 +1,7 @@
 #lang eopl
 
 (require "basic.rkt")
+(require "procedure.rkt")
 (provide (all-defined-out))
 
 (define-datatype expval expval?
@@ -14,6 +15,10 @@
   (cell-val
    (first expval?)
    (second expval?)
+   )
+
+  (proc-val
+   (proc proc?)
    )
   )
 
@@ -58,5 +63,12 @@
   (cases expval val
     (cell-val (first second) #t)
     (else #f)
+    )
+  )
+
+(define (expval->proc val)
+  (cases expval val
+    (proc-val (proc) proc)
+    (else (report-expval-extractor-error 'proc val))
     )
   )
