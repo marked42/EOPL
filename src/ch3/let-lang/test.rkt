@@ -28,3 +28,6 @@
 (equal-answer? (run "v") 5 "built in var i is 5")
 (equal-answer? (run "x") 10 "built in var i is 10")
 (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
+
+; exer 3.6
+(equal-answer? (run "minus(-(minus(5),9))") 14 "unary minus exp")
