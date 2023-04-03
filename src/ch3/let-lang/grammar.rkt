@@ -29,6 +29,10 @@
      equal?-exp)
 
     (expression
+     ("greater?" "(" expression "," expression ")")
+     greater?-exp)
+
+    (expression
      ("minus" "(" expression  ")")
      minus-exp)
 

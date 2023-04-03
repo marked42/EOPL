@@ -43,3 +43,7 @@
 ; exer 3.8
 (equal-answer? (run "equal?(4, 2)") #f "equal?-exp")
 (equal-answer? (run "equal?(2, 2)") #t "equal?-exp")
+
+(equal-answer? (run "greater?(3, 2)") #t "greater?-exp")
+(equal-answer? (run "greater?(3, 3)") #f "greater?-exp")
+(equal-answer? (run "greater?(3, 4)") #f "greater?-exp")
