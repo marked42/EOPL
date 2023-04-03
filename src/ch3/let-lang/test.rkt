@@ -1,6 +1,7 @@
 #lang eopl
 
 (require rackunit)
+(require racket)
 (require "interpreter.rkt")
 (require "value.rkt")
 
@@ -78,8 +79,7 @@
 ; exer 3.12
 (equal-answer? (run "cond zero?(1) ==> 1 zero?(0) ==> 0 end") 0 "cond-exp")
 (equal-answer? (run "cond zero?(0) ==> 0 zero?(1) ==> 1 end") 0 "cond-exp")
-; FIXME: check exception (require racket)
-; (check-exn exn:fail? (lambda () (run "cond zero?(1) ==> 1 zero?(2) ==> 2 end")))
+(check-exn exn:fail? (lambda () (run "cond zero?(1) ==> 1 zero?(2) ==> 2 end")))
 
 ; exer 3.15
 (equal-answer? (run "print(0)") 1 "print-exp")
