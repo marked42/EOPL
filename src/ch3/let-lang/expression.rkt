@@ -60,6 +60,11 @@
    (exps (list-of expression?))
    (body expression?)
    )
+  (unpack-exp
+   (vars (list-of identifier?))
+   (exp expression?)
+   (body expression?)
+   )
 
   (cons-exp
    (exp1 expression?)

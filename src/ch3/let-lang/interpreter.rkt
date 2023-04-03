@@ -27,6 +27,21 @@
       )
   )
 
+(define (extend-env-unpack vars val env)
+  (cond
+    ((and (null? vars) (null-val? val)) env)
+    ((and (pair? vars) (cell-val? val))
+     (let ((first-var (car vars)) (first-val (cell-val->first val)))
+       ; define vars from left to right
+       (let ((new-env (extend-env first-var first-val env)))
+         (extend-env-unpack (cdr vars) (cell-val->second val) new-env)
+         )
+       )
+     )
+    (else (report-unpack-unequal-vars-list-count val))
+    )
+  )
+
 ; get value of a list of exp
 (define (value-of-exps exps env)
   (map (lambda (exp) (value-of-exp exp env)) exps)
@@ -137,6 +152,11 @@
     (let*-exp (vars exps body)
               (value-of-exp body (extend-mul-env-let* vars exps env))
               )
+    (unpack-exp (vars exp body)
+                (let ((val (value-of-exp exp env)))
+                  (value-of-exp body (extend-env-unpack vars val env))
+                  )
+                )
     (cons-exp (exp1 exp2)
               (let ((val1 (value-of-exp exp1 env)) (val2 (value-of-exp exp2 env)))
                 (cell-val val1 val2)
@@ -225,4 +245,8 @@
 
 (define (report-cond-invalid-predicate exp)
   (eopl:error 'cond-exp "invalid predicate " exp)
+  )
+
+(define (report-unpack-unequal-vars-list-count exp)
+  (eopl:error 'unpack-exp "Unequal vars and list count ~s" exp)
   )

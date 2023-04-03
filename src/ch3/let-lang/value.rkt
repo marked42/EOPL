@@ -46,3 +46,17 @@
     (else "error")
     )
   )
+
+(define (null-val? val)
+  (cases expval val
+    (null-val () #t)
+    (else #f)
+    )
+  )
+
+(define (cell-val? val)
+  (cases expval val
+    (cell-val (first second) #t)
+    (else #f)
+    )
+  )
