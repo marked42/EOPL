@@ -7,8 +7,22 @@
 
 (define (empty-env) '())
 
+; define single var
 (define (extend-env var val env)
   (cons (cons var val) env)
+  )
+
+; define multiple vars
+(define (extend-mul-env vars vals env)
+  (if (null? vars)
+      env
+      (let ((first-var (car vars)) (first-val (car vals)))
+        (extend-env
+         first-var
+         first-val
+         (extend-mul-env (cdr vars) (cdr vals) env))
+        )
+      )
   )
 
 (define (init-env)

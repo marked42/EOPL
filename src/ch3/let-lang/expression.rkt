@@ -51,8 +51,8 @@
    (var identifier?)
    )
   (let-exp
-   (var identifier?)
-   (exp1 expression?)
+   (vars (list-of identifier?))
+   (exps (list-of expression?))
    (body expression?)
    )
 
