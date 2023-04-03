@@ -57,6 +57,8 @@
 
     (expression ("null?" "(" expression ")") null?-exp)
 
+    (expression ("list" "(" expression (arbno "," expression)")") list-exp)
+
     (expression
      ("let" identifier "=" expression "in" expression)
      let-exp)

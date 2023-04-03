@@ -70,6 +70,10 @@
   (null?-exp
    (exp1 expression?)
    )
+  (list-exp
+   (exp1 expression?)
+   (exps (list-of expression?))
+   )
   )
 
 (define-datatype program program?
