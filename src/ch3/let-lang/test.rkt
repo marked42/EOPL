@@ -14,7 +14,7 @@
       ((number? sloppy-val) (num-val sloppy-val))
       ((boolean? sloppy-val) (bool-val sloppy-val))
       ((null? sloppy-val) (null-val))
-      ((list? sloppy-val)
+      ((pair? sloppy-val)
        (let ((first (car sloppy-val)) (second (cdr sloppy-val)))
          (cell-val (sloppy->expval first) (sloppy->expval second))
          )
@@ -59,3 +59,4 @@
 (equal-answer? (run "less?(3, 4)") #t "less?-exp")
 
 (equal-answer? (run "emptylist") '() "emptylist-exp")
+(equal-answer? (run "cons(1, 2)") (cons 1 2) "cons-exp")

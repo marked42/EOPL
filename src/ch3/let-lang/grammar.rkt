@@ -50,6 +50,7 @@
 
     (expression (identifier) var-exp)
 
+    (expression ("cons" "(" expression "," expression ")") cons-exp)
     (expression ("emptylist") emptylist-exp)
 
     (expression
