@@ -32,6 +32,10 @@
    (exp1 expression?)
    (exp2 expression?)
    )
+  (less?-exp
+   (exp1 expression?)
+   (exp2 expression?)
+   )
   (minus-exp
    (exp1 expression?)
    )
