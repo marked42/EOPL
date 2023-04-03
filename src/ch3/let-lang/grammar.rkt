@@ -13,6 +13,10 @@
      diff-exp)
 
     (expression
+     ("+" "(" expression "," expression ")")
+     sum-exp)
+
+    (expression
      ("minus" "(" expression  ")")
      minus-exp)
 

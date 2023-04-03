@@ -31,3 +31,6 @@
 
 ; exer 3.6
 (equal-answer? (run "minus(-(minus(5),9))") 14 "unary minus exp")
+
+; exer 3.7
+(equal-answer? (run "+(1, 2)") 3 "sum exp")
