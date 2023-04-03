@@ -16,6 +16,17 @@
     )
   )
 
+(define (extend-mul-env-let* vars exps env)
+  (if (null? vars)
+      env
+      (let ((first-var (car vars)) (first-exp (car exps)))
+        (let ((new-env (extend-env first-var (value-of-exp first-exp env) env)))
+          ; let* evalutates with previous defined variable visible to following initialization expression
+          (extend-mul-env-let* (cdr vars) (cdr exps) new-env))
+        )
+      )
+  )
+
 ; get value of a list of exp
 (define (value-of-exps exps env)
   (map (lambda (exp) (value-of-exp exp env)) exps)
@@ -123,6 +134,9 @@
                (value-of-exp body (extend-mul-env vars vals env))
                )
              )
+    (let*-exp (vars exps body)
+              (value-of-exp body (extend-mul-env-let* vars exps env))
+              )
     (cons-exp (exp1 exp2)
               (let ((val1 (value-of-exp exp1 env)) (val2 (value-of-exp exp2 env)))
                 (cell-val val1 val2)

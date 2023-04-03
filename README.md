@@ -35,5 +35,6 @@ $n$ 是 expressed value，$\lfloor n \rfloor$ 代表 denoted value 中对应的�
 1. list-exp 的语法定义 `(arbno ',' expression)`
 1. unittest for exception
 1. let语句
-    1. let初始化语句的作用域不包括let本身声明的变量
+    1. let定义的若干个变量中，前边的变量对后续变量的初始化语句不可见，变量初始化语句不能使用let中定义的变量，只能使用外层变量
+    1. let*定义的若干个变量中，前边的变量对后续变量的初始化语句可见。
     1. 使用 named let或者 letrec 编写递归函数

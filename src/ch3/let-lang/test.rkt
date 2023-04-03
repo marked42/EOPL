@@ -87,3 +87,6 @@
 
 ; exer 3.16
 (equal-answer? (run "let x = 30 in let x = -(x,1) y = -(x,2) in -(x,y)") 1 "let-exp with arbitrary number of vars")
+
+; exer 3.17
+(equal-answer? (run "let x = 30 in let* x = -(x,1) y = -(x,2) in -(x,y)") 2 "let*-exp with different scoping rule")
