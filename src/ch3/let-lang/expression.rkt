@@ -74,6 +74,11 @@
    (exp1 expression?)
    (exps (list-of expression?))
    )
+
+  (cond-exp
+   (conds (list-of expression?))
+   (acts (list-of expression?))
+   )
   )
 
 (define-datatype program program?

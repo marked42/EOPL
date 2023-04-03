@@ -74,3 +74,9 @@
 ; exer 3.10
 (equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
 (equal-answer? (run "let x = 4 in list(x, -(x, 1), -(x, 3))") (list 4 3 1) "list-exp")
+
+; exer 3.12
+(equal-answer? (run "cond zero?(1) ==> 1 zero?(0) ==> 0 end") 0 "cond-exp")
+(equal-answer? (run "cond zero?(0) ==> 0 zero?(1) ==> 1 end") 0 "cond-exp")
+; FIXME: check exception (require racket)
+; (check-exn exn:fail? (lambda () (run "cond zero?(1) ==> 1 zero?(2) ==> 2 end")))

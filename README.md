@@ -33,5 +33,6 @@ $n$ 是 expressed value，$\lfloor n \rfloor$ 代表 denoted value 中对应的�
 1. re-export imported symbols
 1. display 换行
 1. list-exp 的语法定义 `(arbno ',' expression)`
+1. unittest for exception
 
 使用 named let或者 letrec 编写递归函数
