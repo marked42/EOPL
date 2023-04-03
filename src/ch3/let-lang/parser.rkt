@@ -2,7 +2,7 @@
 
 (require "the-lexical-spec.rkt")
 (require "grammar.rkt")
-; FIXME: sllgen:make-string-parser 隐式的依赖了a-program，必须引入expression.rkt
+; sllgen-make-string-parser uses expression types as output
 (require "expression.rkt")
 (provide (all-defined-out))
 
