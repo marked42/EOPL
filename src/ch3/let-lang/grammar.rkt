@@ -21,6 +21,10 @@
      mul-exp)
 
     (expression
+     ("/" "(" expression "," expression ")")
+     div-exp)
+
+    (expression
      ("minus" "(" expression  ")")
      minus-exp)
 

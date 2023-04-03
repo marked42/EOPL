@@ -20,6 +20,10 @@
    (exp1 expression?)
    (exp2 expression?)
    )
+  (div-exp
+   (exp1 expression?)
+   (exp2 expression?)
+   )
   (minus-exp
    (exp1 expression?)
    )

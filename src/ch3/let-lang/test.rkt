@@ -36,3 +36,6 @@
 (equal-answer? (run "+(1, 2)") 3 "sum exp")
 
 (equal-answer? (run "*(2, 3)") 6 "mul-exp")
+
+; error on dividing 0
+(equal-answer? (run "/(4, 2)") 2 "div-exp")
