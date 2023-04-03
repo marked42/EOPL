@@ -50,6 +50,8 @@
 
     (expression (identifier) var-exp)
 
+    (expression ("emptylist") emptylist-exp)
+
     (expression
      ("let" identifier "=" expression "in" expression)
      let-exp)

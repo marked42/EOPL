@@ -10,6 +10,11 @@
   (bool-val
    (bool boolean?)
    )
+  (null-val)
+  (cell-val
+   (first expval?)
+   (second expval?)
+   )
   )
 
 (define (expval->num val)
