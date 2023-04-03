@@ -37,5 +37,7 @@
     (expression ("cond" (arbno expression "==>" expression) "end") cond-exp)
 
     (expression ("print" "(" expression ")") print-exp)
+
+    (expression ("unpack" (arbno identifier) "=" expression "in" expression) unpack-exp)
     )
   )

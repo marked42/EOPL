@@ -90,3 +90,6 @@
 
 ; exer 3.17
 (equal-answer? (run "let x = 30 in let* x = -(x,1) y = -(x,2) in -(x,y)") 2 "let*-exp with different scoping rule")
+
+; 3.18
+(equal-answer? (run "let u = 7 in unpack x y = cons(u,cons(3,emptylist)) in -(x,y)") 4 "unpack-exp")
