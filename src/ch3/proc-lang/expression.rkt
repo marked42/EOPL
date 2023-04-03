@@ -93,6 +93,9 @@
   (print-exp
    (exp1 expression?)
    )
+
+  (proc-exp (name identifier?) (body expression?))
+  (call-exp (rator expression?) (rand expression?))
   )
 
 (define-datatype program program?
