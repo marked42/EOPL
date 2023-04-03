@@ -32,3 +32,6 @@ $n$ 是 expressed value，$\lfloor n \rfloor$ 代表 denoted value 中对应的�
 1. `(provide (all-defined-out))` 还会有没使用但是导出了的符号提示
 1. re-export imported symbols
 1. display 换行
+1. list-exp 的语法定义 `(arbno ',' expression)`
+
+使用 named let或者 letrec 编写递归函数
