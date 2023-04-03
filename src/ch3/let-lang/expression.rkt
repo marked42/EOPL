@@ -61,6 +61,9 @@
    (exp2 expression?)
    )
   (emptylist-exp)
+  (null?-exp
+   (exp1 expression?)
+   )
   )
 
 (define-datatype program program?

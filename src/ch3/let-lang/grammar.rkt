@@ -53,6 +53,8 @@
     (expression ("cons" "(" expression "," expression ")") cons-exp)
     (expression ("emptylist") emptylist-exp)
 
+    (expression ("null?" "(" expression ")") null?-exp)
+
     (expression
      ("let" identifier "=" expression "in" expression)
      let-exp)
