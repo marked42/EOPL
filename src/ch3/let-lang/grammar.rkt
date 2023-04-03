@@ -25,6 +25,10 @@
      div-exp)
 
     (expression
+     ("equal?" "(" expression "," expression ")")
+     equal?-exp)
+
+    (expression
      ("minus" "(" expression  ")")
      minus-exp)
 

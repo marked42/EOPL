@@ -39,3 +39,7 @@
 
 ; error on dividing 0
 (equal-answer? (run "/(4, 2)") 2 "div-exp")
+
+; exer 3.8
+(equal-answer? (run "equal?(4, 2)") #f "equal?-exp")
+(equal-answer? (run "equal?(2, 2)") #t "equal?-exp")
