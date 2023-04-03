@@ -80,3 +80,7 @@
 (equal-answer? (run "cond zero?(0) ==> 0 zero?(1) ==> 1 end") 0 "cond-exp")
 ; FIXME: check exception (require racket)
 ; (check-exn exn:fail? (lambda () (run "cond zero?(1) ==> 1 zero?(2) ==> 2 end")))
+
+; exer 3.15
+(equal-answer? (run "print(0)") 1 "print-exp")
+(equal-answer? (run "print(zero?(0))") 1 "print-exp")
