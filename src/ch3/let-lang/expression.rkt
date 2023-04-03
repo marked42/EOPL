@@ -55,6 +55,11 @@
    (exps (list-of expression?))
    (body expression?)
    )
+  (let*-exp
+   (vars (list-of identifier?))
+   (exps (list-of expression?))
+   (body expression?)
+   )
 
   (cons-exp
    (exp1 expression?)
