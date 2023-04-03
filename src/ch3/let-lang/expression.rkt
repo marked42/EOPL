@@ -16,6 +16,10 @@
    (exp1 expression?)
    (exp2 expression?)
    )
+  (mul-exp
+   (exp1 expression?)
+   (exp2 expression?)
+   )
   (minus-exp
    (exp1 expression?)
    )

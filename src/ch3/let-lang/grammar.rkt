@@ -17,6 +17,10 @@
      sum-exp)
 
     (expression
+     ("*" "(" expression "," expression ")")
+     mul-exp)
+
+    (expression
      ("minus" "(" expression  ")")
      minus-exp)
 

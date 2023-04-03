@@ -34,3 +34,5 @@
 
 ; exer 3.7
 (equal-answer? (run "+(1, 2)") 3 "sum exp")
+
+(equal-answer? (run "*(2, 3)") 6 "mul-exp")
