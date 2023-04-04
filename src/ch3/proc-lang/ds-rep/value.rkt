@@ -1,8 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require)
-(require "basic.rkt")
-(require "expression.rkt")
+(require racket/lazy-require "basic.rkt" "expression.rkt")
 (lazy-require ["environment.rkt" (environment?)])
 
 (provide (all-defined-out))
