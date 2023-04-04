@@ -11,4 +11,9 @@
    (body expression?)
    (saved-env environment?)
    )
+  (trace-procedure
+   (vars (list-of identifier?))
+   (body expression?)
+   (saved-env environment?)
+   )
   )
