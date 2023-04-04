@@ -1,6 +1,10 @@
 #lang eopl
 
+(require racket/lazy-require)
 (require "basic.rkt")
+(require "expression.rkt")
+(lazy-require ["environment.rkt" (environment?)])
+
 (provide (all-defined-out))
 
 (define-datatype expval expval?
@@ -15,7 +19,22 @@
    (first expval?)
    (second expval?)
    )
+  (proc-val (proc! proc?))
   )
+
+(define-datatype proc proc?
+  (procedure
+   (vars (list-of identifier?))
+   (body expression?)
+   (saved-env environment?)
+   )
+  (trace-procedure
+   (vars (list-of identifier?))
+   (body expression?)
+   (saved-env environment?)
+   )
+  )
+
 
 (define (expval->num val)
   (cases expval val
