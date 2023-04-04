@@ -59,3 +59,10 @@ let u = 7
 ```
 
 计算结果是`4`。
+
+### proc-lang
+
+TODO:
+
+- [ ] free-variables optimization at branch feat/free-variables
+- [ ] dynamic scoping feat/dynamic-scoping-exer-3.28
