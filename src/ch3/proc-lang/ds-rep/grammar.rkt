@@ -41,6 +41,7 @@
     (expression ("unpack" (arbno identifier) "=" expression "in" expression) unpack-exp)
 
     (expression ("proc" "(" identifier ")" expression) proc-exp)
+    (expression ("letproc" identifier "(" identifier ")" expression "in" expression) letproc-exp)
     (expression ("(" expression expression ")") call-exp)
     )
   )

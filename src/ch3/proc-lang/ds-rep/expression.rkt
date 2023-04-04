@@ -94,6 +94,7 @@
    )
 
   (proc-exp (name identifier?) (body expression?))
+  (letproc-exp (proc-name identifier?) (name identifier?) (proc-body expression?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
   )
 
