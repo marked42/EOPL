@@ -1,7 +1,10 @@
 #lang eopl
 
-(provide (all-defined-out))
+(require racket/lazy-require)
 (require "basic.rkt")
+(lazy-require ["value.rkt" (num-val)])
+
+(provide (all-defined-out))
 
 (define-datatype expression expression?
   (const-exp

@@ -4,7 +4,6 @@
 (require "expression.rkt")
 (require "environment.rkt")
 (require "value.rkt")
-(require "procedure.rkt")
 (provide (all-defined-out))
 
 (define (run str)
