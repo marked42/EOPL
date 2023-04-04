@@ -1,11 +1,15 @@
 #lang eopl
 
-(require racket/lazy-require)
-(require "basic.rkt")
-(lazy-require ["value.rkt" (num-val)])
+(require racket/lazy-require "basic.rkt")
+(lazy-require
+  ["value.rkt" (num-val null-val? cell-val? cell-val->first cell-val->second)]
+  ["interpreter.rkt" (value-of-exp)]
+)
 (provide (all-defined-out))
 
 (define (empty-env) '())
+
+(define (environment? env) (list? env))
 
 ; define single var
 (define (extend-env var val env)
@@ -21,6 +25,32 @@
          first-var
          first-val
          (extend-mul-env (cdr vars) (cdr vals) env))
+        )
+      )
+  )
+
+(define (extend-env-unpack vars val env)
+  (cond
+    ((and (null? vars) (null-val? val)) env)
+    ((and (pair? vars) (cell-val? val))
+     (let ((first-var (car vars)) (first-val (cell-val->first val)))
+       ; define vars from left to right
+       (let ((new-env (extend-env first-var first-val env)))
+         (extend-env-unpack (cdr vars) (cell-val->second val) new-env)
+         )
+       )
+     )
+    (else (report-unpack-unequal-vars-list-count val))
+    )
+  )
+
+(define (extend-mul-env-let* vars exps env)
+  (if (null? vars)
+      env
+      (let ((first-var (car vars)) (first-exp (car exps)))
+        (let ((new-env (extend-env first-var (value-of-exp first-exp env) env)))
+          ; let* evalutates with previous defined variable visible to following initialization expression
+          (extend-mul-env-let* (cdr vars) (cdr exps) new-env))
         )
       )
   )
@@ -47,4 +77,6 @@
       )
   )
 
-(define (environment? env) (list? env))
+(define (report-unpack-unequal-vars-list-count exp)
+  (eopl:error 'unpack-exp "Unequal vars and list count ~s" exp)
+  )

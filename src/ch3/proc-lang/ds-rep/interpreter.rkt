@@ -1,9 +1,10 @@
 #lang eopl
 
-(require "parser.rkt")
-(require "expression.rkt")
-(require "environment.rkt")
-(require "value.rkt")
+(require racket/lazy-require "value.rkt" "parser.rkt" "expression.rkt")
+(lazy-require
+  ["environment.rkt" (extend-mul-env extend-mul-env-let* extend-env-unpack init-env extend-env apply-env)]
+  ["procedure.rkt" (apply-procedure procedure trace-procedure)])
+
 (provide (all-defined-out))
 
 (define (run str)
@@ -13,32 +14,6 @@
 (define (value-of-program prog)
   (cases program prog
     (a-program (exp1) (value-of-exp exp1 (init-env)))
-    )
-  )
-
-(define (extend-mul-env-let* vars exps env)
-  (if (null? vars)
-      env
-      (let ((first-var (car vars)) (first-exp (car exps)))
-        (let ((new-env (extend-env first-var (value-of-exp first-exp env) env)))
-          ; let* evalutates with previous defined variable visible to following initialization expression
-          (extend-mul-env-let* (cdr vars) (cdr exps) new-env))
-        )
-      )
-  )
-
-(define (extend-env-unpack vars val env)
-  (cond
-    ((and (null? vars) (null-val? val)) env)
-    ((and (pair? vars) (cell-val? val))
-     (let ((first-var (car vars)) (first-val (cell-val->first val)))
-       ; define vars from left to right
-       (let ((new-env (extend-env first-var first-val env)))
-         (extend-env-unpack (cdr vars) (cell-val->second val) new-env)
-         )
-       )
-     )
-    (else (report-unpack-unequal-vars-list-count val))
     )
   )
 
@@ -255,32 +230,10 @@
     )
   )
 
-(define (apply-procedure proc1 args)
-  (cases proc proc1
-    (procedure (vars body saved-env)
-               (value-of-exp body (extend-mul-env vars args saved-env))
-               )
-    (trace-procedure (vars body saved-env)
-                     (display "entering proc~n" )
-                     (newline)
-                     (let ((res (value-of-exp body (extend-mul-env vars args saved-env))))
-                       (display "exiting proc~n" )
-                       (newline)
-                       res
-                       )
-                     )
-    )
-  )
-
-
 (define (report-cond-no-true-predicate exp)
   (eopl:error 'cond-exp "No true cond for exp ~s" exp)
   )
 
 (define (report-cond-invalid-predicate exp)
   (eopl:error 'cond-exp "invalid predicate " exp)
-  )
-
-(define (report-unpack-unequal-vars-list-count exp)
-  (eopl:error 'unpack-exp "Unequal vars and list count ~s" exp)
   )
