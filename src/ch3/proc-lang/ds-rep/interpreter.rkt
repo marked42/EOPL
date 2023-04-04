@@ -232,6 +232,7 @@
     (print-exp (exp1)
                (let ((val1 (value-of-exp exp1 env)))
                  (display val1)
+                 (newline)
                  (num-val 1)
                  )
                )
