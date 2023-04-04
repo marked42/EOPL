@@ -1,6 +1,5 @@
 #lang eopl
 
-(require "expression.rkt")
 (provide (all-defined-out))
 
 (define the-grammar
