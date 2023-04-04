@@ -100,3 +100,6 @@
 
 ; exer 3.19 procedure created and named as once
 (equal-answer? (run "letproc f (x) -(x,11) in (f (f 77))") 55 "letproc-exp")
+
+; exer 3.20
+(equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
