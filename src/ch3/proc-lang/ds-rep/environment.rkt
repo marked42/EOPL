@@ -1,6 +1,5 @@
 #lang eopl
 
-(require "expression.rkt")
 (require "value.rkt")
 (require "basic.rkt")
 (provide (all-defined-out))
@@ -46,3 +45,5 @@
         )
       )
   )
+
+(define (environment? env) (list? env))

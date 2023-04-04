@@ -1,8 +1,7 @@
 #lang eopl
 
 (provide (all-defined-out))
-
-(define identifier? symbol?)
+(require "basic.rkt")
 
 (define-datatype expression expression?
   (const-exp
@@ -93,6 +92,9 @@
   (print-exp
    (exp1 expression?)
    )
+
+  (proc-exp (name identifier?) (body expression?))
+  (call-exp (rator expression?) (rand expression?))
   )
 
 (define-datatype program program?
