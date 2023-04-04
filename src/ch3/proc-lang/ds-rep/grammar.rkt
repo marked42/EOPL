@@ -39,5 +39,8 @@
     (expression ("print" "(" expression ")") print-exp)
 
     (expression ("unpack" (arbno identifier) "=" expression "in" expression) unpack-exp)
+
+    (expression ("proc" "(" identifier ")" expression) proc-exp)
+    (expression ("(" expression expression ")") call-exp)
     )
   )

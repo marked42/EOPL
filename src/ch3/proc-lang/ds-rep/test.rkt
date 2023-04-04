@@ -93,3 +93,7 @@
 
 ; 3.18
 (equal-answer? (run "let u = 7 in unpack x y = cons(u,cons(3,emptylist)) in -(x,y)") 4 "unpack-exp")
+
+(equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
+; IIFE
+(equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")

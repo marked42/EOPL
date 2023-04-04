@@ -4,6 +4,7 @@
 (require "expression.rkt")
 (require "environment.rkt")
 (require "value.rkt")
+(require "procedure.rkt")
 (provide (all-defined-out))
 
 (define (run str)
@@ -234,7 +235,23 @@
                  (num-val 1)
                  )
                )
+    (proc-exp (var body)
+              (procedure var body env)
+              )
+    (call-exp (rator rand)
+              (let ((rator-val (value-of-exp rator env)) (rand-val (value-of-exp rand env)))
+                (apply-procedure rator-val rand-val)
+                )
+              )
     (else 42)
+    )
+  )
+
+(define (apply-procedure proc1 arg)
+  (cases proc proc1
+    (procedure (var body saved-env)
+               (value-of-exp body (extend-env var arg saved-env))
+               )
     )
   )
 
