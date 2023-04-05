@@ -2,58 +2,36 @@
 
 (require racket/lazy-require "basic.rkt")
 (lazy-require
-  ["value.rkt" (num-val null-val? cell-val? cell-val->first cell-val->second)]
+  ["value.rkt" (num-val null-val? cell-val? expval? cell-val->first cell-val->second)]
+  ["expression.rkt" (expression?)]
   ["interpreter.rkt" (value-of-exp)]
 )
 (provide (all-defined-out))
 
-(define (empty-env) '())
-
-(define (environment? env) (list? env))
-
-; define single var
-(define (extend-env var val env)
-  (cons (cons var val) env)
+(define-datatype environment environment?
+  (empty-env)
+  (extend-env
+    (var identifier?)
+    (val expval?)
+    (env environment?)
   )
-
-; define multiple vars
-(define (extend-mul-env vars vals env)
-  (if (null? vars)
-      env
-      (let ((first-var (car vars)) (first-val (car vals)))
-        (extend-env
-         first-var
-         first-val
-         (extend-mul-env (cdr vars) (cdr vals) env))
-        )
-      )
+  (extend-mul-env
+    (vars (list-of identifier?))
+    (vals (list-of expval?))
+    (env environment?)
   )
-
-(define (extend-env-unpack vars val env)
-  (cond
-    ((and (null? vars) (null-val? val)) env)
-    ((and (pair? vars) (cell-val? val))
-     (let ((first-var (car vars)) (first-val (cell-val->first val)))
-       ; define vars from left to right
-       (let ((new-env (extend-env first-var first-val env)))
-         (extend-env-unpack (cdr vars) (cell-val->second val) new-env)
-         )
-       )
-     )
-    (else (report-unpack-unequal-vars-list-count val))
-    )
+  (extend-env-unpack
+    (vars (list-of identifier?))
+    (val expval?)
+    (env environment?)
   )
-
-(define (extend-mul-env-let* vars exps env)
-  (if (null? vars)
-      env
-      (let ((first-var (car vars)) (first-exp (car exps)))
-        (let ((new-env (extend-env first-var (value-of-exp first-exp env) env)))
-          ; let* evalutates with previous defined variable visible to following initialization expression
-          (extend-mul-env-let* (cdr vars) (cdr exps) new-env))
-        )
-      )
+  (extend-mul-env-let*
+    (vars (list-of identifier?))
+    ; note exps here is a list of expression? not list of expval?
+    (exps (list-of expression?))
+    (env environment?)
   )
+)
 
 (define (init-env)
   (extend-env 'i (num-val 1)
@@ -66,16 +44,65 @@
   )
 
 (define (apply-env env search-var)
-  (if (null? env)
-      (report-no-binding-found search-var)
-      (let ((saved-var (caar env)) (saved-val (cdar env)) (saved-env (cdr env)))
-        (if (eqv? saved-var search-var)
-            saved-val
-            (apply-env saved-env search-var)
-            )
-        )
+  (cases environment env
+    (extend-env (var val saved-env)
+      (if (eqv? search-var var)
+        val
+        (apply-env saved-env search-var)
       )
+    )
+    (extend-mul-env (vars vals saved-env)
+      (letrec ((loop (lambda (vars vals saved-env)
+        (if (null? vars)
+          (apply-env saved-env search-var)
+          (let ((first-var (car vars)) (first-val (car vals)))
+            (if (eqv? first-var search-var)
+              first-val
+              (loop (cdr vars) (cdr vals) saved-env)
+            )
+          )
+        )
+      )))
+        (loop vars vals saved-env)
+      )
+    )
+    (extend-env-unpack (vars val saved-env)
+      (letrec ((loop (lambda (vars val saved-env)
+        (if (null? vars)
+          (apply-env saved-env search-var)
+          (let ((first-var (car vars)) (first-val (cell-val->first val)))
+            (if (eqv? first-var search-var)
+              first-val
+              (loop (cdr vars) (cell-val->second val) saved-env)
+            )
+          )
+        )
+      )))
+        (loop vars val saved-env)
+      )
+    )
+    (extend-mul-env-let* (vars exps saved-env)
+      (letrec ((loop (lambda (vars exps saved-env)
+        (if (null? vars)
+          (apply-env saved-env search-var)
+          (let ((first-var (car vars)) (first-exp (car exps)))
+            (let ((first-val (value-of-exp first-exp saved-env)))
+              (if (eqv? first-var search-var)
+                first-val
+                (loop (cdr vars) (cdr exps)
+                  (extend-env first-var first-val saved-env)
+                )
+              )
+            )
+          )
+        )
+      )))
+        (loop vars exps saved-env)
+      )
+    )
+    (else (report-no-binding-found search-var))
   )
+)
 
 (define (report-unpack-unequal-vars-list-count exp)
   (eopl:error 'unpack-exp "Unequal vars and list count ~s" exp)
