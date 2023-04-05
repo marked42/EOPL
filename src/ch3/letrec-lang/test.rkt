@@ -119,3 +119,11 @@ letrec sum(x, y)
   = if zero?(x) then y else -((sum -(x,1) y), -1)
     in (sum 3 4)
 ") 7 "letrec-exp with multiple arguments")
+
+; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
+(equal-answer? (run "
+letrec
+even(x) = if zero?(x) then 1 else (odd -(x,1))
+odd(x) = if zero?(x) then 0 else (even -(x,1))
+in (odd 13)
+") 1 "letrec-exp with multiple procedures")
