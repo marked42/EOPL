@@ -110,6 +110,12 @@
 
 (equal-answer? (run "
 letrec double(x)
-= if zero?(x) then 0 else -((double -(x,1)), -2)
-in (double 6)
+  = if zero?(x) then 0 else -((double -(x,1)), -2)
+    in (double 6)
 ") 12 "letrec-exp")
+
+(equal-answer? (run "
+letrec sum(x, y)
+  = if zero?(x) then y else -((sum -(x,1) y), -1)
+    in (sum 3 4)
+") 7 "letrec-exp with multiple arguments")

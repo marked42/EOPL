@@ -34,7 +34,7 @@
   )
   (extend-env-rec
     (p-name identifier?)
-    (b-name identifier?)
+    (b-names (list-of identifier?))
     (p-body expression?)
     (env environment?)
   )
@@ -107,12 +107,12 @@
         (loop vars exps saved-env)
       )
     )
-    (extend-env-rec (p-name b-name p-body saved-env)
+    (extend-env-rec (p-name b-names p-body saved-env)
       (if (eqv? search-var p-name)
         ; procedure env is extend-env-rec itself which contains procedure
         ; when procedure is called, procedure body is evaluated in this extend-env-rec
         ; where procedure is visible, which enables recursive call
-        (proc-val (procedure (list b-name) p-body env))
+        (proc-val (procedure b-names p-body env))
         (apply-env saved-env search-var)
       )
     )
