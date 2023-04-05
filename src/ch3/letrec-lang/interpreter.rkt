@@ -9,7 +9,7 @@
     extend-env-unpack
     extend-mul-env
     extend-mul-env-let*
-    extend-env-rec
+    extend-env-rec-mul
   )]
   ["procedure.rkt" (apply-procedure procedure trace-procedure)])
 
@@ -135,8 +135,8 @@
     (let*-exp (vars exps body)
               (value-of-exp body (extend-mul-env-let* vars exps env))
               )
-    (letrec-exp (p-name b-names p-body body)
-              (let ((new-env (extend-env-rec p-name b-names p-body env)))
+    (letrec-exp (p-names b-vars-list p-bodies body)
+              (let ((new-env (extend-env-rec-mul p-names b-vars-list p-bodies env)))
                 (value-of-exp body new-env)
                 )
               )
