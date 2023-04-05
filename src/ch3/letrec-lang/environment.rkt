@@ -2,8 +2,9 @@
 
 (require racket/lazy-require "basic.rkt")
 (lazy-require
-  ["value.rkt" (num-val null-val? cell-val? expval? cell-val->first cell-val->second)]
+  ["value.rkt" (num-val null-val? cell-val? expval? cell-val->first cell-val->second proc-val)]
   ["expression.rkt" (expression?)]
+  ["procedure.rkt" (procedure)]
   ["interpreter.rkt" (value-of-exp)]
 )
 (provide (all-defined-out))
@@ -29,6 +30,12 @@
     (vars (list-of identifier?))
     ; note exps here is a list of expression? not list of expval?
     (exps (list-of expression?))
+    (env environment?)
+  )
+  (extend-env-rec
+    (p-name identifier?)
+    (b-name identifier?)
+    (p-body expression?)
     (env environment?)
   )
 )
@@ -98,6 +105,15 @@
         )
       )))
         (loop vars exps saved-env)
+      )
+    )
+    (extend-env-rec (p-name b-name p-body saved-env)
+      (if (eqv? search-var p-name)
+        ; procedure env is extend-env-rec itself which contains procedure
+        ; when procedure is called, procedure body is evaluated in this extend-env-rec
+        ; where procedure is visible, which enables recursive call
+        (proc-val (procedure (list b-name) p-body env))
+        (apply-env saved-env search-var)
       )
     )
     (else (report-no-binding-found search-var))
