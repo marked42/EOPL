@@ -8,6 +8,7 @@
     (expression (identifier) var-exp)
     (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
     (expression ("let*" (arbno identifier "=" expression) "in" expression) let*-exp)
+    (expression ("letrec" identifier "(" identifier ")" "=" expression "in" expression) letrec-exp)
 
     ; arithmetic
     (expression ("-" "(" expression "," expression ")") diff-exp)

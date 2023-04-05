@@ -107,3 +107,9 @@
 (equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letproc-exp")
 
 (equal-answer? (run "let f = traceproc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "traceproc-exp")
+
+(equal-answer? (run "
+letrec double(x)
+= if zero?(x) then 0 else -((double -(x,1)), -2)
+in (double 6)
+") 12 "letrec-exp")

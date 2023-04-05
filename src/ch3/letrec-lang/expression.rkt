@@ -61,6 +61,12 @@
    (exps (list-of expression?))
    (body expression?)
    )
+  (letrec-exp
+   (p-name identifier?)
+   (b-name identifier?)
+   (p-body expression?)
+   (body expression?)
+   )
   (unpack-exp
    (vars (list-of identifier?))
    (exp expression?)
