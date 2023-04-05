@@ -63,7 +63,7 @@
    )
   (letrec-exp
    (p-name identifier?)
-   (b-name identifier?)
+   (b-names (list-of identifier?))
    (p-body expression?)
    (body expression?)
    )
