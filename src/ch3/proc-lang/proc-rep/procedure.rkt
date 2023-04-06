@@ -4,6 +4,6 @@
 
 (define (proc? val) (procedure? val))
 
-(define (apply-procedure proc arg)
-  (proc arg)
+(define (apply-procedure proc arg env)
+  ((proc env) arg)
   )
