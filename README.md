@@ -66,6 +66,10 @@ TODO:
 
 - [ ] free-variables optimization at branch feat/free-variables
 - [ ] dynamic scoping feat/dynamic-scoping-exer-3.28
-- [ ] environment list representation feat/environment-list-rep
 - [ ] environment procedural representation feat/environment-procedural-rep-3.34
-- [ ] environment cache proc feat/letrec-lang-cache-proc
+
+### letrec lang
+
+#### env-list rep
+
+letrec-lang中环境使用list实现，参考标签: letrec-lang-env-list-env.
