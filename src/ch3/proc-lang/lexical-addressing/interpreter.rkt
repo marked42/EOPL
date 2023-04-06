@@ -70,6 +70,10 @@
     (proc-exp (var body)
               (proc-val (procedure var body env))
               )
+    (nameless-proc-exp (body)
+      (proc-val (procedure 'REMOVE-THIS-NAME-PLACEHOLDER body env))
+    )
+
     (call-exp (rator rand)
               (let ((rator-val (value-of-exp rator env)))
                 (let ((proc1 (expval->proc rator-val)) (rand-val (value-of-exp rand env)))
