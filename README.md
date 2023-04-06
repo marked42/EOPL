@@ -65,8 +65,8 @@ let u = 7
 TODO:
 
 - [ ] free-variables optimization at branch feat/free-variables
-- [ ] dynamic scoping feat/dynamic-scoping-exer-3.28
-- [ ] environment procedural representation feat/environment-procedural-rep-3.34
+- [x] 动态作用域（Dynamic Scoping）代码参考标签：dynamic scoping 练习题 3.28
+- [x] proc-lang/proc-rep
 
 ### letrec lang
 
