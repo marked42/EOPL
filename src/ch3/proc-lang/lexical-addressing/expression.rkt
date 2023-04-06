@@ -16,9 +16,10 @@
   (nameless-let-exp (exp1 expression?) (body expression?))
 
   (proc-exp (name identifier?) (body expression?))
-  (call-exp (rator expression?) (rand expression?))
+  ; get rid of name
+  (nameless-proc-exp (body expression?))
 
-  ; (nameless-proc-exp (name identifier?) (body expression?))
+  (call-exp (rator expression?) (rand expression?))
   )
 
 (define-datatype program program?

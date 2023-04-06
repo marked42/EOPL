@@ -41,12 +41,18 @@
         (translation-of-exp body (extend-senv var env))
       )
     )
-    ; (call-exp (rator rand)
-    ;   (call-exp
-    ;     (translation-of-exp rator env)
-    ;     (translation-of-exp rand env)
-    ;   )
-    ; )
+
+    (proc-exp (name body)
+      (nameless-proc-exp
+        (translation-of-exp body (extend-senv name env))
+      )
+    )
+    (call-exp (rator rand)
+      (call-exp
+        (translation-of-exp rator env)
+        (translation-of-exp rand env)
+      )
+    )
     (else 43)
     )
   )
