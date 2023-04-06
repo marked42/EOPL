@@ -35,12 +35,12 @@
     )
     (var-exp (var)
       (nameless-var-exp (apply-senv env var)))
-    ; (let-exp (var exp body)
-    ;   (nameless-let-exp
-    ;     (translation-of-exp exp env)
-    ;     (translation-of-exp body (extend-senv var env))
-    ;   )
-    ; )
+    (let-exp (var exp body)
+      (nameless-let-exp
+        (translation-of-exp exp env)
+        (translation-of-exp body (extend-senv var env))
+      )
+    )
     ; (call-exp (rator rand)
     ;   (call-exp
     ;     (translation-of-exp rator env)
