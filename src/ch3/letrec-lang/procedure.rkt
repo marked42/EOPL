@@ -2,8 +2,8 @@
 
 (require racket/lazy-require "basic.rkt" "environment.rkt")
 (lazy-require
-  ["expression.rkt" (expression?)]
-  ["interpreter.rkt" (value-of-exp)])
+ ["expression.rkt" (expression?)]
+ ["interpreter.rkt" (value-of-exp)])
 
 (provide (all-defined-out))
 

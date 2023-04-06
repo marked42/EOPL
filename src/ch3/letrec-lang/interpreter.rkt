@@ -2,16 +2,16 @@
 
 (require racket/lazy-require "value.rkt" "parser.rkt" "expression.rkt")
 (lazy-require
-  ["environment.rkt" (
-    init-env
-    apply-env
-    extend-env
-    extend-env-unpack
-    extend-mul-env
-    extend-mul-env-let*
-    build-circular-extend-env-rec-mul-vec
-  )]
-  ["procedure.rkt" (apply-procedure procedure trace-procedure)])
+ ["environment.rkt" (
+                     init-env
+                     apply-env
+                     extend-env
+                     extend-env-unpack
+                     extend-mul-env
+                     extend-mul-env-let*
+                     build-circular-extend-env-rec-mul-vec
+                     )]
+ ["procedure.rkt" (apply-procedure procedure trace-procedure)])
 
 (provide (all-defined-out))
 
@@ -136,10 +136,10 @@
               (value-of-exp body (extend-mul-env-let* vars exps env))
               )
     (letrec-exp (p-names b-vars-list p-bodies body)
-              (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
-                (value-of-exp body new-env)
+                (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
+                  (value-of-exp body new-env)
+                  )
                 )
-              )
     (unpack-exp (vars exp body)
                 (let ((val (value-of-exp exp env)))
                   (value-of-exp body (extend-env-unpack vars val env))
