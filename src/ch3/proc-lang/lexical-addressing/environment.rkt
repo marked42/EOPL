@@ -22,15 +22,11 @@
   )
 
 (define (apply-env env search-var)
-  (if (null? env)
-      (report-no-binding-found search-var)
-      (let ((saved-var (caar env)) (saved-val (cdar env)) (saved-env (cdr env)))
-        (if (eqv? saved-var search-var)
-            saved-val
-            (apply-env saved-env search-var)
-            )
-        )
-      )
+  (cond
+    ((< search-var 0) (report-no-binding-found search-var))
+    ((= search-var 0) (cdar env))
+    (else (apply-env (cdr env) (- search-var 1)))
+    )
   )
 
 (define (environment? env) (list? env))
