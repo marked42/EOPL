@@ -7,14 +7,14 @@
 (define (empty-env) '())
 
 ; define single var
-(define (extend-env var val env)
-  (cons (cons var val) env)
+(define (extend-env val env)
+  (cons val env)
   )
 
 (define (init-env)
-  (extend-env 'i (num-val 1)
-              (extend-env 'v (num-val 5)
-                          (extend-env 'x (num-val 10)
+  (extend-env (num-val 1)
+              (extend-env (num-val 5)
+                          (extend-env (num-val 10)
                                       (empty-env)
                                       )
                           )
@@ -24,7 +24,7 @@
 (define (apply-env env search-var)
   (cond
     ((< search-var 0) (report-no-binding-found search-var))
-    ((= search-var 0) (cdar env))
+    ((= search-var 0) (car env))
     (else (apply-env (cdr env) (- search-var 1)))
     )
   )
