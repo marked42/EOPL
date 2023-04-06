@@ -7,7 +7,6 @@
 
 (define-datatype proc proc?
   (procedure
-   (var identifier?)
    (body expression?)
    (saved-env environment?)
    )

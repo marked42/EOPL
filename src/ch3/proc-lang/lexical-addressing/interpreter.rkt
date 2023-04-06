@@ -63,15 +63,15 @@
     (let-exp (var exp body) (eopl:error 'let-exp "Dont allow let-exp" exp))
     (nameless-let-exp (exp body)
              (let ((val (value-of-exp exp env)))
-               (value-of-exp body (extend-env 'REMOVE-THIS-NAME-PLACEHOLDER val env))
+               (value-of-exp body (extend-env val env))
                )
              )
 
     (proc-exp (var body)
-              (proc-val (procedure var body env))
+              (eopl:error 'proc-exp "Dont allow proc-exp ~s" exp)
               )
     (nameless-proc-exp (body)
-      (proc-val (procedure 'REMOVE-THIS-NAME-PLACEHOLDER body env))
+      (proc-val (procedure body env))
     )
 
     (call-exp (rator rand)
@@ -87,8 +87,8 @@
 
 (define (apply-procedure proc1 arg)
   (cases proc proc1
-    (procedure (var body saved-env)
-               (value-of-exp body (extend-env var arg saved-env))
+    (procedure (body saved-env)
+               (value-of-exp body (extend-env arg saved-env))
                )
     )
   )
