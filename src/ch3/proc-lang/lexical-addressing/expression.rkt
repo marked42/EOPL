@@ -12,6 +12,10 @@
   (let-exp (var identifier?) (exp expression?) (body expression?))
   (proc-exp (name identifier?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
+
+  (nameless-var-exp (num number?))
+  ; (nameless-let-exp (exp1 expression?) (body expression?))
+  ; (nameless-proc-exp (name identifier?) (body expression?))
   )
 
 (define-datatype program program?
