@@ -11,8 +11,8 @@
     (expression ("if" expression "then" expression "else" expression) if-exp)
     (expression (identifier) var-exp)
     (expression ("let" identifier "=" expression "in" expression) let-exp)
-    (expression ("proc" "(" identifier ")" expression) proc-exp)
-    (expression ("(" expression expression ")") call-exp)
+    (expression ("proc" "(" (separated-list identifier ",") ")" expression) proc-exp)
+    (expression ("(" expression (arbno expression) ")") call-exp)
 
     (expression ("cond" (arbno expression "==>" expression) "end") cond-exp)
     (expression ("letrec" identifier "(" identifier ")" "=" expression "in" expression) letrec-exp)

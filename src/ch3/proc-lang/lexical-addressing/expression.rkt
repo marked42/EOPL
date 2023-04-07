@@ -16,11 +16,11 @@
   ; get rid of var compared to let-exp
   (nameless-let-exp (exp1 expression?) (body expression?))
 
-  (proc-exp (name identifier?) (body expression?))
+  (proc-exp (names (list-of identifier?)) (body expression?))
   ; get rid of name
   (nameless-proc-exp (body expression?))
 
-  (call-exp (rator expression?) (rand expression?))
+  (call-exp (rator expression?) (rands (list-of expression?)))
 
   (cond-exp (conds (list-of expression?)) (acts (list-of expression?)))
 
