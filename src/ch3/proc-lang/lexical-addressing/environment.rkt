@@ -6,10 +6,9 @@
 
 (define (empty-env) '())
 
-; define single var
-(define (extend-env val env)
-  (let ((vec (make-vector 1)))
-    (vector-set! vec 0 val)
+; use vec to represent single frame of env
+(define (extend-env vals env)
+  (let ((vec (list->vector vals)))
     (cons vec env)
     )
   )
@@ -19,9 +18,9 @@
   )
 
 (define (init-env)
-  (extend-env (num-val 1)
-              (extend-env (num-val 5)
-                          (extend-env (num-val 10)
+  (extend-env (list (num-val 1))
+              (extend-env (list (num-val 5))
+                          (extend-env (list (num-val 10))
                                       (empty-env)
                                       )
                           )
@@ -29,10 +28,18 @@
   )
 
 (define (apply-env env search-var)
-  (cond
-    ((< search-var 0) (report-no-binding-found search-var))
-    ((= search-var 0) (vector-ref (car env) 0))
-    (else (apply-env (cdr env) (- search-var 1)))
+  (let ((env-offset (car search-var)) (variable-offset (cdr search-var)))
+    (let ((target-env (list-ref env env-offset)))
+      (if target-env
+        (let ((target-var (vector-ref target-env variable-offset)))
+          (if target-var
+            target-var
+            (report-no-binding-found search-var)
+          )
+        )
+        (report-no-binding-found search-var)
+        )
+      )
     )
   )
 

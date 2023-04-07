@@ -38,13 +38,13 @@
     (let-exp (var exp body)
              (nameless-let-exp
               (translation-of-exp exp env)
-              (translation-of-exp body (extend-senv var env))
+              (translation-of-exp body (extend-senv (list var) env))
               )
              )
     (letrec-exp (p-name b-var p-body body)
-                (let ((new-env (extend-senv p-name env)))
+                (let ((new-env (extend-senv (list p-name) env)))
                   (nameless-letrec-exp
-                   (translation-of-exp p-body (extend-senv b-var new-env))
+                   (translation-of-exp p-body (extend-senv (list b-var) new-env))
                    (translation-of-exp body new-env)
                    )
                   )
@@ -52,7 +52,7 @@
 
     (proc-exp (name body)
               (nameless-proc-exp
-               (translation-of-exp body (extend-senv name env))
+               (translation-of-exp body (extend-senv (list name) env))
                )
               )
     (call-exp (rator rand)

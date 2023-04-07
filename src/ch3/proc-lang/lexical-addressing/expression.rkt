@@ -9,7 +9,8 @@
   (zero?-exp (exp1 expression?))
   (if-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
   (var-exp (var identifier?))
-  (nameless-var-exp (num number?))
+  ; environment frame
+  (nameless-var-exp (var pair?))
 
   (let-exp (var identifier?) (exp expression?) (body expression?))
   ; get rid of var compared to let-exp
