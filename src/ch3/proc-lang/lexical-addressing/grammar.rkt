@@ -13,5 +13,7 @@
     (expression ("let" identifier "=" expression "in" expression) let-exp)
     (expression ("proc" "(" identifier ")" expression) proc-exp)
     (expression ("(" expression expression ")") call-exp)
+
+    (expression ("cond" (arbno expression "==>" expression) "end") cond-exp)
     )
   )
