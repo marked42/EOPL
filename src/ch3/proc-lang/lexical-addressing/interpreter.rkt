@@ -68,7 +68,7 @@
     (let-exp (var exp body) (eopl:error 'let-exp "Dont allow let-exp" exp))
     (nameless-let-exp (exp body)
                       (let ((val (value-of-exp exp env)))
-                        (value-of-exp body (extend-env val env))
+                        (value-of-exp body (extend-env (list val) env))
                         )
                       )
 
@@ -133,7 +133,7 @@
 (define (apply-procedure proc1 arg)
   (cases proc proc1
     (procedure (body saved-env)
-               (value-of-exp body (extend-env arg saved-env))
+               (value-of-exp body (extend-env (list arg) saved-env))
                )
     )
   )
