@@ -14,6 +14,10 @@
     )
   )
 
+(define (translation-of-exps exps env)
+  (map (lambda (exp) (translation-of-exp exp env)) exps)
+)
+
 (define (translation-of-exp exp env)
   (cases expression exp
     (const-exp (num) exp)
@@ -50,15 +54,15 @@
                   )
                 )
 
-    (proc-exp (name body)
+    (proc-exp (names body)
               (nameless-proc-exp
-               (translation-of-exp body (extend-senv (list name) env))
+               (translation-of-exp body (extend-senv names env))
                )
               )
-    (call-exp (rator rand)
+    (call-exp (rator rands)
               (call-exp
                (translation-of-exp rator env)
-               (translation-of-exp rand env)
+               (translation-of-exps rands env)
                )
               )
 

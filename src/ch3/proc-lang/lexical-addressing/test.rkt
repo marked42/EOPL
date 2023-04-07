@@ -31,6 +31,9 @@
 (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
 
 (equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
+; multiple arguments
+(equal-answer? (run "let f = proc (x, y) -(x,y) in (f 77 22)") 55 "proc-exp")
+
 ; IIFE
 (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
 

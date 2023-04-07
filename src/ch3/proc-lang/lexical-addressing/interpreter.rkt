@@ -89,10 +89,10 @@
                        (proc-val (procedure body env))
                        )
 
-    (call-exp (rator rand)
+    (call-exp (rator rands)
               (let ((rator-val (value-of-exp rator env)))
-                (let ((proc1 (expval->proc rator-val)) (rand-val (value-of-exp rand env)))
-                  (apply-procedure proc1 rand-val)
+                (let ((proc1 (expval->proc rator-val)) (rand-vals (value-of-exps rands env)))
+                  (apply-procedure proc1 rand-vals)
                   )
                 )
               )
@@ -130,10 +130,10 @@
     )
   )
 
-(define (apply-procedure proc1 arg)
+(define (apply-procedure proc1 args)
   (cases proc proc1
     (procedure (body saved-env)
-               (value-of-exp body (extend-env (list arg) saved-env))
+               (value-of-exp body (extend-env args saved-env))
                )
     )
   )
