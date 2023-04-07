@@ -33,3 +33,8 @@
 (equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
 ; IIFE
 (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
+
+; exer 3.38
+(equal-answer? (run "cond zero?(1) ==> 1 zero?(0) ==> 0 end") 0 "cond-exp")
+(equal-answer? (run "cond zero?(0) ==> 0 zero?(1) ==> 1 end") 0 "cond-exp")
+(check-exn exn:fail? (lambda () (run "cond zero?(1) ==> 1 zero?(2) ==> 2 end")))

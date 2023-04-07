@@ -20,6 +20,8 @@
   (nameless-proc-exp (body expression?))
 
   (call-exp (rator expression?) (rand expression?))
+
+  (cond-exp (conds (list-of expression?)) (acts (list-of expression?)))
   )
 
 (define-datatype program program?
