@@ -15,5 +15,6 @@
     (expression ("(" expression expression ")") call-exp)
 
     (expression ("cond" (arbno expression "==>" expression) "end") cond-exp)
+    (expression ("letrec" identifier "(" identifier ")" "=" expression "in" expression) letrec-exp)
     )
   )

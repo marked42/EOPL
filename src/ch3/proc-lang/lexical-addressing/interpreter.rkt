@@ -72,6 +72,16 @@
                         )
                       )
 
+    (letrec-exp (p-name b-var p-body body) (eopl:error 'letrec-exp "Dont allow letrec-exp" exp))
+    (nameless-letrec-exp (p-body body)
+                         (let ((vec (make-vector 1)))
+                           (let ((new-env (extend-env-vec vec env)))
+                              (vector-set! vec 0 (proc-val (procedure p-body new-env)))
+                              (value-of-exp body new-env)
+                              )
+                            )
+                         )
+
     (proc-exp (var body)
               (eopl:error 'proc-exp "Dont allow proc-exp ~s" exp)
               )

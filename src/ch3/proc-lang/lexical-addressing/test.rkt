@@ -38,3 +38,15 @@
 (equal-answer? (run "cond zero?(1) ==> 1 zero?(0) ==> 0 end") 0 "cond-exp")
 (equal-answer? (run "cond zero?(0) ==> 0 zero?(1) ==> 1 end") 0 "cond-exp")
 (check-exn exn:fail? (lambda () (run "cond zero?(1) ==> 1 zero?(2) ==> 2 end")))
+
+(equal-answer? (run "
+letrec double(x)
+  = if zero?(x) then 0 else -((double -(x,1)), -2)
+    in (double 0)
+") 0 "letrec-exp")
+
+(equal-answer? (run "
+letrec double(x)
+  = if zero?(x) then 0 else -((double -(x,1)), -2)
+    in (double 1)
+") 2 "letrec-exp")

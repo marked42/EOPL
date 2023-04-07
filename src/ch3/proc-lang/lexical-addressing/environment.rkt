@@ -8,7 +8,14 @@
 
 ; define single var
 (define (extend-env val env)
-  (cons val env)
+  (let ((vec (make-vector 1)))
+    (vector-set! vec 0 val)
+    (cons vec env)
+    )
+  )
+
+(define (extend-env-vec vec env)
+  (cons vec env)
   )
 
 (define (init-env)
@@ -24,7 +31,7 @@
 (define (apply-env env search-var)
   (cond
     ((< search-var 0) (report-no-binding-found search-var))
-    ((= search-var 0) (car env))
+    ((= search-var 0) (vector-ref (car env) 0))
     (else (apply-env (cdr env) (- search-var 1)))
     )
   )

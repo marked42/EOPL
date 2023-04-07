@@ -34,6 +34,6 @@
 (define (expval->proc val)
   (cases expval val
     (proc-val (proc1) proc1)
-    (else (report-expval-extractor-error 'bool val))
+    (else (report-expval-extractor-error 'proc val))
     )
   )
