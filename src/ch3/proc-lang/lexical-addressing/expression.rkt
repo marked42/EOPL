@@ -22,6 +22,9 @@
   (call-exp (rator expression?) (rand expression?))
 
   (cond-exp (conds (list-of expression?)) (acts (list-of expression?)))
+
+  (letrec-exp (p-name identifier?) (b-var identifier?) (p-body expression?) (body expression?))
+  (nameless-letrec-exp (p-body expression?) (body expression?))
   )
 
 (define-datatype program program?
