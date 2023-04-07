@@ -64,9 +64,10 @@ let u = 7
 
 TODO:
 
-- [ ] free-variables optimization at branch feat/free-variables
-- [x] 动态作用域（Dynamic Scoping）代码参考标签：dynamic scoping 练习题 3.28
-- [x] proc-lang/proc-rep
+free-variables optimization
+
+- [ ] at branch feat/free-variables
+- [ ] Exercise 3.42 with lexical addressing
 
 ### letrec lang
 
