@@ -65,10 +65,10 @@
     (var-exp (var) (eopl:error 'var-exp "Dont allow var-exp ~s" exp))
     (nameless-var-exp (var) (apply-env env var))
 
-    (let-exp (var exp body) (eopl:error 'let-exp "Dont allow let-exp" exp))
-    (nameless-let-exp (exp body)
-                      (let ((val (value-of-exp exp env)))
-                        (value-of-exp body (extend-env (list val) env))
+    (let-exp (vars exps body) (eopl:error 'let-exp "Dont allow let-exp" exp))
+    (nameless-let-exp (exps body)
+                      (let ((vals (value-of-exps exps env)))
+                        (value-of-exp body (extend-env vals env))
                         )
                       )
 
