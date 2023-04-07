@@ -10,7 +10,7 @@
     (expression ("zero?" "(" expression ")") zero?-exp)
     (expression ("if" expression "then" expression "else" expression) if-exp)
     (expression (identifier) var-exp)
-    (expression ("let" identifier "=" expression "in" expression) let-exp)
+    (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
     (expression ("proc" "(" (separated-list identifier ",") ")" expression) proc-exp)
     (expression ("(" expression (arbno expression) ")") call-exp)
 

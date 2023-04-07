@@ -39,10 +39,10 @@
             )
     (var-exp (var)
              (nameless-var-exp (apply-senv env var)))
-    (let-exp (var exp body)
+    (let-exp (vars exps body)
              (nameless-let-exp
-              (translation-of-exp exp env)
-              (translation-of-exp body (extend-senv (list var) env))
+              (translation-of-exps exps env)
+              (translation-of-exp body (extend-senv vars env))
               )
              )
     (letrec-exp (p-name b-var p-body body)

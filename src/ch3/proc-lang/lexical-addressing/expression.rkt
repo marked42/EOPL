@@ -12,9 +12,9 @@
   ; environment frame
   (nameless-var-exp (var pair?))
 
-  (let-exp (var identifier?) (exp expression?) (body expression?))
+  (let-exp (vars (list-of identifier?)) (exp (list-of expression?)) (body expression?))
   ; get rid of var compared to let-exp
-  (nameless-let-exp (exp1 expression?) (body expression?))
+  (nameless-let-exp (exps (list-of expression?)) (body expression?))
 
   (proc-exp (names (list-of identifier?)) (body expression?))
   ; get rid of name
