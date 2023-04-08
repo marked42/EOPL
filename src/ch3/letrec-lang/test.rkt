@@ -127,3 +127,10 @@ even(x) = if zero?(x) then 1 else (odd -(x,1))
 odd(x) = if zero?(x) then 0 else (even -(x,1))
 in (odd 13)
 ") 1 "letrec-exp with multiple procedures")
+
+(equal-answer? (run "
+let x = 1
+  in begin
+       -(x, 1)
+     end
+") 0 "begin-exp")
