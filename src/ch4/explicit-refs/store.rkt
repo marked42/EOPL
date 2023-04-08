@@ -32,8 +32,6 @@
 
 (define (setref ref val)
   (letrec ((loop (lambda (store ref)
-                   (display (list "store " store ref))
-                   (newline)
                    (cond
                      ((null? store) (report-invalid-reference ref the-store))
                      ((zero? ref) (cons val (cdr store)))
