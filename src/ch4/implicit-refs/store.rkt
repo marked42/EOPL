@@ -12,6 +12,10 @@
   (set! the-store (empty-store))
   )
 
+(define (vals->refs vals)
+  (map (lambda (val) (newref val)) vals)
+)
+
 (define (reference? v) (integer? v))
 
 (define (show-store)
@@ -27,6 +31,7 @@
   )
 
 (define (deref ref)
+  ; (show-store)
   (list-ref the-store ref)
   )
 

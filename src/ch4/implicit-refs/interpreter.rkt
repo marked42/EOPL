@@ -8,7 +8,7 @@
                      extend-mul-env
                      build-circular-extend-env-rec-mul-vec
                      )]
- ["store.rkt" (initialize-store! newref deref setref)]
+ ["store.rkt" (initialize-store! newref deref setref vals->refs)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
@@ -63,11 +63,11 @@
               )
             )
     (var-exp (var)
-             (apply-env env var)
+             (deref (apply-env env var))
              )
     (let-exp (vars exps body)
              (let ((vals (value-of-exps exps env)))
-               (value-of-exp body (extend-mul-env vars vals env))
+               (value-of-exp body (extend-mul-env vars (vals->refs vals) env))
                )
              )
     (letrec-exp (p-names b-vars-list p-bodies body)
@@ -81,7 +81,7 @@
     (call-exp (rator rands)
               (let ((rator-val (value-of-exp rator env)) (rand-vals (value-of-exps rands env)))
                 (let ((proc1 (expval->proc rator-val)))
-                  (apply-procedure proc1 rand-vals)
+                  (apply-procedure proc1 (vals->refs rand-vals))
                   )
                 )
               )
@@ -104,6 +104,11 @@
                  (loop (cons first others))
                  )
                )
+    (assign-exp (var exp1)
+      (let ((val1 (value-of-exp exp1 env)))
+        (setref (apply-env env var) val1)
+      )
+    )
     (else 42)
     )
   )

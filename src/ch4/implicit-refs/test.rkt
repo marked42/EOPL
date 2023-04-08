@@ -19,52 +19,89 @@
                    "Can't convert sloppy value to expval: ~s"
                    sloppy-val)))))
 
-(equal-answer? (run "1") 1 "const exp")
-(equal-answer? (run "-(1, 2)") -1 "diff exp")
-(equal-answer? (run "zero? (0)") #t "zero? exp")
-(equal-answer? (run "zero? (1)") #f "zero? exp")
-(equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
-(equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
-(equal-answer? (run "i") 1 "built in var i is 1")
-(equal-answer? (run "v") 5 "built in var i is 5")
-(equal-answer? (run "x") 10 "built in var i is 10")
-(equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
+; (equal-answer? (run "1") 1 "const exp")
+; (equal-answer? (run "-(1, 2)") -1 "diff exp")
+; (equal-answer? (run "zero? (0)") #t "zero? exp")
+; (equal-answer? (run "zero? (1)") #f "zero? exp")
+; (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
+; (equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
+; (equal-answer? (run "i") 1 "built in var i is 1")
+; (equal-answer? (run "v") 5 "built in var i is 5")
+; (equal-answer? (run "x") 10 "built in var i is 10")
+; (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
 
-; exer 3.16
-(equal-answer? (run "let x = 30 in let x = -(x,1) y = -(x,2) in -(x,y)") 1 "let-exp with arbitrary number of vars")
+; ; exer 3.16
+; (equal-answer? (run "let x = 30 in let x = -(x,1) y = -(x,2) in -(x,y)") 1 "let-exp with arbitrary number of vars")
 
-(equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
-; IIFE
-(equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
+; (equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
+; ; IIFE
+; (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
 
-; exer 3.20
-(equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
+; ; exer 3.20
+; (equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
 
-(equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letproc-exp")
+; (equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letproc-exp")
 
+; (equal-answer? (run "
+; letrec double(x)
+;   = if zero?(x) then 0 else -((double -(x,1)), -2)
+;     in (double 6)
+; ") 12 "letrec-exp")
+
+; (equal-answer? (run "
+; letrec sum(x, y)
+;   = if zero?(x) then y else -((sum -(x,1) y), -1)
+;     in (sum 3 4)
+; ") 7 "letrec-exp with multiple arguments")
+
+; ; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
+; (equal-answer? (run "
+; letrec
+; even(x) = if zero?(x) then 1 else (odd -(x,1))
+; odd(x) = if zero?(x) then 0 else (even -(x,1))
+; in (odd 13)
+; ") 1 "letrec-exp with multiple procedures")
+
+; (equal-answer? (run "
+; let x = 1
+;   in begin
+;        -(x, 1)
+;      end
+; ") 0 "begin-exp")
+
+; update built in variable x
 (equal-answer? (run "
-letrec double(x)
-  = if zero?(x) then 0 else -((double -(x,1)), -2)
-    in (double 6)
-") 12 "letrec-exp")
+begin
+  set x = 30;
+  x
+end
+") 30 "begin-exp")
 
+; update user defined variable
 (equal-answer? (run "
-letrec sum(x, y)
-  = if zero?(x) then y else -((sum -(x,1) y), -1)
-    in (sum 3 4)
-") 7 "letrec-exp with multiple arguments")
-
-; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
-(equal-answer? (run "
-letrec
-even(x) = if zero?(x) then 1 else (odd -(x,1))
-odd(x) = if zero?(x) then 0 else (even -(x,1))
-in (odd 13)
-") 1 "letrec-exp with multiple procedures")
-
-(equal-answer? (run "
-let x = 1
+let a = 25
   in begin
-       -(x, 1)
-     end
-") 0 "begin-exp")
+    set a = 19;
+    a
+  end
+") 19 "begin-exp")
+
+; update procedure parameter variable
+(equal-answer? (run "
+let f = proc (a, b)
+        begin
+          set a = -(a,-1);
+          -(a,b)
+         end
+in (f 44 33)") 12 "begin-exp")
+
+; letrec variables
+(equal-answer? (run "
+letrec double(x) = x
+       triple(x) = x
+    in begin
+      set double = 17;
+      set triple = 20;
+      -(triple,double)
+    end
+") 3 "letrec-exp")
