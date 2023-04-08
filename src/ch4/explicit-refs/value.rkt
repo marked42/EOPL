@@ -2,9 +2,10 @@
 
 (require racket/lazy-require "basic.rkt" "expression.rkt")
 (lazy-require
-  ["environment.rkt" (environment?)]
-  ["procedure.rkt" (proc?)]
-)
+ ["environment.rkt" (environment?)]
+ ["procedure.rkt" (proc?)]
+ ["store.rkt" (reference?)]
+ )
 
 (provide (all-defined-out))
 
@@ -21,6 +22,7 @@
    (second expval?)
    )
   (proc-val (proc1 proc?))
+  (ref-val (ref reference?))
   )
 
 (define (expval->num val)
@@ -42,13 +44,20 @@
     (proc-val (proc1) proc1)
     (else (report-expval-extractor-error 'proc val))
     )
-)
+  )
 
 (define (cell-val->first val)
   (cases expval val
     (cell-val (first second) first)
     (null-val () (null-val))
     (else "error")
+    )
+  )
+
+(define (expval->ref val)
+  (cases expval val
+    (ref-val (ref) ref)
+    (else (eopl:error "expect a ref, get ~s" val))
     )
   )
 
