@@ -132,3 +132,7 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
    1. `call-exp`调用时函数参数也定义了新的变量
 1. 引用的更新，增加了`assign-exp(var, exp)`语句，首先获取变量`var`保存的引用值，然后更新引用指向的数据为`exp`的值。
 1. 引用的读取，`var-exp(var)`，读取变量`var`的引用值，然后获取引用指向的数据。
+
+### letmutable
+
+混合使用 let 和 mut

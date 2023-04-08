@@ -44,6 +44,6 @@
 (define (expval->ref val)
   (cases expval val
     (ref-val (ref) ref)
-    (else (eopl:error "expect a ref, get ~s" val))
+    (else (report-expval-extractor-error 'ref val))
     )
   )

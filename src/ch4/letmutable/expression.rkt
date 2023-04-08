@@ -28,6 +28,11 @@
    (exps (list-of expression?))
    (body expression?)
    )
+  (letmutable-exp
+   (vars (list-of identifier?))
+   (exps (list-of expression?))
+   (body expression?)
+   )
   (letrec-exp
    (p-names (list-of identifier?))
    (b-vars (list-of (list-of identifier?)))
