@@ -38,10 +38,6 @@
   (call-exp (rator expression?) (rands (list-of expression?)))
 
   (begin-exp (first expression?) (others (list-of expression?)))
-
-  (newref-exp (exp1 expression?))
-  (deref-exp (exp1 expression?))
-  (setref-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
