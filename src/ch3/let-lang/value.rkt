@@ -60,3 +60,10 @@
     (else #f)
     )
   )
+
+(define (expval->ref val)
+  (cases expval val
+    (ref-val (ref) ref)
+    (else (report-expval-extractor-error 'ref val))
+    )
+  )

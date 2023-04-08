@@ -14,12 +14,12 @@
   (empty-env)
   (extend-env
    (var identifier?)
-   (val reference?)
+   (val expval?)
    (env environment?)
    )
   (extend-mul-env
    (vars (list-of identifier?))
-   (vals (list-of reference?))
+   (vals (list-of expval?))
    (env environment?)
    )
   (extend-env-rec-mul-vec
@@ -41,7 +41,7 @@
                            '()
                            (let ((first-b-vars (car b-vars-list)) (first-p-body (car p-bodies)))
                              ; vec -> proc-val -> new-env
-                             (vector-set! vec i (newref (proc-val (procedure first-b-vars first-p-body new-env))))
+                             (vector-set! vec i (proc-val (procedure first-b-vars first-p-body new-env)))
                              (loop (cdr p-names) (cdr b-vars-list) (cdr p-bodies) (+ i 1))
                              )
                            )
@@ -54,9 +54,9 @@
   )
 
 (define (init-env)
-  (extend-env 'i (newref (num-val 1))
-              (extend-env 'v (newref (num-val 5))
-                          (extend-env 'x (newref (num-val 10))
+  (extend-env 'i (num-val 1)
+              (extend-env 'v (num-val 5)
+                          (extend-env 'x (num-val 10)
                                       (empty-env)
                                       )
                           )

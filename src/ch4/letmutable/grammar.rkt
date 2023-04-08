@@ -7,6 +7,7 @@
     (expression (number) const-exp)
     (expression (identifier) var-exp)
     (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
+    (expression ("letmutable" (arbno identifier "=" expression) "in" expression) letmutable-exp)
     (expression ("letrec" (arbno identifier "(" (separated-list identifier ",") ")" "=" expression) "in" expression) letrec-exp)
 
     ; arithmetic
