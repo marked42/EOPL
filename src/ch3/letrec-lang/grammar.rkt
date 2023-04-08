@@ -44,5 +44,7 @@
     (expression ("traceproc" "(" identifier (arbno "," identifier) ")" expression) traceproc-exp)
     (expression ("letproc" identifier "(" identifier ")" expression "in" expression) letproc-exp)
     (expression ("(" expression (arbno expression) ")") call-exp)
+
+    (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
     )
   )

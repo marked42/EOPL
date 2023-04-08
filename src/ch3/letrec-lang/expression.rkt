@@ -105,6 +105,8 @@
   (traceproc-exp (first-var identifier?) (rest-vars (list-of identifier?)) (body expression?))
   (letproc-exp (proc-name identifier?) (name identifier?) (proc-body expression?) (body expression?))
   (call-exp (rator expression?) (rands (list-of expression?)))
+
+  (begin-exp (first expression?) (others (list-of expression?)))
   )
 
 (define-datatype program program?
