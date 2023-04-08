@@ -38,6 +38,7 @@
   (call-exp (rator expression?) (rands (list-of expression?)))
 
   (begin-exp (first expression?) (others (list-of expression?)))
+  (assign-exp (var identifier?) (exp1 expression?))
   )
 
 (define-datatype program program?
