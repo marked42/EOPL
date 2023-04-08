@@ -11,6 +11,7 @@
                      extend-mul-env-let*
                      build-circular-extend-env-rec-mul-vec
                      )]
+ ["store.rkt" (initialize-store! newref deref setref)]
  ["procedure.rkt" (apply-procedure procedure trace-procedure)])
 
 (provide (all-defined-out))
@@ -20,6 +21,7 @@
   )
 
 (define (value-of-program prog)
+  (initialize-store!)
   (cases program prog
     (a-program (exp1) (value-of-exp exp1 (init-env)))
     )
@@ -242,16 +244,34 @@
                 )
               )
     (begin-exp (first others)
-      (letrec ((loop (lambda (exps)
-        (cond
-          ((null? exps) #f)
-          ((= (length exps) 1) (value-of-exp (car exps) env))
-          (else (loop (cdr exps)))
-        )
-      )))
-        (loop (cons first others))
-      )
-    )
+               (letrec ((loop (lambda (exps)
+                                (eopl:pretty-print exps)
+                                (cond
+                                  ((null? exps) #f)
+                                  ((= (length exps) 1) (value-of-exp (car exps) env))
+                                  (else (loop (cdr exps)))
+                                  )
+                                )))
+                 (loop (cons first others))
+                 )
+               )
+    (newref-exp (exp1)
+                (ref-val (newref (value-of-exp exp1 env)))
+                )
+    (deref-exp (exp1)
+               (let ((ref (expval->ref (value-of-exp exp1 env))))
+                 (deref ref)
+                 )
+               )
+    (setref-exp (exp1 exp2)
+                (let ((val1 (value-of-exp exp1 env)) (val2 (value-of-exp exp2 env)))
+                  (let ((ref1 (expval->ref val1)))
+                    (setref ref1 val2)
+                    ; return an arbitrary val since we don't care the return value of setref
+                    (num-val 23)
+                    )
+                  )
+                )
     (else 42)
     )
   )

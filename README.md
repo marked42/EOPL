@@ -97,3 +97,26 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
    1. var-exp -> nameless-var-exp
    1. let-exp -> nameless-let-exp
    1. proc-exp -> nameless-proc-exp
+
+## Chapter 4
+
+### explicit refs lang
+
+新增三个语句进行引用相关操作
+
+1. `newref(x)` 创建新引用
+1. `deref(x)` 读取引用的值
+1. `setref(x, val)` 更新引用值
+
+这三个语句中的引用`x`也可以是表达式，所以可以使用引用的引用，需要定义新的表达式引用值类型`ref-val`。
+
+```rkt
+(expression ("newref" "(" expression ")") newref-exp)
+(expression ("deref" "(" expression ")") deref-exp)
+(expression ("setref" "(" expression "," expression")") setref-exp)
+```
+
+当前代码使用`list`来存储所有的引用值，这个`list`是全局共享的。由于使用了`list`的数据结构，引用的创建时间复杂度是O(1)，引用
+的读取和更新是O(N)。
+
+`setref`语句的效果在于更新引用值这个副作用（effect），所以表达式的返回值没有作用，可以根据需要任意选取。

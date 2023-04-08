@@ -46,5 +46,9 @@
     (expression ("(" expression (arbno expression) ")") call-exp)
 
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
+
+    (expression ("newref" "(" expression ")") newref-exp)
+    (expression ("deref" "(" expression ")") deref-exp)
+    (expression ("setref" "(" expression "," expression")") setref-exp)
     )
   )
