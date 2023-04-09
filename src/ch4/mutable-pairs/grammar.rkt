@@ -22,5 +22,12 @@
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
 
     (expression ("set" identifier "=" expression) assign-exp)
+
+    ; mut-pair
+    (expression ("pair" "(" expression "," expression ")") newpair-exp)
+    (expression ("left" "(" expression ")") left-exp)
+    (expression ("right" "(" expression ")") right-exp)
+    (expression ("setleft" "(" expression "," expression ")") setleft-exp)
+    (expression ("setright" "(" expression "," expression ")") setright-exp)
     )
   )

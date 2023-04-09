@@ -39,6 +39,13 @@
 
   (begin-exp (first expression?) (others (list-of expression?)))
   (assign-exp (var identifier?) (exp1 expression?))
+
+  ; mut-pair
+  (newpair-exp (left expression?) (right expression?))
+  (left-exp (exp1 expression?))
+  (right-exp (exp1 expression?))
+  (setleft-exp (exp1 expression?) (exp2 expression?))
+  (setright-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?

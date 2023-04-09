@@ -9,6 +9,7 @@
                      build-circular-extend-env-rec-mul-vec
                      )]
  ["store.rkt" (initialize-store! newref deref setref vals->refs)]
+ ["pair1.rkt" (make-pair left right setleft setright)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
@@ -105,10 +106,43 @@
                  )
                )
     (assign-exp (var exp1)
-      (let ((val1 (value-of-exp exp1 env)))
-        (setref (apply-env env var) val1)
-      )
-    )
+                (let ((val1 (value-of-exp exp1 env)))
+                  (setref (apply-env env var) val1)
+                  )
+                )
+    (newpair-exp (left right)
+                 (let ((left-val (value-of-exp left env)) (right-val (value-of-exp right env)))
+                   (pair-val (make-pair left-val right-val))
+                   )
+                 )
+    (left-exp (exp1)
+              (let ((val1 (value-of-exp exp1 env)))
+                (let ((p (expval->pair-val val1)))
+                  (left p);
+                  )
+                )
+              )
+    (right-exp (exp1)
+               (let ((val1 (value-of-exp exp1 env)))
+                 (let ((p (expval->pair-val val1)))
+                   (right p);
+                   )
+                 )
+               )
+    (setleft-exp (exp1 exp2)
+                 (let ((val1 (value-of-exp exp1 env)))
+                   (let ((p (expval->pair-val val1)))
+                     (setleft p (value-of-exp exp2 env));
+                     )
+                   )
+                 )
+    (setright-exp (exp1 exp2)
+                  (let ((val1 (value-of-exp exp1 env)))
+                    (let ((p (expval->pair-val val1)))
+                      (setright p (value-of-exp exp2 env));
+                      )
+                    )
+                  )
     (else 42)
     )
   )
