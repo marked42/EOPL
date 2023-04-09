@@ -105,3 +105,9 @@ letrec double(x) = x
       -(triple,double)
     end
 ") 3 "letrec-exp")
+
+(equal-answer? (run "
+let x = 11
+  in let p = proc (y) -(y,x)
+    in -(setdynamic x = 17 during (p 22), (p 13))
+") 3 "setdynamic-exp")
