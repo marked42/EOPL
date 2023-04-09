@@ -5,6 +5,7 @@
  ["environment.rkt" (environment?)]
  ["procedure.rkt" (proc?)]
  ["store.rkt" (reference?)]
+ ["pair1.rkt" (mut-pair?)]
  )
 
 (provide (all-defined-out))
@@ -18,6 +19,7 @@
    )
   (proc-val (proc1 proc?))
   (ref-val (ref reference?))
+  (pair-val (pair mut-pair?))
   )
 
 (define (expval->num val)
@@ -45,5 +47,12 @@
   (cases expval val
     (ref-val (ref) ref)
     (else (eopl:error "expect a ref, get ~s" val))
+    )
+  )
+
+(define (expval->pair-val val)
+  (cases expval val
+    (pair-val (p) p)
+    (else (eopl:error "expect a pair, get ~s" val))
     )
   )
