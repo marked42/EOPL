@@ -39,6 +39,8 @@
 
   (begin-exp (first expression?) (others (list-of expression?)))
   (assign-exp (var identifier?) (exp1 expression?))
+
+  (setdynamic-exp (var identifier?) (exp1 expression?) (body expression?))
   )
 
 (define-datatype program program?

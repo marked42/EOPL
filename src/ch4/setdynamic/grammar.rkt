@@ -22,5 +22,7 @@
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
 
     (expression ("set" identifier "=" expression) assign-exp)
+
+    (expression ("setdynamic" identifier "=" expression "during" expression) setdynamic-exp)
     )
   )
