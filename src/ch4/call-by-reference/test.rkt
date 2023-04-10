@@ -56,3 +56,21 @@ in let p = proc (x) proc(y)
                   end
          in ((p b) b)
 ") 4 "aliasing")
+
+(equal-answer? (run "
+let a = 1
+  in let b = a
+    in begin
+      set b = 3;
+      a
+    end
+") 1 "normal let-exp")
+
+(equal-answer? (run "
+let a = 1
+  in letref b = a
+    in begin
+      set b = 3;
+      a
+    end
+") 3 "leftref-exp")
