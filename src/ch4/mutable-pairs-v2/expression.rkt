@@ -46,6 +46,11 @@
   (right-exp (exp1 expression?))
   (setleft-exp (exp1 expression?) (exp2 expression?))
   (setright-exp (exp1 expression?) (exp2 expression?))
+
+  (newarray-exp (len expression?) (val expression?))
+  (arrayref-exp (arr expression?) (index expression?))
+  (arrayset-exp (arr expression?) (index expression?) (value expression?))
+  (arraylength-exp (arr expression?))
   )
 
 (define-datatype program program?

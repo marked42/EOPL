@@ -10,6 +10,7 @@
                      )]
  ["store.rkt" (initialize-store! newref deref setref vals->refs)]
  ["pair1.rkt" (make-pair left right setleft setright)]
+ ["array.rkt" (newarray arrayref arrayset arraylength)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
@@ -140,6 +141,33 @@
                   (let ((val1 (value-of-exp exp1 env)))
                     (let ((p (expval->pair-val val1)))
                       (setright p (value-of-exp exp2 env));
+                      )
+                    )
+                  )
+    ; array
+    (newarray-exp (exp1 exp2)
+                  (let ((val1 (value-of-exp exp1 env)) (val2 (value-of-exp exp2 env)))
+                    (let ((len (expval->num val1)))
+                      (newarray len val2)
+                      )
+                    )
+                  )
+    (arraylength-exp (exp1)
+                     (let ((val1 (value-of-exp exp1 env)))
+                       (num-val (arraylength val1))
+                       )
+                     )
+    (arrayref-exp (exp1 exp2)
+                  (let ((val1 (value-of-exp exp1 env)) (val2 (value-of-exp exp2 env)))
+                    (let ((index (expval->num val2)))
+                      (arrayref val1 index)
+                      )
+                    )
+                  )
+    (arrayset-exp (exp1 exp2 exp3)
+                  (let ((val1 (value-of-exp exp1 env)) (val2 (value-of-exp exp2 env)) (val3 (value-of-exp exp3 env)))
+                    (let ((index (expval->num val2)))
+                      (arrayset val1 index val3)
                       )
                     )
                   )
