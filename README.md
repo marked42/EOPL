@@ -136,3 +136,12 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
 ### letmutable
 
 混合使用 let 和 mut
+
+### ref-exp
+
+在 explicit-refs 中使用`newref(expression)`形式生成引用，其中允许任意形式的表达式，因此可以生成引用的引用，
+引用值是该语言的 expressed value。
+
+使用 ref 表达式`ref id`形式，可以在 call-by-value 机制的语言中，达到 call-by-reference 的效果，引用值是语言的 denoted value，因此在目标语言中是无法获取引用值的，`ref`只能使用到变量名上，因此也无法形成引用的引用。
+
+这一点类似于 JS 中的语言规范中的 [The Reference Specification Type](https://262.ecma-international.org/6.0/#sec-reference-specification-type) 类型。
