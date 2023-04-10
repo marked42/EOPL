@@ -6,6 +6,7 @@
  ["procedure.rkt" (proc?)]
  ["store.rkt" (reference?)]
  ["pair1.rkt" (mut-pair?)]
+ ["array.rkt" (array-val?)]
  )
 
 (provide (all-defined-out))
@@ -20,6 +21,7 @@
   (proc-val (proc1 proc?))
   (ref-val (ref reference?))
   (pair-val (pair mut-pair?))
+  (array-val (arr array-val?))
   )
 
 (define (expval->num val)
