@@ -29,6 +29,15 @@
   (map (lambda (exp) (value-of-exp exp env)) exps)
   )
 
+(define (value-of-operands operands env)
+  (map (lambda (operand)
+    (cases expression operand
+      (var-exp (var) (apply-env env var))
+      (else (newref (value-of-exp operand env)))
+    )
+  ) operands)
+)
+
 (define (value-of-exp exp env)
   (cases expression exp
     ; number constant
@@ -79,9 +88,9 @@
               (proc-val (procedure (cons first-var rest-vars) body env))
               )
     (call-exp (rator rands)
-              (let ((rator-val (value-of-exp rator env)) (rand-vals (value-of-exps rands env)))
+              (let ((rator-val (value-of-exp rator env)))
                 (let ((proc1 (expval->proc rator-val)))
-                  (apply-procedure proc1 (vals->refs rand-vals))
+                  (apply-procedure proc1 (value-of-operands rands env))
                   )
                 )
               )
