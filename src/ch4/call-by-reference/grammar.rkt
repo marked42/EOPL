@@ -17,6 +17,10 @@
     ; control
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
+    ; array
+    (expression ("newarray" "("expression "," expression")") newarray-exp)
+    (expression ("arrayref" "(" identifier "," expression")") arrayref-exp)
+
     (expression ("proc" "(" identifier (arbno "," identifier) ")" expression) proc-exp)
     (expression ("(" expression (arbno expression) ")") call-exp)
 

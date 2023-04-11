@@ -13,14 +13,20 @@
   )
 
 (define (vals->refs vals)
-  (map (lambda (val) (newref val)) vals)
-)
+  (map (lambda (val)
+         (if (reference? val)
+             val
+             (newref val)
+             )
+         ) vals)
+  )
 
 (define (reference? v) (integer? v))
 
 (define (show-store)
-  (display (list "store is: " the-store))
+  (display "store is: ")
   (newline)
+  (eopl:pretty-print the-store)
   )
 
 (define (newref val)
@@ -31,7 +37,6 @@
   )
 
 (define (deref ref)
-  ; (show-store)
   (list-ref the-store ref)
   )
 

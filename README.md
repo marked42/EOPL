@@ -145,3 +145,69 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
 使用 ref 表达式`ref id`形式，可以在 call-by-value 机制的语言中，达到 call-by-reference 的效果，引用值是语言的 denoted value，因此在目标语言中是无法获取引用值的，`ref`只能使用到变量名上，因此也无法形成引用的引用。
 
 这一点类似于 JS 中的语言规范中的 [The Reference Specification Type](https://262.ecma-international.org/6.0/#sec-reference-specification-type) 类型。
+
+
+### arrayref
+
+在`call-by-reference`的基础上实现数组类型，将数据类型当做引用处理，这样`arrayref`可以通过`swap`交换数组元素。
+
+```
+let swap = proc (x, y)
+            let temp = x
+              in begin
+                  set x = y;
+                  set y = temp
+                  end
+    set3 = proc (x) set x = 3
+    set4 = proc (x) set x = 4
+      in let a = newarray(2, -99)
+          in begin
+            (set3 arrayref(a, 0));
+            (set4 arrayref(a, 1));
+            (swap arrayref(a, 0) arrayref(a, 1));
+            -(arrayref(a, 0), arrayref(a, 1))
+          end
+```
+
+上面的代码中关键句是`(swap arrayref(a, 0) arrayref(a, 1))`，为了实现数组元素交换，关键在于`arrayref(a, 0)`表达式
+作为函数调用的参数时，应该按照引用传参，需要在`value-of-operands`函数中增加对`arrayref-exp`类型的处理。
+
+```
+(define (value-of-operands operands env)
+  (map (lambda (operand)
+         (cases expression operand
+           (var-exp (var) (apply-env env var))
+           (arrayref-exp (var exp1)
+                         (let ((ref (apply-env env var)) (val1 (value-of-exp exp1 env)))
+                           (let ((offset (expval->num val1)))
+                             (arrayref ref offset)
+                             )
+                           )
+                         )
+           (else (newref (value-of-exp operand env)))
+           )
+         ) operands)
+  )
+```
+
+同时在`swap`函数内部，`let temp = x`语句的效果因该是`temp`和`x`是指向同一个值的引用，否则当前实现中`temp`的值是指向引用的引用，
+没有实际意义。
+
+需要修改的代码是
+
+```
+(define (vals->refs vals)
+  (map (lambda (val)
+         (if (reference? val)
+             val
+             (newref val)
+             )
+         ) vals)
+  )
+```
+
+此外`arrayref(a, 0)`在不作为函数参数时，得到的值是数组下标对应的元素，而不是引用，这样最后一个表达式才能计算正确。
+
+```
+-(arrayref(a, 0), arrayref(a, 1))
+```

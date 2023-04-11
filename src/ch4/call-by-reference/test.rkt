@@ -74,3 +74,37 @@ let a = 1
       a
     end
 ") 3 "leftref-exp")
+
+(equal-answer? (run "
+let a = newarray(2, -99)
+    in begin
+      arrayref(a, 0)
+    end
+") -99 "new array")
+
+(equal-answer? (run "
+let setx = proc (x) set x = 3
+  in let a = newarray(2, -99)
+      in begin
+        (setx arrayref(a, 1));
+        arrayref(a, 1)
+      end
+") 3 "new array")
+
+(equal-answer? (run "
+let swap = proc (x, y)
+            let temp = x
+              in begin
+                  set x = y;
+                  set y = temp
+                  end
+    set3 = proc (x) set x = 3
+    set4 = proc (x) set x = 4
+      in let a = newarray(2, -99)
+          in begin
+            (set3 arrayref(a, 0));
+            (set4 arrayref(a, 1));
+            (swap arrayref(a, 0) arrayref(a, 1));
+            -(arrayref(a, 0), arrayref(a, 1))
+          end
+") 1 "swap array")
