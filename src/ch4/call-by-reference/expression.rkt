@@ -44,6 +44,9 @@
 
   (begin-exp (first expression?) (others (list-of expression?)))
   (assign-exp (var identifier?) (exp1 expression?))
+
+  (newarray-exp (exp1 expression?) (exp2 expression?))
+  (arrayref-exp (var identifier?) (exp2 expression?))
   )
 
 (define-datatype program program?
