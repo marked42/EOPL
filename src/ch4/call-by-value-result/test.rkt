@@ -19,7 +19,7 @@
                    "Can't convert sloppy value to expval: ~s"
                    sloppy-val)))))
 
-; pass by value
+; call-by-value-result
 (equal-answer? (run "
 let a = 1
   in let b = proc (x) setref(x, 3)
@@ -27,4 +27,4 @@ let a = 1
       (b a);
       a
     end
-") 1 "ref-exp")
+") 3 "ref-exp")

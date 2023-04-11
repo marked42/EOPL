@@ -40,7 +40,6 @@
   (begin-exp (first expression?) (others (list-of expression?)))
   (assign-exp (var identifier?) (exp1 expression?))
 
-  (ref-exp (var identifier?))
   (deref-exp (var identifier?))
   (setref-exp (var identifier?) (exp1 expression?))
   )
