@@ -26,13 +26,23 @@
 
 (define (value-of-operands exps env)
   (map (lambda (exp)
-    (cases expression exp
-      (ref-exp (var)
-        (apply-env env var)
-      )
-      (else (newref (value-of-exp exp env)))
-    )
+    (newref (value-of-exp exp env))
   ) exps)
+)
+
+(define (copy-back-ref-vals exps refs env)
+  (if (null? exps)
+    '()
+    (let ((first-exp (car exps)))
+      (cases expression first-exp
+        (var-exp (var)
+          (setref (apply-env env var) (deref (car refs)))
+        )
+        (else '())
+      )
+      (copy-back-ref-vals (cdr exps) (cdr refs) env)
+    )
+  )
 )
 
 ; get value of a list of exp
@@ -91,8 +101,11 @@
               )
     (call-exp (rator rands)
               (let ((rator-val (value-of-exp rator env)))
-                (let ((proc1 (expval->proc rator-val)))
-                  (apply-procedure proc1 (value-of-operands rands env))
+                (let ((proc1 (expval->proc rator-val)) (refs (value-of-operands rands env)))
+                  (let ((res (apply-procedure proc1 refs)))
+                    (copy-back-ref-vals rands refs env)
+                    res
+                    )
                   )
                 )
               )
@@ -119,9 +132,6 @@
       (let ((val1 (value-of-exp exp1 env)))
         (setref (apply-env env var) val1)
       )
-    )
-    (ref-exp (var)
-      (apply-env env var)
     )
     (deref-exp (var)
                (let ((ref (apply-env env var)))

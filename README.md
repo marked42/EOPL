@@ -146,7 +146,6 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
 
 这一点类似于 JS 中的语言规范中的 [The Reference Specification Type](https://262.ecma-international.org/6.0/#sec-reference-specification-type) 类型。
 
-
 ### arrayref
 
 在`call-by-reference`的基础上实现数组类型，将数据类型当做引用处理，这样`arrayref`可以通过`swap`交换数组元素。
@@ -211,3 +210,21 @@ let swap = proc (x, y)
 ```
 -(arrayref(a, 0), arrayref(a, 1))
 ```
+
+### call-by-value-result
+
+这是`call-by-reference`的一个变种，实现的效果也是函数的执行会对传入的数据产生副作用。
+在`call-by-value`的基础上，函数调用传入参数时，所有参数值生成新的引用值，执行函数内部操作，在函数运行结束后将
+变量类型的参数，使用对应下标引用值指向的数据`result`更新拷贝到变量引用指向的数据。
+
+```rkt
+let a = 1
+  in let b = proc (x) setref(x, 3)
+    in begin
+      (b a);
+      a
+    end
+```
+
+函数`b`执行时`x`被更新为`3`，函数调用完成后，将`x`的结果值`3`复制到变量`a`引用的数据，达到了函数调用修改`a`的效果。
+这种方式相比于`call-by-reference`可能有性能优势，因为利用了内存局部性（memory locality）。

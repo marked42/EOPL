@@ -23,7 +23,6 @@
 
     (expression ("set" identifier "=" expression) assign-exp)
 
-    (expression ("ref" identifier) ref-exp)
     (expression ("deref" "(" identifer ")") deref-exp)
     (expression ("setref" "(" identifier "," expression")") setref-exp)
     )
