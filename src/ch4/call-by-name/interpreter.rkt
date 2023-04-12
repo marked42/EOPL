@@ -7,12 +7,21 @@
                      apply-env
                      extend-mul-env
                      build-circular-extend-env-rec-mul-vec
+                     environment?
                      )]
  ["store.rkt" (initialize-store! newref deref setref vals->refs show-store)]
  ["array.rkt" (newarray arrayref arrayset)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
+
+(define-datatype my-thunk my-thunk?
+    (a-thunk
+        (exp1 expression?)
+        (env environment?)
+    )
+)
+
 
 (define (run str)
   (value-of-program (scan&parse str))
@@ -41,10 +50,27 @@
                              )
                            )
                          )
-           (else (newref (value-of-exp operand env)))
+           (else (let ((th (a-thunk operand env)))
+              ; (display "create thunk: ")
+              ; (newline)
+              ; (eopl:pretty-print th)
+              (newref th)
+             )
+            )
            )
          ) operands)
   )
+
+(define (value-of-thunk th)
+  (cases my-thunk th
+    (a-thunk (exp1 saved-env)
+      (let ((val (value-of-exp exp1 saved-env)))
+        ; (display (list "get thunk value ~s " val))
+        val
+      )
+    )
+  )
+)
 
 (define (value-of-exp exp env)
   (cases expression exp
@@ -80,8 +106,15 @@
               )
             )
     (var-exp (var)
-             (deref (apply-env env var))
+             (let ((ref (apply-env env var)))
+                (let ((val (deref ref)))
+                  (if (expval? val)
+                    val
+                    (value-of-thunk val)
+                  )
+                )
              )
+            )
     (let-exp (vars exps body)
              (let ((vals (value-of-exps exps env)))
                (let ((refs (vals->refs vals)))
