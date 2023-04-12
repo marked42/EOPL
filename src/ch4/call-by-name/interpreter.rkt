@@ -110,7 +110,11 @@
                 (let ((val (deref ref)))
                   (if (expval? val)
                     val
-                    (value-of-thunk val)
+                    (if (thunk-val (value-of-thunk val))
+                      ; call-by-need, replace thunk with actual value so it'll be evaluated once
+                      (setref ref thunk-val)
+                      thunk-val
+                    )
                   )
                 )
              )
