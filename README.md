@@ -252,3 +252,5 @@ letrec infinite-loop (x) = (infinite-loop -(x,-1))
 没有副作用的替换求值策略称为 β-reduction。
 
 `call-by-need`对thunk求值进行缓存，这样每个thunk只会进行一次求值，如果thunk的求值过程有副作用，那么这两种策略结果并不相同。
+
+对于数字、字符串字面量等运行前就可以确定值的常量表达式，惰性求值策略可以不用生成 thunk。
