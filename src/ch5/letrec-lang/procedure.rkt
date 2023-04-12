@@ -3,7 +3,7 @@
 (require racket/lazy-require "basic.rkt" "environment.rkt")
 (lazy-require
  ["expression.rkt" (expression?)]
- ["interpreter.rkt" (value-of-exp)])
+ ["interpreter.rkt" (value-of/k)])
 
 (provide (all-defined-out))
 
@@ -13,26 +13,12 @@
    (body expression?)
    (saved-env environment?)
    )
-  (trace-procedure
-   (vars (list-of identifier?))
-   (body expression?)
-   (saved-env environment?)
-   )
   )
 
-(define (apply-procedure proc1 args)
+(define (apply-procedure proc1 args saved-cont)
   (cases proc proc1
     (procedure (vars body saved-env)
-               (value-of-exp body (extend-mul-env vars args saved-env))
+               (value-of/k body (extend-mul-env vars args saved-env) saved-cont)
                )
-    (trace-procedure (vars body saved-env)
-                     (display "entering proc~n" )
-                     (newline)
-                     (let ((res (value-of-exp body (extend-mul-env vars args saved-env))))
-                       (display "exiting proc~n" )
-                       (newline)
-                       res
-                       )
-                     )
     )
   )
