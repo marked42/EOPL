@@ -2,9 +2,9 @@
 
 (require racket/lazy-require "basic.rkt" "expression.rkt")
 (lazy-require
-  ["environment.rkt" (environment?)]
-  ["procedure.rkt" (proc?)]
-)
+ ["environment.rkt" (environment?)]
+ ["procedure.rkt" (proc?)]
+ )
 
 (provide (all-defined-out))
 
@@ -42,7 +42,7 @@
     (proc-val (proc1) proc1)
     (else (report-expval-extractor-error 'proc val))
     )
-)
+  )
 
 (define (cell-val->first val)
   (cases expval val
