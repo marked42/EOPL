@@ -67,3 +67,20 @@ even(x) = if zero?(x) then 1 else (odd -(x,1))
 odd(x) = if zero?(x) then 0 else (even -(x,1))
 in (odd 13)
 ") 1 "letrec-exp with multiple procedures")
+
+; exer 5.5
+(equal-answer? (run "emptylist") '() "emptylist-exp")
+(equal-answer? (run "cons(1, 2)") (cons 1 2) "cons-exp")
+
+(equal-answer? (run "null?(emptylist)") #t "null?-exp")
+(equal-answer? (run "null?(cons(1, 2))") #f "null?-exp")
+
+(equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
+(equal-answer? (run "car(emptylist)") '() "car-exp")
+
+(equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
+(equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
+
+; exer 5.6
+(equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
+(equal-answer? (run "let x = 4 in list(x, -(x, 1), -(x, 3))") (list 4 3 1) "list-exp")
