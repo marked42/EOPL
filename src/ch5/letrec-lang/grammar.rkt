@@ -18,5 +18,13 @@
 
     (expression ("proc" "(" identifier (arbno "," identifier) ")" expression) proc-exp)
     (expression ("(" expression (arbno expression) ")") call-exp)
+
+    ; list
+    (expression ("emptylist") emptylist-exp)
+    (expression ("null?" "(" expression ")") null?-exp)
+    (expression ("cons" "(" expression "," expression ")") cons-exp)
+    (expression ("car" "(" expression ")") car-exp)
+    (expression ("cdr" "(" expression ")") cdr-exp)
+    (expression ("list" "(" expression (arbno "," expression)")") list-exp)
     )
   )
