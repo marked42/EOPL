@@ -10,6 +10,7 @@
                      build-circular-extend-env-rec-mul-vec
                      environment?
                      )]
+ ["store.rkt" (deref initialize-store! vals->refs)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
@@ -27,7 +28,9 @@
   (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
   (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
   (let-cont (saved-cont cont?) (vars (list-of identifier?)) (body expression?) (env environment?))
-  (call-exp-cont (saved-cont cont?))
+  (call-exp-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
+  (call-exp-cont-2 (saved-cont cont?) (rator expval?))
+  (operands-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
 
   (cons-exp-cont-1 (saved-cont cont?) (exp2 expression?) (saved-env environment?))
   (cons-exp-cont-2 (saved-cont cont?) (val1 expval?))
@@ -73,15 +76,21 @@
                )
     (let-cont (saved-cont vars body env)
               (let ((vals val))
-                (value-of/k body (extend-mul-env vars vals env) saved-cont)
+                (value-of/k body (extend-mul-env vars (vals->refs vals) env) saved-cont)
                 )
               )
-    (call-exp-cont (saved-cont)
-                   (let ((rator-val (car val)) (rand-vals (cdr val)))
-                     (let ((proc1 (expval->proc rator-val)))
-                       (apply-procedure proc1 rand-vals saved-cont)
+    (call-exp-cont (saved-cont rands saved-env)
+                   (let ((rator val))
+                     (value-of-operands/k rands '() saved-env (call-exp-cont-2 saved-cont rator))
+                     )
+                   )
+    (call-exp-cont-2 (saved-cont rator)
+                     (let ((proc1 (expval->proc rator)) (rands val))
+                       (apply-procedure proc1 rands saved-cont)
                        )
                      )
+    (operands-cont (saved-cont exps vals env)
+                   (value-of-operands/k exps (append vals (list val)) env saved-cont)
                    )
     (cons-exp-cont-1 (saved-cont exp2 env)
                      (value-of/k exp2 env (cons-exp-cont-2 saved-cont val))
@@ -127,7 +136,28 @@
       )
   )
 
+(define (value-of-operands/k exps vals env saved-cont)
+  (if (null? exps)
+      (apply-cont saved-cont vals)
+      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
+        (cases expression first-exp
+          (var-exp (var)
+                   (let ((val (deref (apply-env env var))))
+                     (value-of-operands/k rest-exps (append vals (list val)) env saved-cont)
+                     )
+                   )
+          (else
+           (value-of/k first-exp env
+                       (operands-cont saved-cont rest-exps vals env)
+                       )
+           )
+          )
+        )
+      )
+  )
+
 (define (value-of-program prog)
+  (initialize-store!)
   (cases program prog
     (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
     )
@@ -160,7 +190,7 @@
             (value-of/k exp1 env (if-cont cont exp2 exp3 env))
             )
     (var-exp (var)
-             (apply-cont cont (apply-env env var))
+             (apply-cont cont (deref (apply-env env var)))
              )
     (let-exp (vars exps body)
              (value-of-exps/k exps '() env (let-cont cont vars body env))
@@ -169,7 +199,7 @@
               (apply-cont cont (proc-val (procedure (cons first-var rest-vars) body env)))
               )
     (call-exp (rator rands)
-              (value-of-exps/k (cons rator rands) '() env (call-exp-cont cont))
+              (value-of/k rator env (call-exp-cont cont rands env))
               )
     (letrec-exp (p-names b-vars-list p-bodies body)
                 (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
