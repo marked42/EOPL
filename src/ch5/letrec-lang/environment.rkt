@@ -5,6 +5,7 @@
  ["value.rkt" (num-val null-val? cell-val? expval? cell-val->first cell-val->second proc-val)]
  ["expression.rkt" (expression?)]
  ["procedure.rkt" (procedure)]
+ ["store.rkt" (reference? newref deref)]
  ["interpreter.rkt" (value-of-exp)]
  )
 (provide (all-defined-out))
@@ -13,12 +14,12 @@
   (empty-env)
   (extend-env
    (var identifier?)
-   (val expval?)
+   (ref reference?)
    (env environment?)
    )
   (extend-mul-env
    (vars (list-of identifier?))
-   (vals (list-of expval?))
+   (refs (list-of reference?))
    (env environment?)
    )
   (extend-env-rec-mul-vec
@@ -40,7 +41,7 @@
                            '()
                            (let ((first-b-vars (car b-vars-list)) (first-p-body (car p-bodies)))
                              ; vec -> proc-val -> new-env
-                             (vector-set! vec i (proc-val (procedure first-b-vars first-p-body new-env)))
+                             (vector-set! vec i (newref (proc-val (procedure first-b-vars first-p-body new-env))))
                              (loop (cdr p-names) (cdr b-vars-list) (cdr p-bodies) (+ i 1))
                              )
                            )
@@ -53,9 +54,9 @@
   )
 
 (define (init-env)
-  (extend-env 'i (num-val 1)
-              (extend-env 'v (num-val 5)
-                          (extend-env 'x (num-val 10)
+  (extend-env 'i (newref (num-val 1))
+              (extend-env 'v (newref (num-val 5))
+                          (extend-env 'x (newref (num-val 10))
                                       (empty-env)
                                       )
                           )
@@ -70,19 +71,19 @@
                     (apply-env saved-env search-var)
                     )
                 )
-    (extend-mul-env (vars vals saved-env)
-                    (letrec ((loop (lambda (vars vals saved-env)
+    (extend-mul-env (vars refs saved-env)
+                    (letrec ((loop (lambda (vars refs saved-env)
                                      (if (null? vars)
                                          (apply-env saved-env search-var)
-                                         (let ((first-var (car vars)) (first-val (car vals)))
+                                         (let ((first-var (car vars)) (first-ref (car refs)))
                                            (if (eqv? first-var search-var)
-                                               first-val
-                                               (loop (cdr vars) (cdr vals) saved-env)
+                                               first-ref
+                                               (loop (cdr vars) (cdr refs) saved-env)
                                                )
                                            )
                                          )
                                      )))
-                      (loop vars vals saved-env)
+                      (loop vars refs saved-env)
                       )
                     )
     (extend-env-rec-mul-vec (p-names vec saved-env)
