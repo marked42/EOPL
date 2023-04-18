@@ -242,19 +242,70 @@ letrec infinite-loop (x) = (infinite-loop -(x,-1))
 代码中`infinite-loop`是一个无限递归的函数，正常求值策略下调用会产生死循环。在惰性求值策略下，`(f (infinite-loop 0))`中实参`(infinite-loop 0)`被
 包装为`thunk`，不会立即求值，并且由于函数`f`中没有读取变量`z`，所以函数`thunk`不会被求值，因此不会形成死循环。
 
-惰性求值表达式的值**被思考**（thunk）过，因为被称为thunk，也称这种状态函数参数被冻结（frozen），后续`thunk`被求值称为thawed，或者使用主动的说法force。
+惰性求值表达式的值**被思考**（thunk）过，因为被称为 thunk，也称这种状态函数参数被冻结（frozen），后续`thunk`被求值称为 thawed，或者使用主动的说法 force。
 
 惰性求值策略可以表达**无限递归**的数据结构。
 
-在没有副作用的情况下，立即求值和惰性求值的结果是相同的；在有副作用的情况下，创建thunk后到 thunk被求值的这段过程中，环境变量可能由于副作用发生改变，立即求值和
+在没有副作用的情况下，立即求值和惰性求值的结果是相同的；在有副作用的情况下，创建 thunk 后到 thunk 被求值的这段过程中，环境变量可能由于副作用发生改变，立即求值和
 惰性求值得到的结果不相同，因此副作用和惰性求值同时存在时，程序的结果会出现意料以外的行为，因此惰性求值策略一般在没有副作用的函数式编程语言中使用。
 
 没有副作用的替换求值策略称为 β-reduction。
 
-`call-by-need`对thunk求值进行缓存，这样每个thunk只会进行一次求值，如果thunk的求值过程有副作用，那么这两种策略结果并不相同。
+`call-by-need`对 thunk 求值进行缓存，这样每个 thunk 只会进行一次求值，如果 thunk 的求值过程有副作用，那么这两种策略结果并不相同。
 
 对于数字、字符串字面量等运行前就可以确定值的常量表达式，惰性求值策略可以不用生成 thunk。
 
 ## Chapter 5
 
-continuation passing style interpreter
+观察阶乘函数`fact`递归的执行情况情况，每一次`(fact (-n 1))`的递归调用出现在函数参数位置（operand position），整个计算过程中每次递归调用都会加深调用栈，上一层栈中记录了参数`n`，这样才能在子函数返回时继续计算（recursive control behavior）。
+
+```
+(define fact
+            (lambda (n)
+(if (zero? n) 1 (* n (fact (- n 1))))))
+```
+
+```
+(fact 4)
+= (* 4 (fact 3))
+= (* 4 (* 3 (fact 2)))
+= (* 4 (* 3 (* 2 (fact 1))))
+= (* 4 (* 3 (* 2 (* 1 (fact 0)))))
+= (* 4 (* 3 (* 2 (* 1 1))))
+= (* 4 (* 3 (* 2 1)))
+= (* 4 (* 3 2))
+= (* 4 6)
+= 24
+```
+
+观察第二个版本的阶乘函数`fact-iter`调用，递归函数调用不在函数参数位置，而在尾调用位置（tail position），递归子调用值也是整个函数的返回值，
+因此递归调用可以不增加栈深度（iterative control behavior）。
+
+```
+(define fact-iter
+    (lambda (n)
+      (fact-iter-acc n 1)))
+  (define fact-iter-acc
+    (lambda (n a)
+(if (zero? n) a (fact-iter-acc (- n 1) (* n a)))))
+```
+
+```
+(fact-iter 4)
+= (fact-iter-acc 4 1)
+= (fact-iter-acc 3 4)
+= (fact-iter-acc 2 12)
+= (fact-iter-acc 1 24)
+= (fact-iter-acc 0 24)
+= 24
+```
+
+是函数参数的求值而不是函数调用本身使得控制上下文增加。
+
+> It is evaluation of operands, not the calling of procedures, that makes the control context grow.
+
+尾递归调用中，子调用使用父调用的 Continuation，尾递归不会增加 Continuation。
+
+尾递归调用空间复杂度是 O(1)，`fact`空间复杂度是 O(N)
+
+Continuation 的作用和调用栈 stack 一样，记录着程序运行的控制上下文，一个 Continuation 等价于一个栈帧（frame）或者激活记录（activation record）。
