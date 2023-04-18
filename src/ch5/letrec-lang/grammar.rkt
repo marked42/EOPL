@@ -28,5 +28,8 @@
     (expression ("list" "(" expression (arbno "," expression)")") list-exp)
 
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
+
+    ; assign
+    (expression ("set" identifier "=" expression) assign-exp)
     )
   )
