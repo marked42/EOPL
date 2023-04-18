@@ -38,6 +38,8 @@
   (car-exp-cont (saved-cont cont?))
   (cdr-exp-cont (saved-cont cont?))
   (list-exp-cont (saved-cont cont?))
+
+  (begin-operands-cont (saved-cont cont?) (exps (list-of expression?)) (last-val expval?) (saved-env environment?))
   )
 
 (define (apply-cont cont val)
@@ -123,6 +125,10 @@
     (list-exp-cont (saved-cont)
                    (apply-cont saved-cont (build-list-from-vals val))
                    )
+
+    (begin-operands-cont (saved-cont exps last-val saved-env)
+                         (value-of-begin-operands/k exps val saved-env saved-cont)
+                         )
     )
   )
 
@@ -176,6 +182,19 @@
       )
   )
 
+(define (value-of-begin-operands/k exps last-val env saved-cont)
+  (if (null? exps)
+      (apply-cont saved-cont last-val)
+      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
+        (value-of/k
+         first-exp
+         env
+         (begin-operands-cont saved-cont rest-exps last-val env)
+         )
+        )
+      )
+  )
+
 ; TODO: better always place cont at first
 (define (value-of/k exp env cont)
   (cases expression exp
@@ -223,7 +242,9 @@
     (list-exp (exp1 exps)
               (value-of-exps/k (cons exp1 exps) '() env (list-exp-cont cont))
               )
-
+    (begin-exp (exp1 exps)
+               (value-of-begin-operands/k (cons exp1 exps) (bool-val #f) env cont)
+               )
     (else (eopl:error "invalid exp ~s" exp))
     )
   )

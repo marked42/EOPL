@@ -26,5 +26,7 @@
     (expression ("car" "(" expression ")") car-exp)
     (expression ("cdr" "(" expression ")") cdr-exp)
     (expression ("list" "(" expression (arbno "," expression)")") list-exp)
+
+    (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
     )
   )
