@@ -11,7 +11,7 @@
                      environment?
                      )]
  ["store.rkt" (deref initialize-store! vals->refs)]
- ["procedure.rkt" (apply-procedure procedure)])
+ ["procedure.rkt" (apply-procedure/k procedure)])
 
 (provide (all-defined-out))
 
@@ -86,7 +86,7 @@
                    )
     (call-exp-cont-2 (saved-cont rator)
                      (let ((proc1 (expval->proc rator)) (rands val))
-                       (apply-procedure proc1 rands saved-cont)
+                       (apply-procedure/k proc1 rands saved-cont)
                        )
                      )
     (operands-cont (saved-cont exps vals env)

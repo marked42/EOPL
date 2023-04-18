@@ -16,7 +16,7 @@
    )
   )
 
-(define (apply-procedure proc1 args saved-cont)
+(define (apply-procedure/k proc1 args saved-cont)
   (cases proc proc1
     (procedure (vars body saved-env)
                ; create new ref under implicit refs, aka call-by-value
