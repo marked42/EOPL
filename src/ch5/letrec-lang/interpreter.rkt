@@ -10,7 +10,7 @@
                      build-circular-extend-env-rec-mul-vec
                      environment?
                      )]
- ["store.rkt" (deref initialize-store! vals->refs)]
+ ["store.rkt" (deref initialize-store! vals->refs setref)]
  ["procedure.rkt" (apply-procedure/k procedure)])
 
 (provide (all-defined-out))
@@ -40,6 +40,8 @@
   (list-exp-cont (saved-cont cont?))
 
   (begin-operands-cont (saved-cont cont?) (exps (list-of expression?)) (last-val expval?) (saved-env environment?))
+
+  (set-rhs-cont (saved-env environment?) (var identifier?) (saved-cont cont?))
   )
 
 (define (apply-cont cont val)
@@ -129,6 +131,12 @@
     (begin-operands-cont (saved-cont exps last-val saved-env)
                          (value-of-begin-operands/k exps val saved-env saved-cont)
                          )
+    (set-rhs-cont (saved-env var saved-cont)
+                  (let ((ref (apply-env saved-env var)))
+                    (setref ref val)
+                    (apply-cont saved-cont val)
+                    )
+                  )
     )
   )
 
@@ -245,6 +253,9 @@
     (begin-exp (exp1 exps)
                (value-of-begin-operands/k (cons exp1 exps) (bool-val #f) env cont)
                )
+    (assign-exp (var exp1)
+               (value-of/k exp1 env (set-rhs-cont env var cont))
+    )
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
