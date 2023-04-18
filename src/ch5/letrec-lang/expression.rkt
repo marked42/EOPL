@@ -30,6 +30,8 @@
   (cdr-exp (exp1 expression?))
 
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
+
+  (assign-exp (var identifier?) (exp1 expression?))
   )
 
 (define-datatype program program?
