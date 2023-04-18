@@ -28,6 +28,8 @@
   (null?-exp (exp1 expression?))
   (car-exp (exp1 expression?))
   (cdr-exp (exp1 expression?))
+
+  (begin-exp (exp1 expression?) (exps (list-of expression?)))
   )
 
 (define-datatype program program?
