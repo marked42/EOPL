@@ -29,8 +29,6 @@
 ;   (call-exp-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
 ;   (call-exp-cont-2 (saved-cont cont?) (rator expval?))
 ;   (operands-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
-
-;   (null?-exp-cont (saved-cont cont?))
 ;   (car-exp-cont (saved-cont cont?))
 ;   (cdr-exp-cont (saved-cont cont?))
 ;   (list-exp-cont (saved-cont cont?))
@@ -56,16 +54,6 @@
 ;     (operands-cont (saved-cont exps vals env)
 ;                    (value-of-operands/k exps (append vals (list val)) env saved-cont)
 ;                    )
-;     (null?-exp-cont (saved-cont)
-;                     (let ((res
-;                            (cases expval val
-;                              (null-val () (bool-val #t))
-;                              (else (bool-val #f))
-;                              )
-;                            ))
-;                       (apply-cont saved-cont res)
-;                       )
-;                     )
 ;     (car-exp-cont (saved-cont)
 ;                   (let ((res (cell-val->first val)))
 ;                     (apply-cont saved-cont res)
@@ -254,9 +242,9 @@
     (cons-exp (exp1 exp2)
               (apply-cont (cons-exp-cont cont exp1 exp2 env) '())
               )
-    ; (null?-exp (exp1)
-    ;            (value-of/k exp1 env (null?-exp-cont cont))
-    ;            )
+    (null?-exp (exp1)
+               (apply-cont (null?-exp-cont cont exp1 env) '())
+               )
     ; (car-exp (exp1)
     ;          (value-of/k exp1 env (car-exp-cont cont))
     ;          )
@@ -316,4 +304,21 @@
 
 (define (eval-cons-exp val1 val2)
   (cell-val val1 val2)
+  )
+
+(define (null?-exp-cont saved-cont exp1 env)
+  (lambda (val)
+    (value-of/k exp1 env
+                (lambda (val1)
+                  (apply-cont saved-cont (eval-null?-exp val1))
+                  )
+                )
+    )
+  )
+
+(define (eval-null?-exp val1)
+  (cases expval val1
+    (null-val () (bool-val #t))
+    (else (bool-val #f))
+    )
   )
