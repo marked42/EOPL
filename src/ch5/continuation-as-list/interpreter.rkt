@@ -195,8 +195,8 @@
                   (value-of/k body new-env cont)
                   )
                 )
-    ; ; list
-    ; (emptylist-exp () (apply-cont cont (null-val)))
+    ; list
+    (emptylist-exp () (apply-cont cont (null-val)))
     ; (cons-exp (exp1 exp2)
     ;           (value-of/k exp1 env (cons-exp-cont-1 cont exp2 env))
     ;           )
