@@ -78,8 +78,8 @@ in (odd 13)
 (equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
 (equal-answer? (run "car(emptylist)") '() "car-exp")
 
-; (equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
-; (equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
+(equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
+(equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
 
 ; ; exer 5.6
 ; (equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
