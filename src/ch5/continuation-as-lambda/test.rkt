@@ -48,25 +48,25 @@
 
 (equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letproc-exp")
 
-; (equal-answer? (run "
-; letrec double(x)
-;   = if zero?(x) then 0 else -((double -(x,1)), -2)
-;     in (double 6)
-; ") 12 "letrec-exp")
+(equal-answer? (run "
+letrec double(x)
+  = if zero?(x) then 0 else -((double -(x,1)), -2)
+    in (double 6)
+") 12 "letrec-exp")
 
-; (equal-answer? (run "
-; letrec sum(x, y)
-;   = if zero?(x) then y else -((sum -(x,1) y), -1)
-;     in (sum 3 4)
-; ") 7 "letrec-exp with multiple arguments")
+(equal-answer? (run "
+letrec sum(x, y)
+  = if zero?(x) then y else -((sum -(x,1) y), -1)
+    in (sum 3 4)
+") 7 "letrec-exp with multiple arguments")
 
-; ; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
-; (equal-answer? (run "
-; letrec
-; even(x) = if zero?(x) then 1 else (odd -(x,1))
-; odd(x) = if zero?(x) then 0 else (even -(x,1))
-; in (odd 13)
-; ") 1 "letrec-exp with multiple procedures")
+; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
+(equal-answer? (run "
+letrec
+even(x) = if zero?(x) then 1 else (odd -(x,1))
+odd(x) = if zero?(x) then 0 else (even -(x,1))
+in (odd 13)
+") 1 "letrec-exp with multiple procedures")
 
 ; ; exer 5.5
 ; (equal-answer? (run "emptylist") '() "emptylist-exp")
