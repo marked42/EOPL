@@ -24,91 +24,12 @@
   (cont val)
   )
 
-; (define-datatype continuation cont?
-;   (end-cont)
-;   (call-exp-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
-;   (call-exp-cont-2 (saved-cont cont?) (rator expval?))
-;   (operands-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
-;   (begin-operands-cont (saved-cont cont?) (exps (list-of expression?)) (last-val expval?) (saved-env environment?))
-
-;   (set-rhs-cont (ref reference?) (saved-cont cont?))
-;   )
-
-; (define (apply-cont cont val)
-;   (cases continuation cont
-;     (end-cont () val)
-;     (call-exp-cont (saved-cont rands saved-env)
-;                    (let ((rator val))
-;                      (value-of-operands/k rands '() saved-env (call-exp-cont-2 saved-cont rator))
-;                      )
-;                    )
-;     (call-exp-cont-2 (saved-cont rator)
-;                      (let ((proc1 (expval->proc rator)) (rands val))
-;                        (apply-procedure/k proc1 rands saved-cont)
-;                        )
-;                      )
-;     (operands-cont (saved-cont exps vals env)
-;                    (value-of-operands/k exps (append vals (list val)) env saved-cont)
-;                    )
-;     (begin-operands-cont (saved-cont exps last-val saved-env)
-;                          (value-of-begin-operands/k exps val saved-env saved-cont)
-;                          )
-;     (set-rhs-cont (ref saved-cont)
-;                   (setref ref val)
-;                   (apply-cont saved-cont val)
-;                   )
-;     )
-;   )
-
-
-; (define (build-list-from-vals vals)
-;   (if (null? vals)
-;       (null-val)
-;       (let ((first (car vals)) (rest (cdr vals)))
-;         (cell-val first (build-list-from-vals rest))
-;         )
-;       )
-;   )
-
-; (define (value-of-operands/k exps vals env saved-cont)
-;   (if (null? exps)
-;       (apply-cont saved-cont vals)
-;       (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-;         (cases expression first-exp
-;           (var-exp (var)
-;                    (let ((val (deref (apply-env env var))))
-;                      (value-of-operands/k rest-exps (append vals (list val)) env saved-cont)
-;                      )
-;                    )
-;           (else
-;            (value-of/k first-exp env
-;                        (operands-cont saved-cont rest-exps vals env)
-;                        )
-;            )
-;           )
-;         )
-;       )
-;   )
-
 (define (value-of-program prog)
   (initialize-store!)
   (cases program prog
     (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
     )
   )
-
-; (define (value-of-begin-operands/k exps last-val env saved-cont)
-;   (if (null? exps)
-;       (apply-cont saved-cont last-val)
-;       (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-;         (value-of/k
-;          first-exp
-;          env
-;          (begin-operands-cont saved-cont rest-exps last-val env)
-;          )
-;         )
-;       )
-;   )
 
 (define (eval-diff-exp val1 val2)
   (let ((num1 (expval->num val1)) (num2 (expval->num val2)))
