@@ -29,8 +29,6 @@
 ;   (call-exp-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
 ;   (call-exp-cont-2 (saved-cont cont?) (rator expval?))
 ;   (operands-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
-;   (list-exp-cont (saved-cont cont?))
-
 ;   (begin-operands-cont (saved-cont cont?) (exps (list-of expression?)) (last-val expval?) (saved-env environment?))
 
 ;   (set-rhs-cont (ref reference?) (saved-cont cont?))
@@ -52,10 +50,6 @@
 ;     (operands-cont (saved-cont exps vals env)
 ;                    (value-of-operands/k exps (append vals (list val)) env saved-cont)
 ;                    )
-;     (list-exp-cont (saved-cont)
-;                    (apply-cont saved-cont (build-list-from-vals val))
-;                    )
-
 ;     (begin-operands-cont (saved-cont exps last-val saved-env)
 ;                          (value-of-begin-operands/k exps val saved-env saved-cont)
 ;                          )
@@ -239,9 +233,9 @@
     (cdr-exp (exp1)
              (apply-cont (cdr-exp-cont cont exp1 env) '())
              )
-    ; (list-exp (exp1 exps)
-    ;           (value-of-exps/k (cons exp1 exps) '() env (list-exp-cont cont))
-    ;           )
+    (list-exp (exp1 exps)
+              (apply-cont (list-exp-cont cont (cons exp1 exps) env) '())
+              )
     ; (begin-exp (exp1 exps)
     ;            (value-of-begin-operands/k (cons exp1 exps) (bool-val #f) env cont)
     ;            )
@@ -333,4 +327,23 @@
 
 (define (eval-cdr-exp val1)
   (cell-val->second val1)
+  )
+
+(define (list-exp-cont saved-cont exps env)
+  (lambda (val)
+    (value-of-exps/k exps env
+                     (lambda (vals)
+                       (apply-cont saved-cont (build-list-from-vals vals))
+                       )
+                     )
+    )
+  )
+
+(define (build-list-from-vals vals)
+  (if (null? vals)
+      (null-val)
+      (let ((first (car vals)) (rest (cdr vals)))
+        (cell-val first (build-list-from-vals rest))
+        )
+      )
   )
