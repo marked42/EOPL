@@ -30,8 +30,6 @@
 ;   (call-exp-cont-2 (saved-cont cont?) (rator expval?))
 ;   (operands-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
 
-;   (cons-exp-cont-1 (saved-cont cont?) (exp2 expression?) (saved-env environment?))
-;   (cons-exp-cont-2 (saved-cont cont?) (val1 expval?))
 ;   (null?-exp-cont (saved-cont cont?))
 ;   (car-exp-cont (saved-cont cont?))
 ;   (cdr-exp-cont (saved-cont cont?))
@@ -58,14 +56,6 @@
 ;     (operands-cont (saved-cont exps vals env)
 ;                    (value-of-operands/k exps (append vals (list val)) env saved-cont)
 ;                    )
-;     (cons-exp-cont-1 (saved-cont exp2 env)
-;                      (value-of/k exp2 env (cons-exp-cont-2 saved-cont val))
-;                      )
-;     (cons-exp-cont-2 (saved-cont val1)
-;                      (let ((val2 val))
-;                        (apply-cont saved-cont (cell-val val1 val2))
-;                        )
-;                      )
 ;     (null?-exp-cont (saved-cont)
 ;                     (let ((res
 ;                            (cases expval val
@@ -259,11 +249,11 @@
     (letrec-exp (p-names b-vars-list p-bodies body)
                 (apply-cont (letrec-exp-cont cont p-names b-vars-list p-bodies body env) '())
                 )
-    ; ; list
-    ; (emptylist-exp () (apply-cont cont (null-val)))
-    ; (cons-exp (exp1 exp2)
-    ;           (value-of/k exp1 env (cons-exp-cont-1 cont exp2 env))
-    ;           )
+    ; list
+    (emptylist-exp () (apply-cont cont (null-val)))
+    (cons-exp (exp1 exp2)
+              (apply-cont (cons-exp-cont cont exp1 exp2 env) '())
+              )
     ; (null?-exp (exp1)
     ;            (value-of/k exp1 env (null?-exp-cont cont))
     ;            )
@@ -308,4 +298,22 @@
       (value-of/k body new-env saved-cont)
       )
     )
+  )
+
+(define (cons-exp-cont saved-cont exp1 exp2 saved-env)
+  (lambda (val)
+    (value-of/k exp1 saved-env
+                (lambda (val1)
+                  (value-of/k exp2 saved-env
+                              (lambda (val2)
+                                (apply-cont saved-cont (eval-cons-exp val1 val2))
+                                )
+                              )
+                  )
+                )
+    )
+  )
+
+(define (eval-cons-exp val1 val2)
+  (cell-val val1 val2)
   )
