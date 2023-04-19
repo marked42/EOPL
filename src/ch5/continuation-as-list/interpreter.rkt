@@ -19,8 +19,6 @@
   )
 
 ; (define-datatype continuation cont?
-  ; (diff-cont-1 (saved-cont cont?) (exp2 expression?) (saved-env environment?))
-  ; (diff-cont-2 (saved-cont cont?) (val1 expval?))
   ; (zero?-cont (saved-cont cont?))
   ; (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
   ; (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
@@ -42,16 +40,6 @@
   ; )
 
   ; (cases continuation cont
-    ; (diff-cont-1 (saved-cont exp2 saved-env)
-    ;              (value-of/k exp2 saved-env (diff-cont-2 saved-cont val))
-    ;              )
-    ; (diff-cont-2 (saved-cont val1)
-    ;              (apply-cont saved-cont
-    ;                          (let ((num1 (expval->num val1)) (num2 (expval->num val)))
-    ;                            (num-val (- num1 num2))
-    ;                            )
-    ;                          )
-    ;              )
     ; (zero?-cont (saved-cont)
     ;             (let ((num (expval->num val)))
     ;               (apply-cont saved-cont
@@ -194,9 +182,9 @@
 (define (value-of/k exp env cont)
   (cases expression exp
     (const-exp (num) (apply-cont cont (num-val num)))
-    ; (diff-exp (exp1 exp2)
-    ;           (value-of/k exp1 env (diff-cont-1 cont exp2 env))
-    ;           )
+    (diff-exp (exp1 exp2)
+              (value-of/k exp1 env (cons (diff-frame-1 exp2 env) cont))
+              )
     ; (zero?-exp (exp1)
     ;            (value-of/k exp1 env (zero?-cont cont))
     ;            )
@@ -250,8 +238,31 @@
 (define (apply-cont cont val)
   (if (null? cont)
     val
-    #f
+    (let ((first-frame (car cont)) (rest-frames (cdr cont)))
+      (cases frame first-frame
+        (diff-frame-1 (exp2 saved-env)
+          (value-of/k exp2 saved-env
+            (cons (diff-frame-2 val) rest-frames)
+          )
+        )
+        (diff-frame-2 (val1)
+          (apply-cont rest-frames (eval-diff-exp val1 val))
+        )
+        (else (eopl:error "invalid frame type~s " first-frame))
+      )
+    )
   )
 )
 
+(define (eval-diff-exp val1 val2)
+  (let ((num1 (expval->num val1)) (num2 (expval->num val2)))
+    (num-val (- num1 num2))
+    )
+  )
+
 (define (end-cont) '())
+
+(define-datatype frame frame?
+  (diff-frame-1 (exp2 expression?) (saved-env environment?))
+  (diff-frame-2 (val1 expval?))
+  )
