@@ -72,14 +72,14 @@ in (odd 13)
 (equal-answer? (run "emptylist") '() "emptylist-exp")
 (equal-answer? (run "cons(1, 2)") (cons 1 2) "cons-exp")
 
-; (equal-answer? (run "null?(emptylist)") #t "null?-exp")
-; (equal-answer? (run "null?(cons(1, 2))") #f "null?-exp")
+(equal-answer? (run "null?(emptylist)") #t "null?-exp")
+(equal-answer? (run "null?(cons(1, 2))") #f "null?-exp")
 
-; (equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
-; (equal-answer? (run "car(emptylist)") '() "car-exp")
+(equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
+(equal-answer? (run "car(emptylist)") '() "car-exp")
 
-; (equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
-; (equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
+(equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
+(equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
 
 ; ; exer 5.6
 ; (equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
