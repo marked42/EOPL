@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt" "value.rkt" "parser.rkt" "expression.rkt")
+(require racket/lazy-require racket/list "basic.rkt" "value.rkt" "parser.rkt" "expression.rkt")
 (lazy-require
  ["environment.rkt" (
                      init-env
@@ -212,9 +212,9 @@
     (list-exp (exp1 exps)
               (value-of-exps/k (cons exp1 exps) '() env (cons (list-exp-frame) cont))
               )
-    ; (begin-exp (exp1 exps)
-    ;            (value-of-begin-operands/k (cons exp1 exps) (bool-val #f) env cont)
-    ;            )
+    (begin-exp (exp1 exps)
+               (value-of-exps/k (cons exp1 exps) '() env (cons (begin-exp-frame) cont))
+               )
     ; (assign-exp (var exp1)
     ;             (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
     ;             )
@@ -281,6 +281,11 @@
                           (apply-cont rest-frames (build-list-from-vals vals))
                         )
         )
+        (begin-exp-frame ()
+                         (let ((vals val))
+                          (apply-cont rest-frames (last vals))
+                         )
+        )
         (else (eopl:error "invalid frame type~s " first-frame))
       )
     )
@@ -325,6 +330,7 @@
   (car-exp-frame)
   (cdr-exp-frame)
   (list-exp-frame)
+  (begin-exp-frame)
   )
 
 (define (value-of-exps/k exps vals env saved-cont)
@@ -363,3 +369,6 @@
         )
       )
   )
+
+; (define (list-last))
+; (list-ref vals (- (length vals) 1))
