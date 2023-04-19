@@ -153,19 +153,6 @@
     )
   )
 
-; (define (value-of-exps/k exps vals env saved-cont)
-;   (if (null? exps)
-;       (apply-cont saved-cont vals)
-;       (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-;         (value-of/k
-;          first-exp
-;          env
-;          (exps-cont saved-cont rest-exps vals env)
-;          )
-;         )
-;       )
-;   )
-
 ; (define (value-of-begin-operands/k exps last-val env saved-cont)
 ;   (if (null? exps)
 ;       (apply-cont saved-cont last-val)
@@ -194,9 +181,9 @@
     (var-exp (var)
              (apply-cont cont (deref (apply-env env var)))
              )
-    ; (let-exp (vars exps body)
-    ;          (value-of-exps/k exps '() env (let-cont cont vars body env))
-    ;          )
+    (let-exp (vars exps body)
+             (value-of-exps/k exps '() env (cons (let-frame vars body env) cont))
+             )
     ; (proc-exp (first-var rest-vars body)
     ;           (apply-cont cont (proc-val (procedure (cons first-var rest-vars) body env)))
     ;           )
@@ -254,6 +241,14 @@
         (if-frame (exp2 exp3 saved-env)
           (value-of/k (eval-if-exp val exp2 exp3) saved-env rest-frames)
         )
+        (exps-frame (exps vals saved-env)
+                   (value-of-exps/k exps (append vals (list val)) saved-env rest-frames)
+        )
+        (let-frame (vars body saved-env)
+                   (let ((vals val))
+                    (value-of/k body (extend-mul-env vars (vals->refs vals) saved-env) rest-frames)
+                   )
+        )
         (else (eopl:error "invalid frame type~s " first-frame))
       )
     )
@@ -288,4 +283,19 @@
   (diff-frame-2 (val1 expval?))
   (zero?-frame)
   (if-frame (exp2 expression?) (exp3 expression?) (saved-env environment?))
+  (exps-frame (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
+  (let-frame (vars (list-of identifier?)) (body expression?) (saved-env environment?))
+  )
+
+(define (value-of-exps/k exps vals env saved-cont)
+  (if (null? exps)
+      (apply-cont saved-cont vals)
+      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
+        (value-of/k
+         first-exp
+         env
+         (cons (exps-frame rest-exps vals env) saved-cont)
+         )
+        )
+      )
   )
