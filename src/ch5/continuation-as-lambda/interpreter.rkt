@@ -26,7 +26,6 @@
 
 ; (define-datatype continuation cont?
 ;   (end-cont)
-;   (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
 ;   (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
 ;   (let-cont (saved-cont cont?) (vars (list-of identifier?)) (body expression?) (env environment?))
 ;   (call-exp-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
@@ -48,11 +47,6 @@
 ; (define (apply-cont cont val)
 ;   (cases continuation cont
 ;     (end-cont () val)
-;     (if-cont (saved-cont exp2 exp3 saved-env)
-;              (let ((exp (if (expval->bool val) exp2 exp3)))
-;                (value-of/k exp saved-env saved-cont)
-;                )
-;              )
 ;     (exps-cont (saved-cont exps vals env)
 ;                (value-of-exps/k exps (append vals (list val)) env saved-cont)
 ;                )
@@ -217,6 +211,20 @@
     )
   )
 
+(define (if-cont saved-cont exp1 exp2 exp3 saved-env)
+  (lambda (val)
+    (value-of/k exp1 saved-env
+                (lambda (val1)
+                  (value-of/k (eval-if-exp val1 exp2 exp3) saved-env saved-cont)
+                  ))
+    )
+  )
+
+(define (eval-if-exp val1 exp2 exp3)
+  (let ((exp (if (expval->bool val1) exp2 exp3)))
+    exp
+    )
+  )
 
 (define (value-of/k exp env cont)
   (cases expression exp
@@ -227,9 +235,9 @@
     (zero?-exp (exp1)
                (apply-cont (zero?-cont cont exp1 env) '())
                )
-    ; (if-exp (exp1 exp2 exp3)
-    ;         (value-of/k exp1 env (if-cont cont exp2 exp3 env))
-    ;         )
+    (if-exp (exp1 exp2 exp3)
+            (apply-cont (if-cont cont exp1 exp2 exp3 env) '())
+            )
     ; (var-exp (var)
     ;          (apply-cont cont (deref (apply-env env var)))
     ;          )
