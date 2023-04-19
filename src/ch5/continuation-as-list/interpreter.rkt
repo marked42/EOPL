@@ -188,9 +188,9 @@
     (zero?-exp (exp1)
                (value-of/k exp1 env (cons (zero?-frame) cont))
                )
-    ; (if-exp (exp1 exp2 exp3)
-    ;         (value-of/k exp1 env (if-cont cont exp2 exp3 env))
-    ;         )
+    (if-exp (exp1 exp2 exp3)
+            (value-of/k exp1 env (cons (if-frame exp2 exp3 env) cont))
+            )
     ; (var-exp (var)
     ;          (apply-cont cont (deref (apply-env env var)))
     ;          )
@@ -251,6 +251,9 @@
         (zero?-frame ()
           (apply-cont rest-frames (eval-zero?-exp val))
         )
+        (if-frame (exp2 exp3 saved-env)
+          (value-of/k (eval-if-exp val exp2 exp3) saved-env rest-frames)
+        )
         (else (eopl:error "invalid frame type~s " first-frame))
       )
     )
@@ -272,10 +275,17 @@
     )
   )
 
+(define (eval-if-exp val1 exp2 exp3)
+  (let ((exp (if (expval->bool val1) exp2 exp3)))
+    exp
+    )
+  )
+
 (define (end-cont) '())
 
 (define-datatype frame frame?
   (diff-frame-1 (exp2 expression?) (saved-env environment?))
   (diff-frame-2 (val1 expval?))
   (zero?-frame)
+  (if-frame (exp2 expression?) (exp3 expression?) (saved-env environment?))
   )
