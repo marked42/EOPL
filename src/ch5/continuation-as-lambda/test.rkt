@@ -75,8 +75,8 @@ in (odd 13)
 (equal-answer? (run "null?(emptylist)") #t "null?-exp")
 (equal-answer? (run "null?(cons(1, 2))") #f "null?-exp")
 
-; (equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
-; (equal-answer? (run "car(emptylist)") '() "car-exp")
+(equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
+(equal-answer? (run "car(emptylist)") '() "car-exp")
 
 ; (equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
 ; (equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
