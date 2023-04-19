@@ -26,7 +26,7 @@
                    sloppy-val)))))
 
 (equal-answer? (run "1") 1 "const exp")
-; (equal-answer? (run "-(1, 2)") -1 "diff exp")
+(equal-answer? (run "-(1, 2)") -1 "diff exp")
 ; (equal-answer? (run "zero? (0)") #t "zero? exp")
 ; (equal-answer? (run "zero? (1)") #f "zero? exp")
 ; (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
