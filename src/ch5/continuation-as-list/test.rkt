@@ -92,9 +92,9 @@ begin
 end
 ") 10 "begin-exp")
 
-; (equal-answer? (run "
-; begin
-;   set x = 11;
-;   x
-; end
-; ") 11 "assign-exp")
+(equal-answer? (run "
+begin
+  set x = 11;
+  x
+end
+") 11 "assign-exp")
