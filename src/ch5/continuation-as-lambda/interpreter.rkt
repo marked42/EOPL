@@ -26,7 +26,6 @@
 
 ; (define-datatype continuation cont?
 ;   (end-cont)
-;   (zero?-cont (saved-cont cont?))
 ;   (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
 ;   (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
 ;   (let-cont (saved-cont cont?) (vars (list-of identifier?)) (body expression?) (env environment?))
@@ -49,16 +48,6 @@
 ; (define (apply-cont cont val)
 ;   (cases continuation cont
 ;     (end-cont () val)
-;     (zero?-cont (saved-cont)
-;                 (let ((num (expval->num val)))
-;                   (apply-cont saved-cont
-;                               (if (zero? num)
-;                                   (bool-val #t)
-;                                   (bool-val #f)
-;                                   )
-;                               )
-;                   )
-;                 )
 ;     (if-cont (saved-cont exp2 exp3 saved-env)
 ;              (let ((exp (if (expval->bool val) exp2 exp3)))
 ;                (value-of/k exp saved-env saved-cont)
@@ -209,15 +198,35 @@
     )
   )
 
+(define (zero?-cont saved-cont exp1 saved-env)
+  (lambda (val)
+    (value-of/k exp1 saved-env
+                (lambda (val1)
+                  (apply-cont saved-cont (eval-zero?-exp val1))
+                  )
+                )
+    )
+  )
+
+(define (eval-zero?-exp val1)
+  (let ((num (expval->num val1)))
+    (if (zero? num)
+        (bool-val #t)
+        (bool-val #f)
+        )
+    )
+  )
+
+
 (define (value-of/k exp env cont)
   (cases expression exp
     (const-exp (num) (apply-cont cont (num-val num)))
     (diff-exp (exp1 exp2)
               (apply-cont (diff-cont cont exp1 exp2 env) '())
               )
-    ; (zero?-exp (exp1)
-    ;            (value-of/k exp1 env (zero?-cont cont))
-    ;            )
+    (zero?-exp (exp1)
+               (apply-cont (zero?-cont cont exp1 env) '())
+               )
     ; (if-exp (exp1 exp2 exp3)
     ;         (value-of/k exp1 env (if-cont cont exp2 exp3 env))
     ;         )
