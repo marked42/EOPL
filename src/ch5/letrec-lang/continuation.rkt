@@ -9,18 +9,16 @@
  ["../shared/eval.rkt" (
                         eval-diff-exp
                         eval-zero?-exp
+                        eval-if-exp
+                        eval-let-exp
                         eval-null?-exp
                         eval-cons-exp
-                        eval-if-exp
                         eval-car-exp
                         eval-cdr-exp
                         eval-list-exp
                         )]
- ["../shared/environment.rkt" (
-                               extend-mul-env
-                               environment?
-                               )]
- ["../shared/store.rkt" (vals->refs setref reference?)]
+ ["../shared/environment.rkt" (environment?)]
+ ["../shared/store.rkt" (setref reference?)]
  ["../shared/value.rkt" (expval? expval->proc cell-val)]
  ["../shared/expression.rkt" (expression?)]
  ["interpreter.rkt" (value-of/k value-of-exps/k)]
@@ -71,9 +69,9 @@
     (exps-cont (saved-cont exps vals env mapper)
                (value-of-exps/k exps (append vals (list val)) env saved-cont mapper)
                )
-    (let-cont (saved-cont vars body env)
+    (let-cont (saved-cont vars body saved-env)
               (let ((vals val))
-                (value-of/k body (extend-mul-env vars (vals->refs vals) env) saved-cont)
+                (value-of/k body (eval-let-exp vars vals saved-env) saved-cont)
                 )
               )
     (call-cont (saved-cont rands saved-env)

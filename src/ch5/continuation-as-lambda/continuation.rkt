@@ -8,6 +8,7 @@
  ["../shared/eval.rkt" (
                         eval-diff-exp
                         eval-zero?-exp
+                        eval-let-exp
                         eval-null?-exp
                         eval-cons-exp
                         eval-if-exp
@@ -62,7 +63,7 @@
 (define (let-cont saved-cont vars body saved-env)
   (lambda (val)
           (let ((vals val))
-            (value-of/k body (extend-mul-env vars (vals->refs vals) saved-env) saved-cont)
+            (value-of/k body (eval-let-exp vars vals saved-env) saved-cont)
             )
   )
 )

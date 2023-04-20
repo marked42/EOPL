@@ -9,6 +9,7 @@
  ["../shared/eval.rkt" (
                         eval-diff-exp
                         eval-zero?-exp
+                        eval-let-exp
                         eval-null?-exp
                         eval-if-exp
                         eval-cons-exp
@@ -67,7 +68,7 @@
                       )
           (let-frame (vars body saved-env)
                      (let ((vals val))
-                       (value-of/k body (extend-mul-env vars (vals->refs vals) saved-env) saved-cont)
+                       (value-of/k body (eval-let-exp vars vals saved-env) saved-cont)
                        )
                      )
           (call-exp-frame (rands saved-env)
