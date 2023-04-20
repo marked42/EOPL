@@ -10,6 +10,7 @@
                         eval-diff-exp
                         eval-zero?-exp
                         eval-null?-exp
+                        eval-cons-exp
                         eval-if-exp
                         eval-car-exp
                         eval-cdr-exp
@@ -90,7 +91,7 @@
                      )
     (cons-cont-1 (saved-cont val1)
                      (let ((val2 val))
-                       (apply-cont saved-cont (cell-val val1 val2))
+                       (apply-cont saved-cont (eval-cons-exp val1 val2))
                        )
                      )
     (null?-cont (saved-cont)
