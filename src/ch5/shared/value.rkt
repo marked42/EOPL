@@ -1,8 +1,8 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt" "expression.rkt")
+(require racket/lazy-require)
 (lazy-require
- ["environment.rkt" (environment?)]
+ ["basic.rkt" (report-expval-extractor-error)]
  ["procedure.rkt" (proc?)]
  )
 
@@ -71,5 +71,12 @@
   (cases expval val
     (cell-val (first second) #t)
     (else #f)
+    )
+  )
+
+(define (eval-null?-exp val1)
+  (cases expval val1
+    (null-val () (bool-val #t))
+    (else (bool-val #f))
     )
   )
