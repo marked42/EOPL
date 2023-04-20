@@ -14,7 +14,7 @@
                         eval-cons-exp
                         eval-car-exp
                         eval-cdr-exp
-                        build-list-from-vals
+                        eval-list-exp
                         )]
  ["../shared/environment.rkt" (
                                extend-mul-env
@@ -99,7 +99,7 @@
                          )
           (list-exp-frame ()
                           (let ((vals val))
-                            (apply-cont saved-cont (build-list-from-vals vals))
+                            (apply-cont saved-cont (eval-list-exp vals))
                             )
                           )
           (begin-exp-frame ()

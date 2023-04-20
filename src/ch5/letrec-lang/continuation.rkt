@@ -14,7 +14,7 @@
                         eval-if-exp
                         eval-car-exp
                         eval-cdr-exp
-                        build-list-from-vals
+                        eval-list-exp
                         )]
  ["../shared/environment.rkt" (
                                extend-mul-env
@@ -104,7 +104,7 @@
                   (apply-cont saved-cont (eval-cdr-exp val))
                   )
     (list-cont (saved-cont)
-                   (apply-cont saved-cont (build-list-from-vals val))
+                   (apply-cont saved-cont (eval-list-exp val))
                    )
     (begin-cont (saved-cont)
                     (let ((vals val))
