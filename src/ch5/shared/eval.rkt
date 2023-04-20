@@ -2,7 +2,7 @@
 
 (require racket/lazy-require "value.rkt")
 (lazy-require
- ["value.rkt" (num-val bool-val expval->num expval->bool)]
+ ["value.rkt" (num-val bool-val expval->num expval->bool is-null?-exp)]
  )
 
 (provide (all-defined-out))
@@ -44,3 +44,5 @@
         )
       )
   )
+
+(define eval-null?-exp is-null?-exp)

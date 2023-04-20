@@ -74,7 +74,7 @@
     )
   )
 
-(define (eval-null?-exp val1)
+(define (is-null?-exp val1)
   (cases expval val1
     (null-val () (bool-val #t))
     (else (bool-val #f))
