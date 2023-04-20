@@ -28,6 +28,10 @@
     )
   )
 
+(define (eval-cons-exp val1 val2)
+  (cell-val val1 val2)
+  )
+
 (define (eval-car-exp val1)
   (cell-val->first val1)
   )

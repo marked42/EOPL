@@ -11,6 +11,7 @@
                         eval-zero?-exp
                         eval-null?-exp
                         eval-if-exp
+                        eval-cons-exp
                         eval-car-exp
                         eval-cdr-exp
                         build-list-from-vals
@@ -84,7 +85,7 @@
                             )
           (cons-exp-frame-2 (val1)
                             (let ((val2 val))
-                              (apply-cont saved-cont (cell-val val1 val2))
+                              (apply-cont saved-cont (eval-cons-exp val1 val2))
                               )
                             )
           (null?-exp-frame ()
