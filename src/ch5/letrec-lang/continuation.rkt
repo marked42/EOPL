@@ -22,8 +22,9 @@
  ["../shared/store.rkt" (vals->refs setref reference?)]
  ["../shared/value.rkt" (expval? expval->proc cell-val)]
  ["../shared/expression.rkt" (expression?)]
- ["interpreter.rkt" (value-of/k value-of-exps/k value-of-operands/k value-of-begin-operands/k)]
+ ["interpreter.rkt" (value-of/k value-of-exps/k)]
  ["procedure.rkt" (apply-procedure/k)]
+ ["call.rkt" (eval-call-by-ref-operand)]
  )
 
 (provide (all-defined-out))
@@ -34,11 +35,10 @@
   (diff-cont-2 (saved-cont cont?) (val1 expval?))
   (zero?-cont (saved-cont cont?))
   (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
-  (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
+  (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?) (mapper procedure?))
   (let-cont (saved-cont cont?) (vars (list-of identifier?)) (body expression?) (env environment?))
   (call-exp-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
   (call-exp-cont-2 (saved-cont cont?) (rator expval?))
-  (operands-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
 
   (cons-exp-cont-1 (saved-cont cont?) (exp2 expression?) (saved-env environment?))
   (cons-exp-cont-2 (saved-cont cont?) (val1 expval?))
@@ -67,8 +67,8 @@
     (if-cont (saved-cont exp2 exp3 saved-env)
              (value-of/k (eval-if-exp val exp2 exp3) saved-env saved-cont)
              )
-    (exps-cont (saved-cont exps vals env)
-               (value-of-exps/k exps (append vals (list val)) env saved-cont)
+    (exps-cont (saved-cont exps vals env mapper)
+               (value-of-exps/k exps (append vals (list val)) env saved-cont mapper)
                )
     (let-cont (saved-cont vars body env)
               (let ((vals val))
@@ -77,7 +77,7 @@
               )
     (call-exp-cont (saved-cont rands saved-env)
                    (let ((rator val))
-                     (value-of-operands/k rands '() saved-env (call-exp-cont-2 saved-cont rator))
+                     (value-of-exps/k rands '() saved-env (call-exp-cont-2 saved-cont rator) eval-call-by-ref-operand)
                      )
                    )
     (call-exp-cont-2 (saved-cont rator)
@@ -85,9 +85,6 @@
                        (apply-procedure/k proc1 rands saved-cont)
                        )
                      )
-    (operands-cont (saved-cont exps vals env)
-                   (value-of-operands/k exps (append vals (list val)) env saved-cont)
-                   )
     (cons-exp-cont-1 (saved-cont exp2 env)
                      (value-of/k exp2 env (cons-exp-cont-2 saved-cont val))
                      )
@@ -110,7 +107,7 @@
                    )
     (begin-exp-cont (saved-cont)
                     (let ((vals val))
-                      (apply-cont saved-cont (last val))
+                      (apply-cont saved-cont (last vals))
                       )
                     )
     (set-rhs-cont (ref saved-cont)
