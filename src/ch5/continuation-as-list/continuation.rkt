@@ -22,7 +22,8 @@
  ["../shared/store.rkt" (vals->refs setref reference?)]
  ["../shared/value.rkt" (expval? expval->proc cell-val)]
  ["../shared/expression.rkt" (expression?)]
- ["interpreter.rkt" (value-of/k value-of-exps/k apply-procedure/k)]
+ ["interpreter.rkt" (value-of/k value-of-exps/k)]
+ ["procedure.rkt" (apply-procedure/k)]
  )
 
 (provide (all-defined-out))
