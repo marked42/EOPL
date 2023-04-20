@@ -56,12 +56,12 @@
   (equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "nested proc")
   (equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "proc with multiple arguments")
 
-  ; ; letrec
-  ; (equal-answer? (run "
-  ; letrec double(x)
-  ;   = if zero?(x) then 0 else -((double -(x,1)), -2)
-  ;     in (double 6)
-  ; ") 12 "letrec-exp")
+  ; letrec
+  (equal-answer? (run "
+  letrec double(x)
+    = if zero?(x) then 0 else -((double -(x,1)), -2)
+      in (double 6)
+  ") 12 "letrec-exp")
 
   ; (equal-answer? (run "
   ; letrec sum(x, y)
