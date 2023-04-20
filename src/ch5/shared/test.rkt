@@ -37,9 +37,9 @@
   (equal-answer? (run "zero? (0)") #t "zero? exp")
   (equal-answer? (run "zero? (1)") #f "zero? exp")
 
-  ; ; if
-  ; (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
-  ; (equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
+  ; if
+  (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
+  (equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
 
   ; ; var
   ; (equal-answer? (run "i") 1 "built in var i is 1")
