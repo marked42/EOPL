@@ -13,7 +13,7 @@
                         eval-if-exp
                         eval-car-exp
                         eval-cdr-exp
-                        build-list-from-vals
+                        eval-list-exp
                         )]
  ["../shared/environment.rkt" (
                                apply-env
@@ -117,7 +117,7 @@
 
 (define (list-cont saved-cont)
   (lambda (vals)
-    (apply-cont saved-cont (build-list-from-vals vals))
+    (apply-cont saved-cont (eval-list-exp vals))
     )
   )
 

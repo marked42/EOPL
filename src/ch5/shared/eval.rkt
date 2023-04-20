@@ -40,11 +40,11 @@
   (cell-val->second val1)
   )
 
-(define (build-list-from-vals vals)
+(define (eval-list-exp vals)
   (if (null? vals)
       (null-val)
       (let ((first (car vals)) (rest (cdr vals)))
-        (cell-val first (build-list-from-vals rest))
+        (cell-val first (eval-list-exp rest))
         )
       )
   )
