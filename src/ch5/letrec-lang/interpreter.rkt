@@ -98,9 +98,9 @@
     (list-exp (exp1 exps)
               (value-of-exps/k (cons exp1 exps) '() env (list-exp-cont cont))
               )
-    ; (begin-exp (exp1 exps)
-    ;            (value-of-begin-operands/k (cons exp1 exps) (bool-val #f) env cont)
-    ;            )
+    (begin-exp (exp1 exps)
+               (value-of-exps/k (cons exp1 exps) '() env (begin-exp-cont cont))
+               )
     ; (assign-exp (var exp1)
     ;             (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
     ;             )
@@ -137,19 +137,6 @@
                        )
            )
           )
-        )
-      )
-  )
-
-(define (value-of-begin-operands/k exps last-val env saved-cont)
-  (if (null? exps)
-      (apply-cont saved-cont last-val)
-      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-        (value-of/k
-         first-exp
-         env
-         (begin-operands-cont saved-cont rest-exps last-val env)
-         )
         )
       )
   )
