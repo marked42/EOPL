@@ -4,7 +4,8 @@
 (lazy-require
  ["expression.rkt" (expression?)]
  ["basic.rkt" (identifier?)]
- ["environment.rkt" (environment?)]
+ ["environment.rkt" (environment? extend-mul-env)]
+ ["store.rkt" (vals->refs)]
  )
 
 (provide (all-defined-out))
@@ -17,11 +18,11 @@
    )
   )
 
-(define (proc->procedure proc1)
+(define (apply-procedure/k value-of/k proc1 args saved-cont)
   (cases proc proc1
     (procedure (vars body saved-env)
                ; create new ref under implicit refs, aka call-by-value
-               (list vars body saved-env)
+               (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
                )
     )
   )

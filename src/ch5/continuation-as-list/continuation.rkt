@@ -22,8 +22,8 @@
  ["../shared/store.rkt" (vals->refs setref reference?)]
  ["../shared/value.rkt" (expval? expval->proc cell-val)]
  ["../shared/expression.rkt" (expression?)]
+ ["../shared/procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k)]
- ["procedure.rkt" (apply-procedure/k)]
  )
 
 (provide (all-defined-out))
@@ -76,7 +76,7 @@
                           )
           (call-exp-frame-1 (rator)
                             (let ((proc1 (expval->proc rator)) (rands val))
-                              (apply-procedure/k proc1 rands saved-cont)
+                              (apply-procedure/k value-of/k proc1 rands saved-cont)
                               )
                             )
           (cons-exp-frame-1 (exp2 saved-env)
