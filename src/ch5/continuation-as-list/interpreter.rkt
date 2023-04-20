@@ -7,14 +7,13 @@
   "../shared/expression.rkt"
   )
 (lazy-require
- ["../shared/procedure.rkt" (procedure proc->procedure)]
+ ["../shared/procedure.rkt" (procedure)]
  ["../shared/environment.rkt" (
                                init-env
                                apply-env
-                               extend-mul-env
                                build-circular-extend-env-rec-mul-vec
                                )]
- ["../shared/store.rkt" (deref initialize-store! vals->refs)]
+ ["../shared/store.rkt" (deref initialize-store!)]
  ["../shared/value.rkt" (num-val proc-val null-val)]
  ["../shared/parser.rkt" (scan&parse)]
  ["continuation.rkt" (
