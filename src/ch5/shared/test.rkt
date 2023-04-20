@@ -106,11 +106,11 @@
   end
   ") 10 "begin-exp")
 
-  ; ; assign
-  ; (equal-answer? (run "
-  ; begin
-  ;   set x = 11;
-  ;   x
-  ; end
-  ; ") 11 "assign-exp")
+  ; assign
+  (equal-answer? (run "
+  begin
+    set x = 11;
+    x
+  end
+  ") 11 "assign-exp")
   )
