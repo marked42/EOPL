@@ -15,10 +15,26 @@
                                apply-env
                                extend-mul-env
                                build-circular-extend-env-rec-mul-vec
-                               environment?
                                )]
- ["../shared/store.rkt" (deref initialize-store! vals->refs setref reference?)]
- ["../shared/eval.rkt" (eval-diff-exp eval-zero?-exp eval-if-exp eval-car-exp eval-cdr-exp build-list-from-vals)]
+ ["../shared/store.rkt" (deref initialize-store! vals->refs)]
+ ["./continuation.rkt" (
+                        end-cont
+                        build-cont
+                        apply-cont
+                        diff-frame-1
+                        zero?-frame
+                        if-frame
+                        exps-frame
+                        let-frame
+                        call-exp-frame
+                        cons-exp-frame-1
+                        null?-exp-frame
+                        car-exp-frame
+                        cdr-exp-frame
+                        list-exp-frame
+                        begin-exp-frame
+                        set-rhs-frame
+                        )]
  )
 
 (provide (all-defined-out))
@@ -38,25 +54,25 @@
   (cases expression exp
     (const-exp (num) (apply-cont cont (num-val num)))
     (diff-exp (exp1 exp2)
-              (value-of/k exp1 env (cons (diff-frame-1 exp2 env) cont))
+              (value-of/k exp1 env (build-cont (diff-frame-1 exp2 env) cont))
               )
     (zero?-exp (exp1)
-               (value-of/k exp1 env (cons (zero?-frame) cont))
+               (value-of/k exp1 env (build-cont (zero?-frame) cont))
                )
     (if-exp (exp1 exp2 exp3)
-            (value-of/k exp1 env (cons (if-frame exp2 exp3 env) cont))
+            (value-of/k exp1 env (build-cont (if-frame exp2 exp3 env) cont))
             )
     (var-exp (var)
              (apply-cont cont (deref (apply-env env var)))
              )
     (let-exp (vars exps body)
-             (value-of-exps/k exps '() env (cons (let-frame vars body env) cont))
+             (value-of-exps/k exps '() env (build-cont (let-frame vars body env) cont))
              )
     (proc-exp (first-var rest-vars body)
-              (apply-cont cont (proc-val (procedure (cons first-var rest-vars) body env)))
+              (apply-cont cont (proc-val (procedure (build-cont first-var rest-vars) body env)))
               )
     (call-exp (rator rands)
-              (value-of/k rator env (cons (call-exp-frame rands env) cont))
+              (value-of/k rator env (build-cont (call-exp-frame rands env) cont))
               )
     (letrec-exp (p-names b-vars-list p-bodies body)
                 (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
@@ -66,100 +82,39 @@
     ; list
     (emptylist-exp () (apply-cont cont (null-val)))
     (cons-exp (exp1 exp2)
-              (value-of/k exp1 env (cons (cons-exp-frame-1 exp2 env) cont))
+              (value-of/k exp1 env (build-cont (cons-exp-frame-1 exp2 env) cont))
               )
     (null?-exp (exp1)
-               (value-of/k exp1 env (cons (null?-exp-frame) cont))
+               (value-of/k exp1 env (build-cont (null?-exp-frame) cont))
                )
     (car-exp (exp1)
-             (value-of/k exp1 env (cons (car-exp-frame) cont))
+             (value-of/k exp1 env (build-cont (car-exp-frame) cont))
              )
     (cdr-exp (exp1)
-             (value-of/k exp1 env (cons (cdr-exp-frame) cont))
+             (value-of/k exp1 env (build-cont (cdr-exp-frame) cont))
              )
     (list-exp (exp1 exps)
-              (value-of-exps/k (cons exp1 exps) '() env (cons (list-exp-frame) cont))
+              (value-of-exps/k (build-cont exp1 exps) '() env (build-cont (list-exp-frame) cont))
               )
     (begin-exp (exp1 exps)
-               (value-of-exps/k (cons exp1 exps) '() env (cons (begin-exp-frame) cont))
+               (value-of-exps/k (build-cont exp1 exps) '() env (build-cont (begin-exp-frame) cont))
                )
     (assign-exp (var exp1)
-                (value-of/k exp1 env (cons (set-rhs-frame (apply-env env var)) cont))
+                (value-of/k exp1 env (build-cont (set-rhs-frame (apply-env env var)) cont))
                 )
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
 
-(define (apply-cont cont val)
-  (if (null? cont)
-      val
-      (let ((first-frame (car cont)) (saved-cont (cdr cont)))
-        (cases frame first-frame
-          (diff-frame-1 (exp2 saved-env)
-                        (value-of/k exp2 saved-env
-                                    (cons (diff-frame-2 val) saved-cont)
-                                    )
-                        )
-          (diff-frame-2 (val1)
-                        (apply-cont saved-cont (eval-diff-exp val1 val))
-                        )
-          (zero?-frame ()
-                       (apply-cont saved-cont (eval-zero?-exp val))
-                       )
-          (if-frame (exp2 exp3 saved-env)
-                    (value-of/k (eval-if-exp val exp2 exp3) saved-env saved-cont)
-                    )
-          (exps-frame (exps vals saved-env)
-                      (value-of-exps/k exps (append vals (list val)) saved-env saved-cont)
-                      )
-          (let-frame (vars body saved-env)
-                     (let ((vals val))
-                       (value-of/k body (extend-mul-env vars (vals->refs vals) saved-env) saved-cont)
-                       )
-                     )
-          (call-exp-frame (rands saved-env)
-                          (let ((rator val))
-                            (value-of-exps/k rands '() saved-env (cons (call-exp-frame-1 rator) saved-cont))
-                            )
-                          )
-          (call-exp-frame-1 (rator)
-                            (let ((proc1 (expval->proc rator)) (rands val))
-                              (apply-procedure/k proc1 rands saved-cont)
-                              )
-                            )
-          (cons-exp-frame-1 (exp2 saved-env)
-                            (value-of/k exp2 saved-env (cons (cons-exp-frame-2 val) saved-cont))
-                            )
-          (cons-exp-frame-2 (val1)
-                            (let ((val2 val))
-                              (apply-cont saved-cont (cell-val val1 val2))
-                              )
-                            )
-          (null?-exp-frame ()
-                           (apply-cont saved-cont (eval-null?-exp val))
-                           )
-          (car-exp-frame ()
-                         (apply-cont saved-cont (eval-car-exp val))
-                         )
-          (cdr-exp-frame ()
-                         (apply-cont saved-cont (eval-cdr-exp val))
-                         )
-          (list-exp-frame ()
-                          (let ((vals val))
-                            (apply-cont saved-cont (build-list-from-vals vals))
-                            )
-                          )
-          (begin-exp-frame ()
-                           (let ((vals val))
-                             (apply-cont saved-cont (last vals))
-                             )
-                           )
-          (set-rhs-frame (ref)
-                         (setref ref val)
-                         (apply-cont saved-cont val)
-                         )
-          (else (eopl:error "invalid frame type~s " first-frame))
-          )
+(define (value-of-exps/k exps vals env saved-cont)
+  (if (null? exps)
+      (apply-cont saved-cont vals)
+      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
+        (value-of/k
+         first-exp
+         env
+         (build-cont (exps-frame rest-exps vals env) saved-cont)
+         )
         )
       )
   )
@@ -171,38 +126,4 @@
       (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
       )
     )
-  )
-
-(define (end-cont) '())
-
-(define-datatype frame frame?
-  (diff-frame-1 (exp2 expression?) (saved-env environment?))
-  (diff-frame-2 (val1 expval?))
-  (zero?-frame)
-  (if-frame (exp2 expression?) (exp3 expression?) (saved-env environment?))
-  (exps-frame (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
-  (let-frame (vars (list-of identifier?)) (body expression?) (saved-env environment?))
-  (call-exp-frame (rands (list-of expression?)) (saved-env environment?))
-  (call-exp-frame-1 (rator expval?))
-  (cons-exp-frame-1 (exp2 expression?) (saved-env environment?))
-  (cons-exp-frame-2 (val1 expval?))
-  (null?-exp-frame)
-  (car-exp-frame)
-  (cdr-exp-frame)
-  (list-exp-frame)
-  (begin-exp-frame)
-  (set-rhs-frame (ref reference?))
-  )
-
-(define (value-of-exps/k exps vals env saved-cont)
-  (if (null? exps)
-      (apply-cont saved-cont vals)
-      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-        (value-of/k
-         first-exp
-         env
-         (cons (exps-frame rest-exps vals env) saved-cont)
-         )
-        )
-      )
   )
