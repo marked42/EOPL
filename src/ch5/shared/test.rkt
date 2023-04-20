@@ -30,8 +30,8 @@
   ; const
   (equal-answer? (run "1") 1 "const exp")
 
-  ; ; diff
-  ; (equal-answer? (run "-(1, 2)") -1 "diff exp")
+  ; diff
+  (equal-answer? (run "-(1, 2)") -1 "diff exp")
 
   ; ; zero
   ; (equal-answer? (run "zero? (0)") #t "zero? exp")

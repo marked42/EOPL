@@ -55,9 +55,9 @@
 (define (value-of/k exp env cont)
   (cases expression exp
     (const-exp (num) (apply-cont cont (num-val num)))
-    ; (diff-exp (exp1 exp2)
-    ;           (value-of/k exp1 env (diff-cont-1 cont exp2 env))
-    ;           )
+    (diff-exp (exp1 exp2)
+              (value-of/k exp1 env (diff-cont-1 cont exp2 env))
+              )
     ; (zero?-exp (exp1)
     ;            (value-of/k exp1 env (zero?-cont cont))
     ;            )
