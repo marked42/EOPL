@@ -1,16 +1,25 @@
 #lang eopl
 
-(require racket/lazy-require racket/list "basic.rkt" "value.rkt" "parser.rkt" "expression.rkt")
+(require
+  racket/lazy-require
+  racket/list
+  "../shared/basic.rkt"
+  "../shared/value.rkt"
+  "../shared/parser.rkt"
+  "../shared/expression.rkt"
+  )
 (lazy-require
- ["environment.rkt" (
-                     init-env
-                     apply-env
-                     extend-mul-env
-                     build-circular-extend-env-rec-mul-vec
-                     environment?
-                     )]
- ["store.rkt" (deref initialize-store! vals->refs setref reference?)]
- ["procedure.rkt" (apply-procedure/k procedure)])
+ ["../shared/procedure.rkt" (procedure proc->procedure)]
+ ["../shared/environment.rkt" (
+                               init-env
+                               apply-env
+                               extend-mul-env
+                               build-circular-extend-env-rec-mul-vec
+                               environment?
+                               )]
+ ["../shared/store.rkt" (deref initialize-store! vals->refs setref reference?)]
+ ["../shared/eval.rkt" (eval-diff-exp eval-zero?-exp eval-if-exp eval-car-exp eval-cdr-exp build-list-from-vals)]
+ )
 
 (provide (all-defined-out))
 
@@ -83,96 +92,84 @@
 
 (define (apply-cont cont val)
   (if (null? cont)
-    val
-    (let ((first-frame (car cont)) (saved-cont (cdr cont)))
-      (cases frame first-frame
-        (diff-frame-1 (exp2 saved-env)
-          (value-of/k exp2 saved-env
-            (cons (diff-frame-2 val) saved-cont)
+      val
+      (let ((first-frame (car cont)) (saved-cont (cdr cont)))
+        (cases frame first-frame
+          (diff-frame-1 (exp2 saved-env)
+                        (value-of/k exp2 saved-env
+                                    (cons (diff-frame-2 val) saved-cont)
+                                    )
+                        )
+          (diff-frame-2 (val1)
+                        (apply-cont saved-cont (eval-diff-exp val1 val))
+                        )
+          (zero?-frame ()
+                       (apply-cont saved-cont (eval-zero?-exp val))
+                       )
+          (if-frame (exp2 exp3 saved-env)
+                    (value-of/k (eval-if-exp val exp2 exp3) saved-env saved-cont)
+                    )
+          (exps-frame (exps vals saved-env)
+                      (value-of-exps/k exps (append vals (list val)) saved-env saved-cont)
+                      )
+          (let-frame (vars body saved-env)
+                     (let ((vals val))
+                       (value-of/k body (extend-mul-env vars (vals->refs vals) saved-env) saved-cont)
+                       )
+                     )
+          (call-exp-frame (rands saved-env)
+                          (let ((rator val))
+                            (value-of-exps/k rands '() saved-env (cons (call-exp-frame-1 rator) saved-cont))
+                            )
+                          )
+          (call-exp-frame-1 (rator)
+                            (let ((proc1 (expval->proc rator)) (rands val))
+                              (apply-procedure/k proc1 rands saved-cont)
+                              )
+                            )
+          (cons-exp-frame-1 (exp2 saved-env)
+                            (value-of/k exp2 saved-env (cons (cons-exp-frame-2 val) saved-cont))
+                            )
+          (cons-exp-frame-2 (val1)
+                            (let ((val2 val))
+                              (apply-cont saved-cont (cell-val val1 val2))
+                              )
+                            )
+          (null?-exp-frame ()
+                           (apply-cont saved-cont (eval-null?-exp val))
+                           )
+          (car-exp-frame ()
+                         (apply-cont saved-cont (eval-car-exp val))
+                         )
+          (cdr-exp-frame ()
+                         (apply-cont saved-cont (eval-cdr-exp val))
+                         )
+          (list-exp-frame ()
+                          (let ((vals val))
+                            (apply-cont saved-cont (build-list-from-vals vals))
+                            )
+                          )
+          (begin-exp-frame ()
+                           (let ((vals val))
+                             (apply-cont saved-cont (last vals))
+                             )
+                           )
+          (set-rhs-frame (ref)
+                         (setref ref val)
+                         (apply-cont saved-cont val)
+                         )
+          (else (eopl:error "invalid frame type~s " first-frame))
           )
         )
-        (diff-frame-2 (val1)
-          (apply-cont saved-cont (eval-diff-exp val1 val))
-        )
-        (zero?-frame ()
-          (apply-cont saved-cont (eval-zero?-exp val))
-        )
-        (if-frame (exp2 exp3 saved-env)
-          (value-of/k (eval-if-exp val exp2 exp3) saved-env saved-cont)
-        )
-        (exps-frame (exps vals saved-env)
-                   (value-of-exps/k exps (append vals (list val)) saved-env saved-cont)
-        )
-        (let-frame (vars body saved-env)
-                   (let ((vals val))
-                    (value-of/k body (extend-mul-env vars (vals->refs vals) saved-env) saved-cont)
-                   )
-        )
-        (call-exp-frame (rands saved-env)
-                        (let ((rator val))
-                          (value-of-exps/k rands '() saved-env (cons (call-exp-frame-1 rator) saved-cont))
-                        )
-        )
-        (call-exp-frame-1 (rator)
-                        (let ((proc1 (expval->proc rator)) (rands val))
-                          (apply-procedure/k proc1 rands saved-cont)
-                        )
-        )
-        (cons-exp-frame-1 (exp2 saved-env)
-                          (value-of/k exp2 saved-env (cons (cons-exp-frame-2 val) saved-cont))
-        )
-        (cons-exp-frame-2 (val1)
-                         (let ((val2 val))
-                          (apply-cont saved-cont (cell-val val1 val2))
-                          )
-                         )
-        (null?-exp-frame ()
-                         (apply-cont saved-cont (eval-null?-exp val))
-        )
-        (car-exp-frame ()
-                       (apply-cont saved-cont (eval-car-exp val))
-        )
-        (cdr-exp-frame ()
-                       (apply-cont saved-cont (eval-cdr-exp val))
-        )
-        (list-exp-frame ()
-                        (let ((vals val))
-                          (apply-cont saved-cont (build-list-from-vals vals))
-                        )
-        )
-        (begin-exp-frame ()
-                         (let ((vals val))
-                          (apply-cont saved-cont (last vals))
-                         )
-        )
-        (set-rhs-frame (ref)
-                       (setref ref val)
-                       (apply-cont saved-cont val)
-        )
-        (else (eopl:error "invalid frame type~s " first-frame))
       )
-    )
-  )
-)
-
-(define (eval-diff-exp val1 val2)
-  (let ((num1 (expval->num val1)) (num2 (expval->num val2)))
-    (num-val (- num1 num2))
-    )
   )
 
-(define (eval-zero?-exp val1)
-  (let ((num (expval->num val1)))
-    (if (zero? num)
-        (bool-val #t)
-        (bool-val #f)
-        )
-    )
-  )
-
-(define (eval-if-exp val1 exp2 exp3)
-  (let ((exp (if (expval->bool val1) exp2 exp3)))
-    exp
+(define (apply-procedure/k proc1 args saved-cont)
+  (let ((procedure (proc->procedure proc1)))
+    (let ((vars (first procedure)) (body (second procedure)) (saved-env (third procedure)))
+      ; create new ref under implicit refs, aka call-by-value
+      (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
+      )
     )
   )
 
@@ -206,30 +203,6 @@
          env
          (cons (exps-frame rest-exps vals env) saved-cont)
          )
-        )
-      )
-  )
-
-(define (eval-null?-exp val1)
-  (cases expval val1
-    (null-val () (bool-val #t))
-    (else (bool-val #f))
-    )
-  )
-
-(define (eval-car-exp val1)
-  (cell-val->first val1)
-  )
-
-(define (eval-cdr-exp val1)
-  (cell-val->second val1)
-  )
-
-(define (build-list-from-vals vals)
-  (if (null? vals)
-      (null-val)
-      (let ((first (car vals)) (rest (cdr vals)))
-        (cell-val first (build-list-from-vals rest))
         )
       )
   )

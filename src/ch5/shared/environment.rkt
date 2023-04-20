@@ -2,11 +2,9 @@
 
 (require racket/lazy-require "basic.rkt")
 (lazy-require
- ["value.rkt" (num-val null-val? cell-val? expval? cell-val->first cell-val->second proc-val)]
- ["expression.rkt" (expression?)]
+ ["value.rkt" (num-val proc-val)]
  ["procedure.rkt" (procedure)]
- ["store.rkt" (reference? newref deref)]
- ["interpreter.rkt" (value-of-exp)]
+ ["store.rkt" (reference? newref)]
  )
 (provide (all-defined-out))
 

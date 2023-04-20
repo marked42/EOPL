@@ -1,7 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt")
-(lazy-require ["value.rkt" (num-val)])
+(require "basic.rkt")
 
 (provide (all-defined-out))
 

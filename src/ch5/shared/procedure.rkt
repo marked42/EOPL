@@ -1,10 +1,11 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt" "environment.rkt")
+(require racket/lazy-require racket/list)
 (lazy-require
  ["expression.rkt" (expression?)]
- ["store.rkt" (vals->refs)]
- ["interpreter.rkt" (value-of/k)])
+ ["basic.rkt" (identifier?)]
+ ["environment.rkt" (environment?)]
+ )
 
 (provide (all-defined-out))
 
@@ -16,11 +17,11 @@
    )
   )
 
-(define (apply-procedure/k proc1 args saved-cont)
+(define (proc->procedure proc1)
   (cases proc proc1
     (procedure (vars body saved-env)
                ; create new ref under implicit refs, aka call-by-value
-               (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
+               (list vars body saved-env)
                )
     )
   )
