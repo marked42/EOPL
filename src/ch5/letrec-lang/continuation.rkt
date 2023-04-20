@@ -47,7 +47,7 @@
   (cdr-exp-cont (saved-cont cont?))
   (list-exp-cont (saved-cont cont?))
 
-  (begin-operands-cont (saved-cont cont?) (exps (list-of expression?)) (last-val expval?) (saved-env environment?))
+  (begin-exp-cont (saved-cont cont?))
 
   (set-rhs-cont (ref reference?) (saved-cont cont?))
   )
@@ -108,10 +108,11 @@
     (list-exp-cont (saved-cont)
                    (apply-cont saved-cont (build-list-from-vals val))
                    )
-
-    (begin-operands-cont (saved-cont exps last-val saved-env)
-                         (value-of-begin-operands/k exps last-val saved-env saved-cont)
-                         )
+    (begin-exp-cont (saved-cont)
+                    (let ((vals val))
+                      (apply-cont saved-cont (last val))
+                      )
+                    )
     (set-rhs-cont (ref saved-cont)
                   (setref ref val)
                   (apply-cont saved-cont val)
