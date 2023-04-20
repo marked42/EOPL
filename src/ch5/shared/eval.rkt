@@ -3,6 +3,8 @@
 (require racket/lazy-require "value.rkt")
 (lazy-require
  ["value.rkt" (num-val bool-val expval->num expval->bool is-null?-exp)]
+ ["environment.rkt" ( extend-mul-env)]
+ ["store.rkt" (vals->refs)]
  )
 
 (provide (all-defined-out))
@@ -27,6 +29,10 @@
     exp
     )
   )
+
+(define (eval-let-exp vars vals saved-env)
+  (extend-mul-env vars (vals->refs vals) saved-env)
+)
 
 (define (eval-cons-exp val1 val2)
   (cell-val val1 val2)
