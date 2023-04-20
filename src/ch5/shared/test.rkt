@@ -46,9 +46,9 @@
   (equal-answer? (run "v") 5 "built in var i is 5")
   (equal-answer? (run "x") 10 "built in var i is 10")
 
-  ; ; let-exp
-  ; (equal-answer? (run "let a = 1 x = 2 in -(a, x)") -1 "let exp")
-  ; (equal-answer? (run "let x = 30 in let x = -(x,1) y = -(x,2) in -(x,y)") 1 "let-exp with arbitrary number of vars")
+  ; let-exp
+  (equal-answer? (run "let a = 1 x = 2 in -(a, x)") -1 "let exp")
+  (equal-answer? (run "let x = 30 in let x = -(x,1) y = -(x,2) in -(x,y)") 1 "let-exp with arbitrary number of vars")
 
   ; ; proc and call
   ; (equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
