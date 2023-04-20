@@ -1,26 +1,26 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt" "environment.rkt")
+(require
+  racket/lazy-require
+  racket/list
+  )
+
 (lazy-require
- ["expression.rkt" (expression?)]
- ["store.rkt" (vals->refs)]
- ["interpreter.rkt" (value-of/k)])
+ ["../shared/procedure.rkt" (proc->procedure)]
+ ["../shared/environment.rkt" (
+                               extend-mul-env
+                               )]
+ ["../shared/store.rkt" (vals->refs)]
+ ["interpreter.rkt" (value-of/k)]
+ )
 
 (provide (all-defined-out))
 
-(define-datatype proc proc?
-  (procedure
-   (vars (list-of identifier?))
-   (body expression?)
-   (saved-env environment?)
-   )
-  )
-
 (define (apply-procedure/k proc1 args saved-cont)
-  (cases proc proc1
-    (procedure (vars body saved-env)
-               ; create new ref under implicit refs, aka call-by-value
-               (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
-               )
+  (let ((procedure (proc->procedure proc1)))
+    (let ((vars (first procedure)) (body (second procedure)) (saved-env (third procedure)))
+      ; create new ref under implicit refs, aka call-by-value
+      (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
+      )
     )
   )

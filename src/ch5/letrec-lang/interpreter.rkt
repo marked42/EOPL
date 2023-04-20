@@ -1,16 +1,43 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt" "value.rkt" "parser.rkt" "expression.rkt")
+(require
+  racket/lazy-require
+  racket/list
+  ; use program and expression datatype
+  "../shared/expression.rkt"
+  )
 (lazy-require
- ["environment.rkt" (
-                     init-env
-                     apply-env
-                     extend-mul-env
-                     build-circular-extend-env-rec-mul-vec
-                     environment?
-                     )]
- ["store.rkt" (deref initialize-store! vals->refs setref reference?)]
- ["procedure.rkt" (apply-procedure/k procedure)])
+ ["../shared/procedure.rkt" (procedure)]
+ ["../shared/environment.rkt" (
+                               init-env
+                               apply-env
+                               build-circular-extend-env-rec-mul-vec
+                               )]
+ ["../shared/store.rkt" (deref initialize-store!)]
+ ["../shared/value.rkt" (num-val proc-val null-val bool-val)]
+ ["../shared/parser.rkt" (scan&parse)]
+ ["continuation.rkt" (
+                      end-cont
+                      build-cont
+                      apply-cont
+                      diff-cont-1
+                      diff-cont-2
+                      zero?-cont
+                      if-cont
+                      exps-cont
+                      let-cont
+                      call-exp-cont
+                      cons-exp-cont-1
+                      operands-cont
+                      begin-operands-cont
+                      null?-exp-cont
+                      car-exp-cont
+                      cdr-exp-cont
+                      list-exp-cont
+                      begin-exp-cont
+                      set-rhs-cont
+                      )]
+ )
 
 (provide (all-defined-out))
 
@@ -18,128 +45,78 @@
   (value-of-program (scan&parse str))
   )
 
-
-(define-datatype continuation cont?
-  (end-cont)
-  (diff-cont-1 (saved-cont cont?) (exp2 expression?) (saved-env environment?))
-  (diff-cont-2 (saved-cont cont?) (val1 expval?))
-  (zero?-cont (saved-cont cont?))
-  (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
-  (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
-  (let-cont (saved-cont cont?) (vars (list-of identifier?)) (body expression?) (env environment?))
-  (call-exp-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
-  (call-exp-cont-2 (saved-cont cont?) (rator expval?))
-  (operands-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
-
-  (cons-exp-cont-1 (saved-cont cont?) (exp2 expression?) (saved-env environment?))
-  (cons-exp-cont-2 (saved-cont cont?) (val1 expval?))
-  (null?-exp-cont (saved-cont cont?))
-  (car-exp-cont (saved-cont cont?))
-  (cdr-exp-cont (saved-cont cont?))
-  (list-exp-cont (saved-cont cont?))
-
-  (begin-operands-cont (saved-cont cont?) (exps (list-of expression?)) (last-val expval?) (saved-env environment?))
-
-  (set-rhs-cont (ref reference?) (saved-cont cont?))
-  )
-
-(define (apply-cont cont val)
-  (cases continuation cont
-    (end-cont () val)
-    (diff-cont-1 (saved-cont exp2 saved-env)
-                 (value-of/k exp2 saved-env (diff-cont-2 saved-cont val))
-                 )
-    (diff-cont-2 (saved-cont val1)
-                 (apply-cont saved-cont
-                             (let ((num1 (expval->num val1)) (num2 (expval->num val)))
-                               (num-val (- num1 num2))
-                               )
-                             )
-                 )
-    (zero?-cont (saved-cont)
-                (let ((num (expval->num val)))
-                  (apply-cont saved-cont
-                              (if (zero? num)
-                                  (bool-val #t)
-                                  (bool-val #f)
-                                  )
-                              )
-                  )
-                )
-    (if-cont (saved-cont exp2 exp3 saved-env)
-             (let ((exp (if (expval->bool val) exp2 exp3)))
-               (value-of/k exp saved-env saved-cont)
-               )
-             )
-    (exps-cont (saved-cont exps vals env)
-               (value-of-exps/k exps (append vals (list val)) env saved-cont)
-               )
-    (let-cont (saved-cont vars body env)
-              (let ((vals val))
-                (value-of/k body (extend-mul-env vars (vals->refs vals) env) saved-cont)
-                )
-              )
-    (call-exp-cont (saved-cont rands saved-env)
-                   (let ((rator val))
-                     (value-of-operands/k rands '() saved-env (call-exp-cont-2 saved-cont rator))
-                     )
-                   )
-    (call-exp-cont-2 (saved-cont rator)
-                     (let ((proc1 (expval->proc rator)) (rands val))
-                       (apply-procedure/k proc1 rands saved-cont)
-                       )
-                     )
-    (operands-cont (saved-cont exps vals env)
-                   (value-of-operands/k exps (append vals (list val)) env saved-cont)
-                   )
-    (cons-exp-cont-1 (saved-cont exp2 env)
-                     (value-of/k exp2 env (cons-exp-cont-2 saved-cont val))
-                     )
-    (cons-exp-cont-2 (saved-cont val1)
-                     (let ((val2 val))
-                       (apply-cont saved-cont (cell-val val1 val2))
-                       )
-                     )
-    (null?-exp-cont (saved-cont)
-                    (let ((res
-                           (cases expval val
-                             (null-val () (bool-val #t))
-                             (else (bool-val #f))
-                             )
-                           ))
-                      (apply-cont saved-cont res)
-                      )
-                    )
-    (car-exp-cont (saved-cont)
-                  (let ((res (cell-val->first val)))
-                    (apply-cont saved-cont res)
-                    )
-                  )
-    (cdr-exp-cont (saved-cont)
-                  (let ((res (cell-val->second val)))
-                    (apply-cont saved-cont res)
-                    )
-                  )
-    (list-exp-cont (saved-cont)
-                   (apply-cont saved-cont (build-list-from-vals val))
-                   )
-
-    (begin-operands-cont (saved-cont exps last-val saved-env)
-                         (value-of-begin-operands/k exps val saved-env saved-cont)
-                         )
-    (set-rhs-cont (ref saved-cont)
-                  (setref ref val)
-                  (apply-cont saved-cont val)
-                  )
+(define (value-of-program prog)
+  (initialize-store!)
+  (cases program prog
+    (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
     )
   )
 
+(define (value-of/k exp env cont)
+  (cases expression exp
+    (const-exp (num) (apply-cont cont (num-val num)))
+    ; (diff-exp (exp1 exp2)
+    ;           (value-of/k exp1 env (diff-cont-1 cont exp2 env))
+    ;           )
+    ; (zero?-exp (exp1)
+    ;            (value-of/k exp1 env (zero?-cont cont))
+    ;            )
+    ; (if-exp (exp1 exp2 exp3)
+    ;         (value-of/k exp1 env (if-cont cont exp2 exp3 env))
+    ;         )
+    ; (var-exp (var)
+    ;          (apply-cont cont (deref (apply-env env var)))
+    ;          )
+    ; (let-exp (vars exps body)
+    ;          (value-of-exps/k exps '() env (let-cont cont vars body env))
+    ;          )
+    ; (proc-exp (first-var rest-vars body)
+    ;           (apply-cont cont (proc-val (procedure (cons first-var rest-vars) body env)))
+    ;           )
+    ; (call-exp (rator rands)
+    ;           (value-of/k rator env (call-exp-cont cont rands env))
+    ;           )
+    ; (letrec-exp (p-names b-vars-list p-bodies body)
+    ;             (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
+    ;               (value-of/k body new-env cont)
+    ;               )
+    ;             )
+    ; ; list
+    ; (emptylist-exp () (apply-cont cont (null-val)))
+    ; (cons-exp (exp1 exp2)
+    ;           (value-of/k exp1 env (cons-exp-cont-1 cont exp2 env))
+    ;           )
+    ; (null?-exp (exp1)
+    ;            (value-of/k exp1 env (null?-exp-cont cont))
+    ;            )
+    ; (car-exp (exp1)
+    ;          (value-of/k exp1 env (car-exp-cont cont))
+    ;          )
+    ; (cdr-exp (exp1)
+    ;          (value-of/k exp1 env (cdr-exp-cont cont))
+    ;          )
+    ; (list-exp (exp1 exps)
+    ;           (value-of-exps/k (cons exp1 exps) '() env (list-exp-cont cont))
+    ;           )
+    ; (begin-exp (exp1 exps)
+    ;            (value-of-begin-operands/k (cons exp1 exps) (bool-val #f) env cont)
+    ;            )
+    ; (assign-exp (var exp1)
+    ;             (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
+    ;             )
+    (else (eopl:error "invalid exp ~s" exp))
+    )
+  )
 
-(define (build-list-from-vals vals)
-  (if (null? vals)
-      (null-val)
-      (let ((first (car vals)) (rest (cdr vals)))
-        (cell-val first (build-list-from-vals rest))
+(define (value-of-exps/k exps vals env saved-cont)
+  (if (null? exps)
+      (apply-cont saved-cont vals)
+      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
+        (value-of/k
+         first-exp
+         env
+         (exps-cont saved-cont rest-exps vals env)
+         )
         )
       )
   )
@@ -164,26 +141,6 @@
       )
   )
 
-(define (value-of-program prog)
-  (initialize-store!)
-  (cases program prog
-    (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
-    )
-  )
-
-(define (value-of-exps/k exps vals env saved-cont)
-  (if (null? exps)
-      (apply-cont saved-cont vals)
-      (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-        (value-of/k
-         first-exp
-         env
-         (exps-cont saved-cont rest-exps vals env)
-         )
-        )
-      )
-  )
-
 (define (value-of-begin-operands/k exps last-val env saved-cont)
   (if (null? exps)
       (apply-cont saved-cont last-val)
@@ -195,60 +152,4 @@
          )
         )
       )
-  )
-
-(define (value-of/k exp env cont)
-  (cases expression exp
-    (const-exp (num) (apply-cont cont (num-val num)))
-    (diff-exp (exp1 exp2)
-              (value-of/k exp1 env (diff-cont-1 cont exp2 env))
-              )
-    (zero?-exp (exp1)
-               (value-of/k exp1 env (zero?-cont cont))
-               )
-    (if-exp (exp1 exp2 exp3)
-            (value-of/k exp1 env (if-cont cont exp2 exp3 env))
-            )
-    (var-exp (var)
-             (apply-cont cont (deref (apply-env env var)))
-             )
-    (let-exp (vars exps body)
-             (value-of-exps/k exps '() env (let-cont cont vars body env))
-             )
-    (proc-exp (first-var rest-vars body)
-              (apply-cont cont (proc-val (procedure (cons first-var rest-vars) body env)))
-              )
-    (call-exp (rator rands)
-              (value-of/k rator env (call-exp-cont cont rands env))
-              )
-    (letrec-exp (p-names b-vars-list p-bodies body)
-                (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
-                  (value-of/k body new-env cont)
-                  )
-                )
-    ; list
-    (emptylist-exp () (apply-cont cont (null-val)))
-    (cons-exp (exp1 exp2)
-              (value-of/k exp1 env (cons-exp-cont-1 cont exp2 env))
-              )
-    (null?-exp (exp1)
-               (value-of/k exp1 env (null?-exp-cont cont))
-               )
-    (car-exp (exp1)
-             (value-of/k exp1 env (car-exp-cont cont))
-             )
-    (cdr-exp (exp1)
-             (value-of/k exp1 env (cdr-exp-cont cont))
-             )
-    (list-exp (exp1 exps)
-              (value-of-exps/k (cons exp1 exps) '() env (list-exp-cont cont))
-              )
-    (begin-exp (exp1 exps)
-               (value-of-begin-operands/k (cons exp1 exps) (bool-val #f) env cont)
-               )
-    (assign-exp (var exp1)
-                (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
-                )
-    (else (eopl:error "invalid exp ~s" exp))
-    )
   )
