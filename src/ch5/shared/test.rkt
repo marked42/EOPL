@@ -33,9 +33,9 @@
   ; diff
   (equal-answer? (run "-(1, 2)") -1 "diff exp")
 
-  ; ; zero
-  ; (equal-answer? (run "zero? (0)") #t "zero? exp")
-  ; (equal-answer? (run "zero? (1)") #f "zero? exp")
+  ; zero
+  (equal-answer? (run "zero? (0)") #t "zero? exp")
+  (equal-answer? (run "zero? (1)") #f "zero? exp")
 
   ; ; if
   ; (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
