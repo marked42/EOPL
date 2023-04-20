@@ -63,41 +63,41 @@
       in (double 6)
   ") 12 "letrec-exp")
 
-  ; (equal-answer? (run "
-  ; letrec sum(x, y)
-  ;   = if zero?(x) then y else -((sum -(x,1) y), -1)
-  ;     in (sum 3 4)
-  ; ") 7 "letrec-exp with multiple arguments")
+  (equal-answer? (run "
+  letrec sum(x, y)
+    = if zero?(x) then y else -((sum -(x,1) y), -1)
+      in (sum 3 4)
+  ") 7 "letrec-exp with multiple arguments")
 
-  ; ; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
-  ; (equal-answer? (run "
-  ; letrec
-  ; even(x) = if zero?(x) then 1 else (odd -(x,1))
-  ; odd(x) = if zero?(x) then 0 else (even -(x,1))
-  ; in (odd 13)
-  ; ") 1 "letrec-exp with multiple procedures")
+  ; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
+  (equal-answer? (run "
+  letrec
+  even(x) = if zero?(x) then 1 else (odd -(x,1))
+  odd(x) = if zero?(x) then 0 else (even -(x,1))
+  in (odd 13)
+  ") 1 "letrec-exp with multiple procedures")
 
-  ; ; emptylist
-  ; (equal-answer? (run "emptylist") '() "emptylist-exp")
+  ; emptylist
+  (equal-answer? (run "emptylist") '() "emptylist-exp")
 
-  ; ; cons
-  ; (equal-answer? (run "cons(1, 2)") (cons 1 2) "cons-exp")
+  ; cons
+  (equal-answer? (run "cons(1, 2)") (cons 1 2) "cons-exp")
 
-  ; ; null?
-  ; (equal-answer? (run "null?(emptylist)") #t "null?-exp")
-  ; (equal-answer? (run "null?(cons(1, 2))") #f "null?-exp")
+  ; null?
+  (equal-answer? (run "null?(emptylist)") #t "null?-exp")
+  (equal-answer? (run "null?(cons(1, 2))") #f "null?-exp")
 
-  ; ; car
-  ; (equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
-  ; (equal-answer? (run "car(emptylist)") '() "car-exp")
+  ; car
+  (equal-answer? (run "car(cons(1, 2))") 1 "car-exp")
+  (equal-answer? (run "car(emptylist)") '() "car-exp")
 
-  ; ; cdr
-  ; (equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
-  ; (equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
+  ; cdr
+  (equal-answer? (run "cdr(cons(1, 2))") 2 "cdr-exp")
+  (equal-answer? (run "cdr(emptylist)") '() "cdr-exp")
 
-  ; ; list
-  ; (equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
-  ; (equal-answer? (run "let x = 4 in list(x, -(x, 1), -(x, 3))") (list 4 3 1) "list-exp")
+  ; list
+  (equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
+  (equal-answer? (run "let x = 4 in list(x, -(x, 1), -(x, 3))") (list 4 3 1) "list-exp")
 
   ; ; begin
   ; (equal-answer? (run "
