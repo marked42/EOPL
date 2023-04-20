@@ -41,10 +41,10 @@
   (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
   (equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
 
-  ; ; var
-  ; (equal-answer? (run "i") 1 "built in var i is 1")
-  ; (equal-answer? (run "v") 5 "built in var i is 5")
-  ; (equal-answer? (run "x") 10 "built in var i is 10")
+  ; var
+  (equal-answer? (run "i") 1 "built in var i is 1")
+  (equal-answer? (run "v") 5 "built in var i is 5")
+  (equal-answer? (run "x") 10 "built in var i is 10")
 
   ; ; let-exp
   ; (equal-answer? (run "let a = 1 x = 2 in -(a, x)") -1 "let exp")
