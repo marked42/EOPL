@@ -3,9 +3,7 @@
 (require
   racket/lazy-require
   racket/list
-  "../shared/basic.rkt"
-  "../shared/value.rkt"
-  "../shared/parser.rkt"
+  ; use program and expression datatype
   "../shared/expression.rkt"
   )
 (lazy-require
@@ -17,24 +15,26 @@
                                build-circular-extend-env-rec-mul-vec
                                )]
  ["../shared/store.rkt" (deref initialize-store! vals->refs)]
- ["./continuation.rkt" (
-                        end-cont
-                        build-cont
-                        apply-cont
-                        diff-frame-1
-                        zero?-frame
-                        if-frame
-                        exps-frame
-                        let-frame
-                        call-exp-frame
-                        cons-exp-frame-1
-                        null?-exp-frame
-                        car-exp-frame
-                        cdr-exp-frame
-                        list-exp-frame
-                        begin-exp-frame
-                        set-rhs-frame
-                        )]
+ ["../shared/value.rkt" (num-val proc-val null-val)]
+ ["../shared/parser.rkt" (scan&parse)]
+ ["continuation.rkt" (
+                      end-cont
+                      build-cont
+                      apply-cont
+                      diff-frame-1
+                      zero?-frame
+                      if-frame
+                      exps-frame
+                      let-frame
+                      call-exp-frame
+                      cons-exp-frame-1
+                      null?-exp-frame
+                      car-exp-frame
+                      cdr-exp-frame
+                      list-exp-frame
+                      begin-exp-frame
+                      set-rhs-frame
+                      )]
  )
 
 (provide (all-defined-out))
@@ -117,13 +117,4 @@
          )
         )
       )
-  )
-
-(define (apply-procedure/k proc1 args saved-cont)
-  (let ((procedure (proc->procedure proc1)))
-    (let ((vars (first procedure)) (body (second procedure)) (saved-env (third procedure)))
-      ; create new ref under implicit refs, aka call-by-value
-      (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
-      )
-    )
   )
