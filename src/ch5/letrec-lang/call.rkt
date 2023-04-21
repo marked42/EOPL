@@ -16,16 +16,6 @@
 (provide (all-defined-out))
 
 (define (eval-operand-call-by-value exp1 saved-env saved-cont)
-  (cases expression exp1
-    (var-exp (var)
-             ; call by value
-             ; deref so that value instead of ref is passed as procedure parameters
-             (let ((val (deref (apply-env saved-env var))))
-               (apply-cont saved-cont val)
-               )
-             )
-    (else
-     (value-of/k exp1 saved-env saved-cont)
-     )
-    )
+  ; just get the value of exp1
+  (value-of/k exp1 saved-env saved-cont)
   )
