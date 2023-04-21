@@ -9,8 +9,16 @@
 ```rkt
 #lang eopl
 ```
-
 EOPL 中使用 Scheme 的函数`identifier?`判断一个值是不是标识符，Racket 没有提供这个函数，但是有类似`symbol?`来判断一个值是不是符号，区别参考这个[问题](https://stackoverflow.com/questions/48393025/difference-between-an-identifier-and-symbol-in-scheme)。
+
+## TODO:
+
+- proc-lang free-variables optimization
+  - [ ] at branch feat/free-variables
+  - [ ] Exercise 3.42 with lexical addressing
+- chapter 5.1
+  - [ ] Exercise 5.16 在 Exercise 4.22的基础上，实现CPS解释器。
+
 
 ## Chapter 3
 
@@ -61,13 +69,6 @@ let u = 7
 计算结果是`4`。
 
 ### proc-lang
-
-TODO:
-
-free-variables optimization
-
-- [ ] at branch feat/free-variables
-- [ ] Exercise 3.42 with lexical addressing
 
 ### letrec lang
 
@@ -309,3 +310,20 @@ letrec infinite-loop (x) = (infinite-loop -(x,-1))
 尾递归调用空间复杂度是 O(1)，`fact`空间复杂度是 O(N)
 
 Continuation 的作用和调用栈 stack 一样，记录着程序运行的控制上下文，一个 Continuation 等价于一个栈帧（frame）或者激活记录（activation record）。
+
+## 5.1 A Continuation-Passing Interpreter
+
+在`src/ch5`下总共有四个版本的实现
+
+1. letrec-lang 是用普通数据结构代表Continuation的实现，函数调用使用了值传递（call by value）。
+1. call-by-ref 是在letrec-lang的基础上，函数调用使用了引用传递（call by reference）的版本。
+1. continuation-as-lambda 使用了原生`lambda`函数来代表Continuation的实现，函数调用使用了值传递（call by value）。
+1. continuation-as-list 是使用了`list`来代表Continuation的实现，`list`的每个元素代表一个表达式的求值过程，等同于栈帧（stack frame），空`list`代表`end-cont`，也就是整个程序的最后运算。函数调用使用了值传递（call by value）。
+
+CPS解释器的实现核心思路如下，
+
+整个程序有个初始的`end-cont`代表程序结束运算时的回调。对不同表达式分类处理，每类表达式分成若干个计算步骤，每个步骤进行时递归的调用`value-of/k`计算当前步骤的表达式`exp1`，并且将之前的`cont`拼接当前表达式`exp1`求值后应该进行的操作，形成新的`cont1`，`cont1`被回调时拿到了`exp1`的值，进行相应计算得到结果，并用于调用`cont`。每一步计算都形成新的`cont`嵌套了旧的`cont`，`end-cont`被嵌套在最内层，效果等价于调用栈增长。
+
+letrec-lang/continuation-as-lambda的实现中，`cont`的数据都是嵌套的；continuation-as-list稍有不同，将每帧拆分开，使用线性的结构表示。
+
+需要注意的是`let-exp/call-exp/begin-exp/list-exp`这几个要对若干表达式顺序求值的情况，统一使用了`value-of-exps/k`进行处理。
