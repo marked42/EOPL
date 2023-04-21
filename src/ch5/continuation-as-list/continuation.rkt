@@ -16,16 +16,14 @@
                         eval-car-exp
                         eval-cdr-exp
                         eval-list-exp
+                        eval-begin-exp
                         )]
- ["../shared/environment.rkt" (
-                               extend-mul-env
-                               environment?
-                               )]
- ["../shared/store.rkt" (vals->refs setref reference?)]
- ["../shared/value.rkt" (expval? expval->proc cell-val)]
+ ["../shared/environment.rkt" (environment?)]
+ ["../shared/store.rkt" (setref reference?)]
+ ["../shared/value.rkt" (expval? expval->proc)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
- ["interpreter.rkt" (value-of/k value-of-exps/k)]
+ ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  )
 
 (provide (all-defined-out))
@@ -64,7 +62,7 @@
                     (value-of/k (eval-if-exp val exp2 exp3) saved-env saved-cont)
                     )
           (exps-frame (exps vals saved-env)
-                      (value-of-exps/k exps (append vals (list val)) saved-env saved-cont)
+                      (value-of-exps-helper/k exps (append vals (list val)) saved-env saved-cont)
                       )
           (let-frame (vars body saved-env)
                      (let ((vals val))
@@ -73,7 +71,7 @@
                      )
           (call-exp-frame (rands saved-env)
                           (let ((rator val))
-                            (value-of-exps/k rands '() saved-env (build-cont (call-exp-frame-1 rator) saved-cont))
+                            (value-of-exps/k rands saved-env (build-cont (call-exp-frame-1 rator) saved-cont))
                             )
                           )
           (call-exp-frame-1 (rator)
@@ -105,7 +103,7 @@
                           )
           (begin-exp-frame ()
                            (let ((vals val))
-                             (apply-cont saved-cont (last vals))
+                             (apply-cont saved-cont (eval-begin-exp vals))
                              )
                            )
           (set-rhs-frame (ref)

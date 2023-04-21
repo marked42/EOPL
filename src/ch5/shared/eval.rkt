@@ -1,13 +1,18 @@
 #lang eopl
 
-(require racket/lazy-require "value.rkt")
+(require racket/lazy-require racket/list "value.rkt")
 (lazy-require
- ["value.rkt" (num-val bool-val expval->num expval->bool is-null?-exp)]
- ["environment.rkt" ( extend-mul-env)]
- ["store.rkt" (vals->refs)]
+ ["value.rkt" (num-val bool-val proc-val expval->num expval->bool is-null?-exp)]
+ ["environment.rkt" (apply-env extend-mul-env build-circular-extend-env-rec-mul-vec)]
+ ["procedure.rkt" (procedure)]
+ ["store.rkt" (deref vals->refs)]
  )
 
 (provide (all-defined-out))
+
+(define (eval-const-exp num)
+  (num-val num)
+  )
 
 (define (eval-diff-exp val1 val2)
   (let ((num1 (expval->num val1)) (num2 (expval->num val2)))
@@ -30,9 +35,25 @@
     )
   )
 
+(define (eval-var-exp saved-env var)
+  (deref (apply-env saved-env var))
+  )
+
 (define (eval-let-exp vars vals saved-env)
   (extend-mul-env vars (vals->refs vals) saved-env)
-)
+  )
+
+(define (eval-proc-exp first-var rest-vars body saved-env)
+  (proc-val (procedure (cons first-var rest-vars) body saved-env))
+  )
+
+(define (eval-letrec-exp p-names b-vars-list p-bodies env)
+  (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)
+  )
+
+(define (eval-emptylist-exp)
+  (null-val)
+  )
 
 (define (eval-cons-exp val1 val2)
   (cell-val val1 val2)
@@ -53,6 +74,10 @@
         (cell-val first (eval-list-exp rest))
         )
       )
+  )
+
+(define (eval-begin-exp vals)
+  (last vals)
   )
 
 (define eval-null?-exp is-null?-exp)

@@ -7,14 +7,9 @@
   "../shared/expression.rkt"
   )
 (lazy-require
- ["../shared/procedure.rkt" (procedure)]
- ["../shared/environment.rkt" (
-                               init-env
-                               apply-env
-                               build-circular-extend-env-rec-mul-vec
-                               )]
- ["../shared/store.rkt" (deref initialize-store!)]
- ["../shared/value.rkt" (num-val proc-val null-val)]
+ ["../shared/environment.rkt" (init-env apply-env)]
+ ["../shared/store.rkt" (initialize-store!)]
+ ["../shared/eval.rkt" (eval-const-exp eval-var-exp eval-proc-exp eval-letrec-exp eval-emptylist-exp)]
  ["../shared/parser.rkt" (scan&parse)]
  ["continuation.rkt" (
                       end-cont
@@ -51,7 +46,7 @@
 
 (define (value-of/k exp env cont)
   (cases expression exp
-    (const-exp (num) (apply-cont cont (num-val num)))
+    (const-exp (num) (apply-cont cont (eval-const-exp num)))
     (diff-exp (exp1 exp2)
               (value-of/k exp1 env (build-cont (diff-frame-1 exp2 env) cont))
               )
@@ -62,24 +57,22 @@
             (value-of/k exp1 env (build-cont (if-frame exp2 exp3 env) cont))
             )
     (var-exp (var)
-             (apply-cont cont (deref (apply-env env var)))
+             (apply-cont cont (eval-var-exp env var))
              )
     (let-exp (vars exps body)
-             (value-of-exps/k exps '() env (build-cont (let-frame vars body env) cont))
+             (value-of-exps/k exps env (build-cont (let-frame vars body env) cont))
              )
     (proc-exp (first-var rest-vars body)
-              (apply-cont cont (proc-val (procedure (build-cont first-var rest-vars) body env)))
+              (apply-cont cont (eval-proc-exp first-var rest-vars body env))
               )
     (call-exp (rator rands)
               (value-of/k rator env (build-cont (call-exp-frame rands env) cont))
               )
     (letrec-exp (p-names b-vars-list p-bodies body)
-                (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
-                  (value-of/k body new-env cont)
-                  )
+                (value-of/k body (eval-letrec-exp p-names b-vars-list p-bodies env) cont)
                 )
     ; list
-    (emptylist-exp () (apply-cont cont (null-val)))
+    (emptylist-exp () (apply-cont cont (eval-emptylist-exp)))
     (cons-exp (exp1 exp2)
               (value-of/k exp1 env (build-cont (cons-exp-frame-1 exp2 env) cont))
               )
@@ -93,10 +86,10 @@
              (value-of/k exp1 env (build-cont (cdr-exp-frame) cont))
              )
     (list-exp (exp1 exps)
-              (value-of-exps/k (build-cont exp1 exps) '() env (build-cont (list-exp-frame) cont))
+              (value-of-exps/k (build-cont exp1 exps) env (build-cont (list-exp-frame) cont))
               )
     (begin-exp (exp1 exps)
-               (value-of-exps/k (build-cont exp1 exps) '() env (build-cont (begin-exp-frame) cont))
+               (value-of-exps/k (build-cont exp1 exps) env (build-cont (begin-exp-frame) cont))
                )
     (assign-exp (var exp1)
                 (value-of/k exp1 env (build-cont (set-rhs-frame (apply-env env var)) cont))
@@ -105,14 +98,18 @@
     )
   )
 
-(define (value-of-exps/k exps vals env saved-cont)
+(define (value-of-exps/k exps saved-env saved-cont)
+  (value-of-exps-helper/k exps '() saved-env saved-cont)
+  )
+
+(define (value-of-exps-helper/k exps vals saved-env saved-cont)
   (if (null? exps)
       (apply-cont saved-cont vals)
       (let ((first-exp (car exps)) (rest-exps (cdr exps)))
         (value-of/k
          first-exp
-         env
-         (build-cont (exps-frame rest-exps vals env) saved-cont)
+         saved-env
+         (build-cont (exps-frame rest-exps vals saved-env) saved-cont)
          )
         )
       )
