@@ -17,6 +17,7 @@
                         eval-letrec-exp
                         eval-emptylist-exp
                         )]
+ ["../shared/call.rkt" (make-eval-operand-call-by-value)]
  ["continuation.rkt" (
                       end-cont
                       apply-cont
@@ -34,10 +35,13 @@
                       begin-cont
                       set-rhs-cont
                       )]
- ["call.rkt" (eval-operand-call-by-value)]
  )
 
 (provide (all-defined-out))
+
+(define (eval-operand-call-by-value exp1 saved-env saved-cont)
+  (make-eval-operand-call-by-value value-of/k exp1 saved-env saved-cont)
+  )
 
 (define (run str)
   (value-of-program (scan&parse str))

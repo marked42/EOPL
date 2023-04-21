@@ -20,11 +20,15 @@
  ["../shared/value.rkt" (expval? expval->proc)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
+ ["../shared/call.rkt" (make-eval-operand-call-by-ref)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
- ["call.rkt" (eval-operand-call-by-ref)]
  )
 
 (provide (all-defined-out))
+
+(define (eval-operand-call-by-ref exp1 saved-env saved-cont)
+  (make-eval-operand-call-by-ref value-of/k apply-cont exp1 saved-env saved-cont)
+  )
 
 (define-datatype continuation cont?
   (end-cont)
