@@ -113,4 +113,17 @@
     x
   end
   ") 11 "assign-exp")
+
   )
+
+(define (run-test-call-by-ref run)
+  ; call by ref
+  (equal-answer? (run "
+  let f = proc (y) set y = 42
+    in let g = 13
+      in begin
+        (f g);
+        g
+      end
+  ") 42 "call-by-reference")
+)

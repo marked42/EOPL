@@ -19,3 +19,17 @@
   ; just get the value of exp1
   (value-of/k exp1 saved-env saved-cont)
   )
+
+(define (eval-operand-call-by-ref exp1 saved-env saved-cont)
+  (cases expression exp1
+    (var-exp (var)
+             ; call by ref
+             (let ((ref (apply-env saved-env var)))
+               (apply-cont saved-cont ref )
+               )
+             )
+    (else
+     (value-of/k exp1 saved-env saved-cont)
+     )
+    )
+  )
