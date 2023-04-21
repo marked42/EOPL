@@ -21,7 +21,7 @@
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
- ["call.rkt" (eval-call-by-ref-operand)]
+ ["call.rkt" (eval-operand-call-by-value)]
  )
 
 (provide (all-defined-out))
@@ -74,7 +74,7 @@
               )
     (call-cont (saved-cont rands saved-env)
                (let ((rator val))
-                 (value-of-exps/k rands saved-env (call-cont-1 saved-cont rator) eval-call-by-ref-operand)
+                 (value-of-exps/k rands saved-env (call-cont-1 saved-cont rator) eval-operand-call-by-value)
                  )
                )
     (call-cont-1 (saved-cont rator)

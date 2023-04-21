@@ -34,7 +34,7 @@
                       begin-cont
                       set-rhs-cont
                       )]
- ["call.rkt" (eval-call-by-value-operand)]
+ ["call.rkt" (eval-operand-call-by-value)]
  )
 
 (provide (all-defined-out))
@@ -66,7 +66,7 @@
              (apply-cont cont (eval-var-exp env var))
              )
     (let-exp (vars exps body)
-             (value-of-exps/k exps env (let-cont cont vars body env) eval-call-by-value-operand)
+             (value-of-exps/k exps env (let-cont cont vars body env) eval-operand-call-by-value)
              )
     (proc-exp (first-var rest-vars body)
               (apply-cont cont (eval-proc-exp first-var rest-vars body env))
@@ -92,10 +92,10 @@
              (value-of/k exp1 env (cdr-cont cont))
              )
     (list-exp (exp1 exps)
-              (value-of-exps/k (cons exp1 exps) env (list-cont cont) eval-call-by-value-operand)
+              (value-of-exps/k (cons exp1 exps) env (list-cont cont) eval-operand-call-by-value)
               )
     (begin-exp (exp1 exps)
-               (value-of-exps/k (cons exp1 exps) env (begin-cont cont) eval-call-by-value-operand)
+               (value-of-exps/k (cons exp1 exps) env (begin-cont cont) eval-operand-call-by-value)
                )
     (assign-exp (var exp1)
                 (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
