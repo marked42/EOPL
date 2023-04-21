@@ -1,9 +1,6 @@
 #lang eopl
 
-(require
-  racket/lazy-require
-  racket/list
-  )
+(require racket/lazy-require)
 (lazy-require
  ["../shared/basic.rkt" (identifier?)]
  ["../shared/eval.rkt" (
@@ -16,13 +13,14 @@
                         eval-car-exp
                         eval-cdr-exp
                         eval-list-exp
+                        eval-begin-exp
                         )]
  ["../shared/environment.rkt" (environment?)]
  ["../shared/store.rkt" (setref reference?)]
- ["../shared/value.rkt" (expval? expval->proc cell-val)]
+ ["../shared/value.rkt" (expval? expval->proc)]
  ["../shared/expression.rkt" (expression?)]
- ["interpreter.rkt" (value-of/k value-of-exps/k)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
+ ["interpreter.rkt" (value-of/k value-of-exps/k)]
  ["call.rkt" (eval-call-by-ref-operand)]
  )
 
@@ -55,8 +53,8 @@
   (cases continuation cont
     (end-cont () val)
     (diff-cont (saved-cont exp2 saved-env)
-                 (value-of/k exp2 saved-env (diff-cont-1 saved-cont val))
-                 )
+               (value-of/k exp2 saved-env (diff-cont-1 saved-cont val))
+               )
     (diff-cont-1 (saved-cont val1)
                  (apply-cont saved-cont (eval-diff-exp val1 val))
                  )
@@ -75,40 +73,40 @@
                 )
               )
     (call-cont (saved-cont rands saved-env)
-                   (let ((rator val))
-                     (value-of-exps/k rands '() saved-env (call-cont-1 saved-cont rator) eval-call-by-ref-operand)
-                     )
-                   )
+               (let ((rator val))
+                 (value-of-exps/k rands '() saved-env (call-cont-1 saved-cont rator) eval-call-by-ref-operand)
+                 )
+               )
     (call-cont-1 (saved-cont rator)
-                     (let ((proc1 (expval->proc rator)) (rands val))
-                       (apply-procedure/k value-of/k proc1 rands saved-cont)
-                       )
-                     )
-    (cons-cont (saved-cont exp2 env)
-                     (value-of/k exp2 env (cons-cont-1 saved-cont val))
-                     )
-    (cons-cont-1 (saved-cont val1)
-                     (let ((val2 val))
-                       (apply-cont saved-cont (eval-cons-exp val1 val2))
-                       )
-                     )
-    (null?-cont (saved-cont)
-                    (apply-cont saved-cont (eval-null?-exp val))
-                    )
-    (car-cont (saved-cont)
-                  (apply-cont saved-cont (eval-car-exp val))
-                  )
-    (cdr-cont (saved-cont)
-                  (apply-cont saved-cont (eval-cdr-exp val))
-                  )
-    (list-cont (saved-cont)
-                   (apply-cont saved-cont (eval-list-exp val))
+                 (let ((proc1 (expval->proc rator)) (rands val))
+                   (apply-procedure/k value-of/k proc1 rands saved-cont)
                    )
+                 )
+    (cons-cont (saved-cont exp2 env)
+               (value-of/k exp2 env (cons-cont-1 saved-cont val))
+               )
+    (cons-cont-1 (saved-cont val1)
+                 (let ((val2 val))
+                   (apply-cont saved-cont (eval-cons-exp val1 val2))
+                   )
+                 )
+    (null?-cont (saved-cont)
+                (apply-cont saved-cont (eval-null?-exp val))
+                )
+    (car-cont (saved-cont)
+              (apply-cont saved-cont (eval-car-exp val))
+              )
+    (cdr-cont (saved-cont)
+              (apply-cont saved-cont (eval-cdr-exp val))
+              )
+    (list-cont (saved-cont)
+               (apply-cont saved-cont (eval-list-exp val))
+               )
     (begin-cont (saved-cont)
-                    (let ((vals val))
-                      (apply-cont saved-cont (last vals))
-                      )
-                    )
+                (let ((vals val))
+                  (apply-cont saved-cont (eval-begin-exp vals))
+                  )
+                )
     (set-rhs-cont (ref saved-cont)
                   (setref ref val)
                   (apply-cont saved-cont val)
