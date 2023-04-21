@@ -13,7 +13,13 @@
   )
 
 (define (vals->refs vals)
-  (map (lambda (val) (newref val)) vals)
+  (map (lambda (val)
+         (if (reference? val)
+             ; return directly if val is a ref, this is for call-by-reference
+             val
+             (newref val)
+             )
+         ) vals)
   )
 
 (define (reference? v) (integer? v))
