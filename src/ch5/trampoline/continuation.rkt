@@ -22,7 +22,7 @@
  ["../shared/procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
- ["bounce.rkt" (create-bounced-apply-procedure/k)]
+ ["bounce-ds.rkt" (create-bounced-apply-procedure/k)]
  )
 
 (provide (all-defined-out))

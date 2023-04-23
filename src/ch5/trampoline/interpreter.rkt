@@ -36,7 +36,7 @@
                       set-rhs-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
- ["bounce.rkt" (apply-bounce)]
+ ["bounce-ds.rkt" (apply-bounce)]
  )
 
 (provide (all-defined-out))
