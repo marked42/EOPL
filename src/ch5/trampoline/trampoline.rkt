@@ -18,3 +18,10 @@
         )
       )
   )
+
+
+(define (trampoline-loop bounce)
+  (do ([val bounce (apply-bounce val)])
+    ((expval? val) val)
+    )
+  )
