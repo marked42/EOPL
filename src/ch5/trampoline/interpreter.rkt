@@ -10,7 +10,6 @@
  ["../shared/environment.rkt" (init-env apply-env)]
  ["../shared/store.rkt" (initialize-store!)]
  ["../shared/parser.rkt" (scan&parse)]
- ["../shared/value.rkt" (expval?)]
  ["../shared/eval.rkt" (
                         eval-const-exp
                         eval-var-exp
@@ -36,7 +35,7 @@
                       set-rhs-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
- ["bounce-ds.rkt" (apply-bounce)]
+ ["trampoline.rkt" (trampoline)]
  )
 
 (provide (all-defined-out))
@@ -52,15 +51,6 @@
                (trampoline (value-of/k exp1 (init-env) (end-cont)))
                )
     )
-  )
-
-(define (trampoline bounce)
-  (if (expval? bounce)
-      bounce
-      (let ((val (apply-bounce bounce)))
-        (trampoline val)
-        )
-      )
   )
 
 (define (value-of/k exp env cont)
