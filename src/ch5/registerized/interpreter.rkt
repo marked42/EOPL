@@ -1,13 +1,17 @@
 #lang eopl
 
-(require racket/lazy-require "value.rkt" "parser.rkt" "expression.rkt")
+(require racket/lazy-require "parser.rkt" "expression.rkt")
 (lazy-require
- ["basic.rkt" (identifier?)]
- ["environment.rkt" (init-env apply-env extend-env environment?)]
- ["procedure.rkt" (procedure apply-procedure/k)]
+ ["basic.rkt" (identifier? report-expval-extractor-error report-no-binding-found)]
  )
 
 (provide (all-defined-out))
+
+(define expr 'uninitialized)
+(define env 'uninitialized)
+(define cont 'uninitialized)
+(define val 'uninitialized)
+(define proc1 'uninitialized)
 
 (define (run str)
   (value-of-program (scan&parse str))
@@ -15,36 +19,74 @@
 
 (define (value-of-program prog)
   (cases program prog
-    (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
+    (a-program (exp1)
+               (set! expr exp1)
+               (set! env (init-env))
+               (set! cont (end-cont))
+               (value-of/k)
+               ; return val which stores the result
+               val
+               )
     )
   )
 
-(define (value-of/k exp env cont)
-  (cases expression exp
+(define (value-of/k)
+  (cases expression expr
     ; number constant
-    (const-exp (num) (apply-cont cont (num-val num)))
+    (const-exp (num)
+               (set! val (num-val num))
+               ; useless
+               ; (set! cont cont)
+               (apply-cont)
+               )
     ; subtraction of two numbers
     (diff-exp (exp1 exp2)
-              (value-of/k exp1 env (diff-cont cont exp2 env))
+              (set! expr exp1)
+              ; useless
+              ; (set! env env)
+              (set! cont (diff-cont cont exp2 env))
+              (value-of/k)
               )
     ; true only if exp1 is number 0
     (zero?-exp (exp1)
-               (value-of/k exp1 env (zero?-cont cont))
+               (set! expr exp1)
+               ; useless
+               ; (set! env env)
+               (set! cont (zero?-cont cont))
+               (value-of/k)
                )
     (if-exp (exp1 exp2 exp3)
-            (value-of/k exp1 env (if-cont cont exp2 exp3 env))
+            (set! expr exp1)
+            ; useless
+            ; (set! env env)
+            (set! cont (if-cont cont exp2 exp3 env))
+            (value-of/k)
             )
     (var-exp (var)
-             (apply-cont cont (apply-env env var))
+             (set! val (apply-env env var))
+             ; useless
+             ; (set! cont cont)
+             (apply-cont)
              )
     (let-exp (var exp1 body)
-             (value-of/k exp1 env (let-cont cont var body env))
+             (set! cont (let-cont cont var body env))
+             (set! expr exp1)
+             ; useless
+             ; (set! env env)
+             (value-of/k)
              )
     (proc-exp (var body)
-              (apply-cont cont (proc-val (procedure var body env)))
+              (set! val (proc-val (procedure var body env)))
+              ; useless
+              ; (set! cont cont)
+              (apply-cont)
               )
     (call-exp (rator rand)
-              (value-of/k rator env (call-cont cont rand env))
+              (set! expr rator)
+              ; useless
+              ; (set! env env)
+              (set! cont (call-cont cont rand env))
+              (value-of/k)
               )
     (else 42)
     )
@@ -61,42 +103,135 @@
   (call-cont-1 (saved-cont cont?) (rator expval?))
   )
 
-(define (apply-cont cont val)
+(define (apply-cont)
   (cases continuation cont
-    (end-cont () val)
+    ; end-cont is useless
+    ; (end-cont () val)
     (diff-cont (saved-cont exp2 saved-env)
-               (value-of/k exp2 saved-env (diff-cont-1 saved-cont val))
+               (set! cont (diff-cont-1 saved-cont val))
+               (set! expr exp2)
+               (set! env saved-env)
+               (value-of/k)
                )
     (diff-cont-1 (saved-cont val1)
+                 (set! cont saved-cont)
                  (let ((num1 (expval->num val1)) (num2 (expval->num val)))
-                   (apply-cont saved-cont (num-val (- num1 num2)))
+                   (set! val (num-val (- num1 num2)))
+                   (apply-cont)
                    )
                  )
     (zero?-cont (saved-cont)
-                (apply-cont saved-cont
-                            (let ((num (expval->num val)))
-                              (if (zero? num)
-                                  (bool-val #t)
-                                  (bool-val #f)
-                                  )
-                              )
+                (set! val (let ((num (expval->num val)))
+                            (if (zero? num)
+                                (bool-val #t)
+                                (bool-val #f)
+                                )
                             )
+                      )
+                (set! cont saved-cont)
+                (apply-cont)
                 )
     (if-cont (saved-cont exp2 exp3 saved-env)
-             (value-of/k (if (expval->bool val) exp2 exp3) saved-env saved-cont)
+             (set! expr (if (expval->bool val) exp2 exp3))
+             (set! cont saved-cont)
+             (set! env saved-env)
+             (value-of/k)
              )
     (let-cont (saved-cont var body saved-env)
-              (value-of/k body (extend-env var val saved-env) saved-cont)
+              (set! cont saved-cont)
+              (set! env (extend-env var val saved-env))
+              (set! expr body)
+              (value-of/k)
               )
     (call-cont (saved-cont rand saved-env)
-               (let ((rator val))
-                 (value-of/k rand saved-env (call-cont-1 saved-cont rator))
-                 )
+               (set! expr rand)
+               (set! env saved-env)
+               (set! cont (call-cont-1 saved-cont val))
+               (value-of/k)
                )
     (call-cont-1 (saved-cont rator)
-                 (let ((proc1 (expval->proc rator)) (rand val))
-                   (apply-procedure/k proc1 rand saved-cont)
-                   )
+                 (set! proc1 (expval->proc rator))
+                 (set! cont saved-cont)
+                 (apply-procedure/k)
                  )
+    (else "error")
+    )
+  )
+
+(define-datatype proc proc?
+  (procedure
+   (var identifier?)
+   (body expression?)
+   (saved-env environment?)
+   )
+  )
+
+(define (apply-procedure/k)
+  (cases proc proc1
+    (procedure (var body saved-env)
+               (set! expr body)
+               (set! env (extend-env var val saved-env))
+               (value-of/k)
+               )
+    )
+  )
+
+(define-datatype expval expval?
+  (num-val (num number?))
+  (bool-val (bool boolean?))
+  (proc-val (proc1 proc?))
+  )
+
+(define (expval->num val)
+  (cases expval val
+    (num-val (num) num)
+    (else (report-expval-extractor-error 'num val))
+    )
+  )
+
+(define (expval->bool val)
+  (cases expval val
+    (bool-val (bool) bool)
+    (else (report-expval-extractor-error 'bool val))
+    )
+  )
+
+(define (expval->proc val)
+  (cases expval val
+    (proc-val (proc1) proc1)
+    (else (report-expval-extractor-error 'proc val))
+    )
+  )
+
+(define-datatype environment environment?
+  (empty-env)
+  (extend-env
+   (var identifier?)
+   (val expval?)
+   (env environment?)
+   )
+  )
+
+; use a vec to build circular refs to avoid create same proc-val multiple times
+
+(define (init-env)
+  (extend-env 'i (num-val 1)
+              (extend-env 'v (num-val 5)
+                          (extend-env 'x (num-val 10)
+                                      (empty-env)
+                                      )
+                          )
+              )
+  )
+
+(define (apply-env env search-var)
+  (cases environment env
+    (extend-env (var val saved-env)
+                (if (eqv? search-var var)
+                    val
+                    (apply-env saved-env search-var)
+                    )
+                )
+    (else (report-no-binding-found search-var))
     )
   )
