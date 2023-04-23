@@ -10,6 +10,7 @@
  ["../shared/environment.rkt" (init-env apply-env)]
  ["../shared/store.rkt" (initialize-store!)]
  ["../shared/parser.rkt" (scan&parse)]
+ ["../shared/value.rkt" (expval?)]
  ["../shared/eval.rkt" (
                         eval-const-exp
                         eval-var-exp
@@ -46,8 +47,19 @@
 (define (value-of-program prog)
   (initialize-store!)
   (cases program prog
-    (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
+    (a-program (exp1)
+               (trampoline (value-of/k exp1 (init-env) (end-cont)))
+               )
     )
+  )
+
+(define (trampoline bounce)
+  (if (expval? bounce)
+      bounce
+      (let ((val (bounce)))
+        (trampoline val)
+        )
+      )
   )
 
 (define (value-of/k exp env cont)
