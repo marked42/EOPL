@@ -36,6 +36,7 @@
                       set-rhs-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
+ ["bounce.rkt" (apply-bounce)]
  )
 
 (provide (all-defined-out))
@@ -56,7 +57,7 @@
 (define (trampoline bounce)
   (if (expval? bounce)
       bounce
-      (let ((val (bounce)))
+      (let ((val (apply-bounce bounce)))
         (trampoline val)
         )
       )
