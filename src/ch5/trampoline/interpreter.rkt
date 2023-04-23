@@ -35,7 +35,7 @@
                       set-rhs-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
- ["trampoline.rkt" (trampoline)]
+ ["trampoline.rkt" (trampoline-loop)]
  )
 
 (provide (all-defined-out))
@@ -48,7 +48,7 @@
   (initialize-store!)
   (cases program prog
     (a-program (exp1)
-               (trampoline (value-of/k exp1 (init-env) (end-cont)))
+               (trampoline-loop (value-of/k exp1 (init-env) (end-cont)))
                )
     )
   )
