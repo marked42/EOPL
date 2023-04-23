@@ -327,3 +327,99 @@ CPS解释器的实现核心思路如下，
 letrec-lang/continuation-as-lambda的实现中，`cont`的数据都是嵌套的；continuation-as-list稍有不同，将每帧拆分开，使用线性的结构表示。
 
 需要注意的是`let-exp/call-exp/begin-exp/list-exp`这几个要对若干表达式顺序求值的情况，统一使用了`value-of-exps/k`进行处理。
+
+## 5.2 Trampoline Interpreter
+
+5.1 中的CPS解释器执行时，函数递归调用，调用栈不断增长，在过程式语言中会造成栈溢出错误，可以使用蹦床（trampoline）的技巧来解决这个问题。
+
+修改`apply-procedure/k`使其返回一个代表了后续运算的值`thunk`中，这样在`apply-procedure/k`返回时，递归函数调用栈会被弹出，将返回值逐层向上传递直到最顶层，效果是将`apply-procedure/k`所代表的后续运算存储`thunk`起来，然后在顶层使用`trampoline`函数重新激活`thunk`继续之前运算，就像蹦床一样，当`trampoline`得到的值不是`thunk`，而是一个值，就得到了最终的运算结果。
+
+```mermaid
+stateDiagram
+    valueOfProgram: value-of-program
+    valueOfExp: value-of/k
+    applyCont: apply-cont
+    applyProcedure: apply-procedure/k
+
+    [*] --> valueOfProgram
+    valueOfProgram --> valueOfExp
+
+    valueOfExp --> valueOfExp
+    valueOfExp --> applyCont
+
+    applyCont --> valueOfExp
+    applyCont --> applyProcedure
+
+    applyProcedure --> valueOfExp
+```
+
+根据程序中递归的解释器递归调用关系图（忽略了`value-of-exps/k`），`apply-procedure/k`返回`thunk`，确定几个函数的返回值类型。
+
+```
+apply-procedure/k -> thunk
+value-of/k -> bounce
+apply-cont -> bounce
+bounce = expval | thunk
+```
+
+ch5/trampoline/bounce.rkt中`apply-procedure/k`返回参数为空的函数包裹原来的函数体，使用函数表示实现`thunk`。
+
+```racket
+(define (create-bounced-apply-procedure/k apply-procedure/k)
+  ; apply-procedure/k
+  (lambda (value-of/k proc1 args saved-cont)
+    (lambda ()
+      (apply-procedure/k value-of/k proc1 args saved-cont)
+      )
+    )
+  )
+```
+
+ch5/trampoline/bounce-ds.rkt中`apply-procedure/k`返回一个数据结构`a-bounce`表示`thunk`。
+
+```racket
+(define (create-bounced-apply-procedure/k apply-procedure/k)
+  ; apply-procedure/k
+  (lambda (value-of/k proc1 args saved-cont)
+    (a-bounce apply-procedure/k value-of/k proc1 args saved-cont)
+    )
+  )
+```
+
+在函数入口位置需要使用蹦床函数`trampoline`重新激活`thunk`。
+
+```racket
+(define (trampoline bounce)
+  (if (expval? bounce)
+    ; 如果得到了结果值，直接返回
+    bounce
+    ; 激活蹦床函数，继续执行运算
+    (trampoline (apply-bounce bounce))
+  )
+)
+```
+
+上述蹦床函数的实现能消除`value-of/k`/`apply-cont`/`apply-procedure/k`递归调用的栈溢出问题，但是还有两个问题。
+
+一个问题是实现假设了解释器运行中在一个有限的时间内必定会调用到`apply-procedure/k`，从而不触发栈溢出问题（Page 157）。
+
+> For example, we can insert a (lambda () ...) around the body of apply-procedure/k,
+> since in our language no expression would run more than a bounded amount of time without performing a procedure call.
+
+但是这个假设并不严格，对于不包含函数调用的表达式，例如`-(a,b)`，如果嵌套层数非常多，`value-of/k`/`apply-cont`的递归调用也能造成调用栈很深，从而触发栈溢出问题。
+为了完全避免栈溢出，需要在每个递归调用处，应用`thunk`的技巧。
+
+另外一个问题是返回`thunk`消除了`value-of/k`/`apply-cont`/`apply-procedure/k`造成的栈无限增长，但是`trampoline`函数本身也是递归调用的，也可能造成栈无限增长。
+可以通过将`trampoline`函数从递归形式改写为循环来解决这个问题（Exercise 5.21）。
+
+参考代码ch5/trampoline.rkt中`trampoline-loop`实现。
+
+```racket
+(define (trampoline-loop bounce)
+  (do ([val bounce (apply-bounce val)])
+    ((expval? val) val)
+    )
+  )
+```
+
+另外还可以通过**抛出异常**的方式弹出函数栈，在程序入口捕捉异常，重新激活运算。
