@@ -26,6 +26,12 @@
 
 (provide (all-defined-out))
 
+(define (bounced-apply-procedure/k value-of/k proc1 args saved-cont)
+  (lambda ()
+    (apply-procedure/k value-of/k proc1 args saved-cont)
+    )
+  )
+
 (define-datatype continuation cont?
   (end-cont)
   (diff-cont (saved-cont cont?) (exp2 expression?) (saved-env environment?))
@@ -79,7 +85,7 @@
                )
     (call-cont-1 (saved-cont rator)
                  (let ((proc1 (expval->proc rator)) (rands val))
-                   (apply-procedure/k value-of/k proc1 rands saved-cont)
+                   (bounced-apply-procedure/k value-of/k proc1 rands saved-cont)
                    )
                  )
     (cons-cont (saved-cont exp2 env)
