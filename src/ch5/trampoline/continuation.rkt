@@ -22,15 +22,12 @@
  ["../shared/procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
+ ["bounce.rkt" (create-bounced-apply-procedure/k)]
  )
 
 (provide (all-defined-out))
 
-(define (bounced-apply-procedure/k value-of/k proc1 args saved-cont)
-  (lambda ()
-    (apply-procedure/k value-of/k proc1 args saved-cont)
-    )
-  )
+(define bounced-apply-procedure/k (create-bounced-apply-procedure/k apply-procedure/k))
 
 (define-datatype continuation cont?
   (end-cont)
