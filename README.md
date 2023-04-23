@@ -20,7 +20,7 @@ EOPL 中使用 Scheme 的函数`identifier?`判断一个值是不是标识符，
   - [ ] Exercise 5.16 在 Exercise 4.22的基础上，实现CPS解释器。
 
 
-## Chapter 3
+## Chapter 3 Expressions
 
 source language/defined language 指要设计和实现的语言。
 implementation language/defining language 指编写源码使用的语言。
@@ -99,7 +99,7 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
    1. let-exp -> nameless-let-exp
    1. proc-exp -> nameless-proc-exp
 
-## Chapter 4
+## Chapter 4 State
 
 ### explicit refs lang
 
@@ -256,7 +256,7 @@ letrec infinite-loop (x) = (infinite-loop -(x,-1))
 
 对于数字、字符串字面量等运行前就可以确定值的常量表达式，惰性求值策略可以不用生成 thunk。
 
-## Chapter 5
+## Chapter 5 Continuation-Passing Interpreter
 
 观察阶乘函数`fact`递归的执行情况情况，每一次`(fact (-n 1))`的递归调用出现在函数参数位置（operand position），整个计算过程中每次递归调用都会加深调用栈，上一层栈中记录了参数`n`，这样才能在子函数返回时继续计算（recursive control behavior）。
 
@@ -311,7 +311,7 @@ letrec infinite-loop (x) = (infinite-loop -(x,-1))
 
 Continuation 的作用和调用栈 stack 一样，记录着程序运行的控制上下文，一个 Continuation 等价于一个栈帧（frame）或者激活记录（activation record）。
 
-## 5.1 A Continuation-Passing Interpreter
+### 5.1 A Continuation-Passing Interpreter
 
 在`src/ch5`下总共有四个版本的实现
 
@@ -328,7 +328,7 @@ letrec-lang/continuation-as-lambda的实现中，`cont`的数据都是嵌套的�
 
 需要注意的是`let-exp/call-exp/begin-exp/list-exp`这几个要对若干表达式顺序求值的情况，统一使用了`value-of-exps/k`进行处理。
 
-## 5.2 Trampoline Interpreter
+### 5.2 Trampoline Interpreter
 
 5.1 中的CPS解释器执行时，函数递归调用，调用栈不断增长，在过程式语言中会造成栈溢出错误，可以使用蹦床（trampoline）的技巧来解决这个问题。
 
