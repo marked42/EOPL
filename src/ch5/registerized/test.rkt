@@ -3,7 +3,6 @@
 (require rackunit)
 (require racket)
 (require "interpreter.rkt")
-(require "value.rkt")
 
 (define equal-answer?
   (lambda (ans correct-ans msg)
