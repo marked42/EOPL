@@ -126,4 +126,88 @@
         g
       end
   ") 42 "call-by-reference")
-)
+  )
+
+(define (run-test-exception run)
+  (equal-answer? (run "
+  try 33 catch (m) 44
+  ") 33 "simple succeed")
+
+  (equal-answer? (run "
+  try 33 catch (m) foo
+  ") 33 "dont run handler til failure")
+
+  (equal-answer? (run "
+  try -(1, raise 44) catch (m) m
+  ") 44 "simple failure")
+
+  (check-exn exn:fail? (lambda () (run "-(1, raise 44)")))
+
+  (equal-answer? (run "
+  let f = proc (x) -(x, -(raise 99, 1))
+    in try (f 33)
+       catch (m) 44
+  ") 44 "exceptions have dynamic scope")
+
+  (equal-answer? (run "
+  let f = proc (x) -(x, -(raise 99, 1))
+    in -(try (f 33)
+       catch (m) -(m,55), 1)
+  ") 43 "handler in non tail recursive position")
+
+  (equal-answer? (run "
+  try try -(raise 23, 11)
+      catch (m) -(raise 22, 1)
+  catch (m) m
+  ") 22 "propagate error 1")
+
+  (equal-answer? (run "
+  let f = proc (x) -(1, raise 99)
+    in try
+          try (f 44)
+          catch (exc) (f 23)
+       catch (exc) 11
+  ") 11 "propagate error 2")
+
+  (equal-answer? (run "
+  let index = proc (n)
+                letrec inner2 (lst)
+                  % find position of n in lst else raise exception
+                  = if null?(lst) then lst
+                  else if zero?(-(car(lst), n)) then lst
+                  else let v = (inner2 cdr(lst))
+                       in v
+                    in proc(lst)
+                      try (inner2 lst)
+                      catch (x) -1
+              in ((index 3) list(2, 3, 4))
+  ") '(3 4) "test-example-0.1")
+
+  (equal-answer? (run "
+  let index = proc (n)
+                letrec inner2 (lst)
+                  % find position of n in lst else raise exception
+                  = if null?(lst) then raise 99
+                  else if zero?(-(car(lst), n)) then 0
+                  else let v = (inner2 cdr(lst))
+                       in -(v, -1)
+                    in proc(lst)
+                      try (inner2 lst)
+                      catch (x) -1
+              in ((index 2) list(2, 3, 4))
+  ") 0 "test-example-1.1")
+
+  (equal-answer? (run "
+  let index = proc (n)
+                letrec inner2 (lst)
+                  % find position of n in lst else raise exception
+                  = if null?(lst) then raise 99
+                  else if zero?(-(car(lst), n)) then 0
+                  else let v = (inner2 cdr(lst))
+                       in -(v, -1)
+                    in proc(lst)
+                      try (inner2 lst)
+                      catch (x) -1
+              in ((index 5) list(2, 3, 4))
+  ") -1 "test-example-1.1")
+  )

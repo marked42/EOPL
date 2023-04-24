@@ -33,6 +33,8 @@
                       list-cont
                       begin-cont
                       set-rhs-cont
+                      try-cont
+                      raise-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
  )
@@ -100,6 +102,12 @@
     (assign-exp (var exp1)
                 (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
                 )
+    (try-exp (exp1 var handler-exp)
+             (value-of/k exp1 env (try-cont cont var handler-exp env))
+             )
+    (raise-exp (exp1)
+               (value-of/k exp1 env (raise-cont cont))
+               )
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
