@@ -423,3 +423,158 @@ ch5/trampoline/bounce-ds.rkt中`apply-procedure/k`返回一个数据结构`a-bou
 ```
 
 另外还可以通过**抛出异常**的方式弹出函数栈，在程序入口捕捉异常，重新激活运算。
+
+### 5.4 Exception
+
+支持简单的异常语法，因为Continuation抽象了程序运行的后续运算，因此完全可以控制程序进行任意流程的运算，实现异常控制流。
+
+```
+try Expression catch (identifier) Expression
+try-exp (exp1 var handler-exp)
+
+raise Expression
+raise-exp (exp2)
+```
+表达式对第一个`exp1`求值，如果没有抛出异常，那么表达式的值就作为整个`try`表达式的值；如果`exp1`中使用`raise`抛出异常，那么对抛出的表达式`exp2`进行求值，得到的结果绑定绑定到变量`var`上，然后对`handler-exp`进行求值，变量`var`的值在运行时绑定，因此是**动态作用域的（dynamic scope）**。
+
+`raise`表达式对应的`try`是包裹着`raise`的**最近的**`try`，包裹指的是`raise`在`try`的`exp1`部分，而不是`handler-exp`部分。这里的异常机制比较简单，不会对抛出的异常值类型和`try`捕获的异常类型匹配，或者说`try`捕获所有的异常类型。
+
+核心代码如下，未抛出异常的情况下`try-cont`用得到的值`val`继续执行`saved-cont`。
+
+```racket
+(define (apply-cont cont val)
+  (cases continuation cont
+    (try-cont (saved-cont var handler-exp saved-env)
+              ; returns normally
+              (apply-cont saved-cont val)
+              )
+    (raise-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
+  )
+)
+```
+
+抛出异常的情况下，`try-cont`不会被执行到，`raise-cont`被执行，这时候使用`apply-handler`向上沿着嵌套的Continuation找到最近一层的`try-cont`，然后将抛出的异常值`val`动态绑定到`var`上，并在此环境下对`handler-exp`求值，得到的结果作为整个`try`的返回值，继续执行后续运算。
+
+```racket
+; search upward linearly for corresponding try-exp
+(define (apply-handler saved-cont val)
+  (cases continuation saved-cont
+    (end-cont () (report-uncaught-exception val))
+    (diff-cont (saved-cont exp2 saved-env)
+               (apply-handler saved-cont val)
+               )
+    ...
+    (try-cont (saved-cont var handler-exp saved-env)
+              ; returns normally
+              (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
+              )
+    (raise-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
+    )
+  )
+
+(define (report-uncaught-exception val)
+  (eopl:error 'uncaught-exception "Uncaught expcetion ~s " val)
+  )
+```
+
+如果没有找到`raise`对应的外层`try`会沿着嵌套的Continuation找到`end-cont`，说明异常未被捕获。
+
+没有捕获异常的情况下，`try`表达式的`handler-exp`**不会执行**，因此下面的未知变量`some-unbound-variable`不会报错。
+
+```racket
+try 33 catch (m) some-unbound-variable
+```
+
+`try`表达式可以**嵌套**，`try2`中抛出的异常值`23`会被`catch2`捕获，`m`绑定到`23`上；`catch2`中再次抛出异常值`22`，位于`try1`包括的范围，因此被`catch1`捕获，`n`绑定到`22`，`n`作为整个表达式的值。
+
+```racket
+; try1
+try
+  ; try2
+  try
+    -(raise 23, 11)
+  ; catch2
+  catch (m)
+    -(raise 22, 1)
+; catch1
+catch (n)
+  n
+```
+
+`raise`表达式也可以嵌套，`raise1`抛出异常，然后需要对抛出的异常表达式`raise 3`求值，`raise2`抛出异常，然后对异常值`3`进行求值，求值后继续寻找`raise2`对应的`try-cont`表达式，然后将`m`绑定到`3`，作为整个表达式的值。
+
+```racket
+try
+  ; raise1
+  raise
+    begin
+      ; executed
+      set x = 1;
+
+      ; raise 2
+      raise 3
+
+      ; not executed
+      set x = 2;
+    end
+catch (m) m
+```
+
+程序运行过程中，`raise1`的执行被转移到了`raise2`，因此`raise1`中`raise2`之后的流程没有得到执行。
+
+#### 常量时间
+
+沿着嵌套Continuation进行异常展开的时间复杂度是O(N)，效率较低，可以将`try-cont`记录下来，忽略中间的其他类型Continuation，做到常量时间O(1)的异常展开（Exercise 5.35）。
+
+这里使用一个`list`记录嵌套的`try-cont`，在`try`表达式执行前，将`try-cont`入栈。
+
+```racket
+(define (value-of/k exp env cont)
+  (cases expression exp
+    ...
+    (try-exp (exp1 var handler-exp)
+             (let ((new-try-cont (try-cont cont var handler-exp env)))
+               ; installs handler
+               (push-try-cont new-try-cont)
+               (value-of/k exp1 env new-try-cont)
+               )
+             )
+    (raise-exp (exp1)
+               (value-of/k exp1 env (raise-cont))
+               )
+  )
+)
+```
+
+未抛出异常的情况`list`栈顶的`try-cont`弹出；抛出异常的情况下，`list`栈顶保存的`try-cont`对应当前`raise`，需要在`handler-exp`求值之将栈顶元素弹出，因为`handler-exp`可能嵌套`try`表达式，会修改`list`。
+
+```racket
+(define (apply-cont cont val)
+  (cases continuation cont
+    ...
+    (try-cont (saved-cont var handler-exp saved-env)
+              ; uninstall handler when try cont succeeds or fails
+              (pop-try-cont)
+              (apply-cont saved-cont val)
+              )
+    (raise-cont ()
+                ; should uninstall exception handler before evaluating handler-exp
+                ; cause it may nest try-exp/raise-exp which changes try-conts stack
+                (let ((top-try-cont (pop-try-cont)))
+                  (cases continuation top-try-cont
+                    (try-cont (saved-cont var handler-exp saved-env)
+                              ; continue from try-exp denoted by saved-cont of top-try-cont
+                              ; after evaluating handler-exp
+                              (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
+                              )
+                    (else eopl:error "invalid try cont" top-try-cont)
+                    )
+                  )
+                )
+  )
+)
+```
