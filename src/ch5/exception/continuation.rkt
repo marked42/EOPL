@@ -15,8 +15,8 @@
                         eval-list-exp
                         eval-begin-exp
                         )]
- ["../shared/environment.rkt" (environment?)]
- ["../shared/store.rkt" (setref reference?)]
+ ["../shared/environment.rkt" (extend-env environment?)]
+ ["../shared/store.rkt" (setref reference? newref)]
  ["../shared/value.rkt" (expval? expval->proc)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
@@ -47,6 +47,9 @@
   (begin-cont (saved-cont cont?))
 
   (set-rhs-cont (ref reference?) (saved-cont cont?))
+
+  (try-cont (saved-cont cont?) (var identifier?) (handler-exp expression?) (saved-env environment?))
+  (raise-cont (saved-cont cont?))
   )
 
 (define (apply-cont cont val)
@@ -111,5 +114,79 @@
                   (setref ref val)
                   (apply-cont saved-cont val)
                   )
+    (try-cont (saved-cont var handler-exp saved-env)
+              ; returns normally
+              (apply-cont saved-cont val)
+              )
+    (raise-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
     )
+  )
+
+; search upward linearly for corresponding try-exp
+(define (apply-handler saved-cont val)
+  (cases continuation saved-cont
+    (end-cont () (report-uncaught-exception val))
+    (diff-cont (saved-cont exp2 saved-env)
+               (apply-handler saved-cont val)
+               )
+    (diff-cont-1 (saved-cont val1)
+                 (apply-handler saved-cont val)
+                 )
+    (zero?-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
+    (if-cont (saved-cont exp2 exp3 saved-env)
+             (apply-handler saved-cont val)
+             )
+    (exps-cont (saved-cont exps vals env mapper)
+               (apply-handler saved-cont val)
+               )
+    (let-cont (saved-cont vars body saved-env)
+              (apply-handler saved-cont val)
+              )
+    (call-cont (saved-cont rands saved-env)
+               (apply-handler saved-cont val)
+               )
+    (call-cont-1 (saved-cont rator)
+                 (apply-handler saved-cont val)
+                 )
+    (cons-cont (saved-cont exp2 env)
+               (apply-handler saved-cont val)
+               )
+    (cons-cont-1 (saved-cont val1)
+                 (apply-handler saved-cont val)
+                 )
+    (null?-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
+    (car-cont (saved-cont)
+              (apply-handler saved-cont val)
+              )
+    (cdr-cont (saved-cont)
+              (apply-handler saved-cont val)
+              )
+    (list-cont (saved-cont)
+               (apply-handler saved-cont val)
+               )
+    (begin-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
+    (set-rhs-cont (ref saved-cont)
+                  (apply-handler saved-cont val)
+                  )
+    (try-cont (saved-cont var handler-exp saved-env)
+              ; returns normally
+              (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
+              )
+    ; TODO: what about raise raise ?
+    (raise-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
+    )
+  )
+
+(define (report-uncaught-exception val)
+  (eopl:error 'uncaught-exception "Uncaught expcetion ~s " val)
   )

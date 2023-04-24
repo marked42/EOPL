@@ -31,5 +31,9 @@
 
     ; assign
     (expression ("set" identifier "=" expression) assign-exp)
+
+    ; try-catch
+    (expression ("try" expression "catch" "(" identifier ")" expression) try-exp)
+    (expression ("raise" expression) raise-exp)
     )
   )

@@ -31,6 +31,9 @@
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
 
   (assign-exp (var identifier?) (exp1 expression?))
+
+  (try-exp (exp1 expression?) (var identifier?) (handler-exp expression?))
+  (raise-exp (exp1 expression?))
   )
 
 (define-datatype program program?
