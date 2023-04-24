@@ -37,7 +37,6 @@
                       raise-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
- ["exception.rkt" (initialize-try-conts! push-try-cont)]
  )
 
 (provide (all-defined-out))
@@ -48,7 +47,6 @@
 
 (define (value-of-program prog)
   (initialize-store!)
-  (initialize-try-conts!)
   (cases program prog
     (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
     )
@@ -105,14 +103,10 @@
                 (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
                 )
     (try-exp (exp1 var handler-exp)
-             (let ((new-try-cont (try-cont cont var handler-exp env)))
-               ; installs handler
-               (push-try-cont new-try-cont)
-               (value-of/k exp1 env new-try-cont)
-               )
+             (value-of/k exp1 env (try-cont cont var handler-exp env))
              )
     (raise-exp (exp1)
-               (value-of/k exp1 env (raise-cont))
+               (value-of/k exp1 env (raise-cont cont))
                )
     (else (eopl:error "invalid exp ~s" exp))
     )
