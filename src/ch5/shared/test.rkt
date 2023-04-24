@@ -134,7 +134,7 @@
   ") 33 "simple succeed")
 
   (equal-answer? (run "
-  try 33 catch (m) foo
+  try 33 catch (m) some-unbound-variable
   ") 33 "dont run handler til failure")
 
   (equal-answer? (run "
@@ -154,6 +154,11 @@
     in -(try (f 33)
        catch (m) -(m,55), 1)
   ") 43 "handler in non tail recursive position")
+
+  (equal-answer? (run "
+  try raise -(raise 3, 1)
+  catch (m) m
+  ") 3 "nested raise")
 
   (equal-answer? (run "
   try try -(raise 23, 11)
