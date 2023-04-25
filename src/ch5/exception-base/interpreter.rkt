@@ -36,7 +36,6 @@
                       try-cont
                       raise-cont
                       )]
- ["call.rkt" (eval-operand-call-by-value)]
  )
 
 (provide (all-defined-out))
@@ -68,7 +67,7 @@
              (apply-cont cont (eval-var-exp env var))
              )
     (let-exp (vars exps body)
-             (value-of-exps/k exps env (let-cont cont vars body env) eval-operand-call-by-value)
+             (value-of-exps/k exps env (let-cont cont vars body env))
              )
     (proc-exp (first-var rest-vars body)
               (apply-cont cont (eval-proc-exp first-var rest-vars body env))
@@ -94,10 +93,10 @@
              (value-of/k exp1 env (cdr-cont cont))
              )
     (list-exp (exp1 exps)
-              (value-of-exps/k (cons exp1 exps) env (list-cont cont) eval-operand-call-by-value)
+              (value-of-exps/k (cons exp1 exps) env (list-cont cont))
               )
     (begin-exp (exp1 exps)
-               (value-of-exps/k (cons exp1 exps) env (begin-cont cont) eval-operand-call-by-value)
+               (value-of-exps/k (cons exp1 exps) env (begin-cont cont))
                )
     (assign-exp (var exp1)
                 (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
@@ -112,16 +111,16 @@
     )
   )
 
-(define (value-of-exps/k exps saved-env saved-cont mapper)
-  (value-of-exps-helper/k exps '() saved-env saved-cont mapper)
+(define (value-of-exps/k exps saved-env saved-cont)
+  (value-of-exps-helper/k exps '() saved-env saved-cont)
   )
 
-(define (value-of-exps-helper/k exps vals saved-env saved-cont mapper)
+(define (value-of-exps-helper/k exps vals saved-env saved-cont)
   (if (null? exps)
       (apply-cont saved-cont vals)
       (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-        (mapper first-exp saved-env
-                (exps-cont saved-cont rest-exps vals saved-env mapper)
+        (value-of/k first-exp saved-env
+                (exps-cont saved-cont rest-exps vals saved-env)
                 )
         )
       )
