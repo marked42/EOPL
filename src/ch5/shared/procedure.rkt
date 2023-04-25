@@ -18,6 +18,15 @@
    )
   )
 
+(define (proc->procedure proc1)
+  (cases proc proc1
+    (procedure (vars body saved-env)
+               (list vars body saved-env)
+               )
+    (else (eopl:error 'proc->procedure "invalid proc ~s " proc1))
+    )
+  )
+
 (define (apply-procedure/k value-of/k proc1 args saved-cont)
   (cases proc proc1
     (procedure (vars body saved-env)

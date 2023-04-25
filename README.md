@@ -526,11 +526,13 @@ catch (m) m
 
 程序运行过程中，`raise1`的执行被转移到了`raise2`，因此`raise1`中`raise2`之后的流程没有得到执行。
 
-#### 常量时间
+#### 常量时间异常展开
 
-沿着嵌套Continuation进行异常展开的时间复杂度是O(N)，效率较低，可以将`try-cont`记录下来，忽略中间的其他类型Continuation，做到常量时间O(1)的异常展开（Exercise 5.35）。
+沿着嵌套Continuation进行异常展开的时间复杂度是O(N)，效率较低，可以将`try-cont`记录下来，忽略中间的其他类型Continuation，做到常量时间O(1)的异常展开。
 
-这里使用一个`list`记录嵌套的`try-cont`，在`try`表达式执行前，将`try-cont`入栈。
+##### 方法1 记录try-cont栈
+
+使用一个`list`记录嵌套的`try-cont`，在`try`表达式执行前，将`try-cont`入栈。
 
 ```racket
 (define (value-of/k exp env cont)
@@ -577,4 +579,67 @@ catch (m) m
                 )
   )
 )
+```
+
+##### 方法2 向下逐层传递try-cont
+
+CPS解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归下降调用的过程，将当前表达式对应的最内层`try-cont`作为函数参数传递，可以常量时间读取`try-cont`（Exercise 5.35）。
+
+`value-of/k`增加参数`try`，遇到`try-exp`时，递归使用`value-of/k`对`exp1`求值，这时候使用`new-try-cont`，效果等同于方法一的入栈;其他的表达式类型将`try`递归向下传递即可。
+
+```racket
+(define (value-of/k exp env cont try)
+  (cases expression exp
+    ...
+    (try-exp (exp1 var handler-exp)
+             (let ((new-try-cont (try-cont cont var handler-exp env try)))
+               (value-of/k exp1 env new-try-cont new-try-cont)
+               )
+             )
+    (raise-exp (exp1)
+               (value-of/k exp1 env (raise-cont cont) try)
+               )
+  )
+)
+```
+
+`new-try-cont`中需要记录外层的`try`，在`new-try-cont`代表的表达式计算完成后，需要恢复之前的`try`，相当于方法一中的出栈。
+
+```racket
+(define-datatype continuation cont?
+  ...
+  (try-cont (saved-cont cont?) (var identifier?) (handler-exp expression?) (saved-env environment?) (parent cont?))
+)
+
+(define (apply-cont cont val try)
+  (cases continuation cont
+    ...
+    (try-cont (saved-cont var handler-exp saved-env parent)
+              ; restore enclosing try when returns normally
+              (apply-cont saved-cont val parent)
+              )
+    (raise-cont (saved-cont)
+                (cases continuation try
+                  (try-cont (saved-cont var handler-exp saved-env parent)
+                            ; continue from try-cont, update enclosing try cont with parent
+                            (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont parent)
+                            )
+                  (else (report-uncaught-exception))
+                  )
+                )
+  )
+)
+```
+
+另外在程序入口使用`end-cont`作为初始的`value-of/k`函数`try-cont`参数，如果异常展开得到的try不是`try-cont`类型，表明没有对应`try`，抛出异常。
+
+```racket
+(define (value-of-program prog)
+  (initialize-store!)
+  (let ((dummy-try-cont (end-cont)))
+    (cases program prog
+      (a-program (exp1) (value-of/k exp1 (init-env) (end-cont) dummy-try-cont))
+      )
+    )
+  )
 ```
