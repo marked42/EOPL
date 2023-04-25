@@ -21,7 +21,6 @@
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
- ["call.rkt" (eval-operand-call-by-value)]
  )
 
 (provide (all-defined-out))
@@ -32,7 +31,7 @@
   (diff-cont-1 (saved-cont cont?) (val1 expval?))
   (zero?-cont (saved-cont cont?))
   (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
-  (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?) (mapper procedure?))
+  (exps-cont (saved-cont cont?) (exps (list-of expression?)) (vals (list-of expval?)) (saved-env environment?))
   (let-cont (saved-cont cont?) (vars (list-of identifier?)) (body expression?) (env environment?))
   (call-cont (saved-cont cont?) (rands (list-of expression?)) (saved-env environment?))
   (call-cont-1 (saved-cont cont?) (rator expval?))
@@ -67,8 +66,8 @@
     (if-cont (saved-cont exp2 exp3 saved-env)
              (value-of/k (eval-if-exp val exp2 exp3) saved-env saved-cont)
              )
-    (exps-cont (saved-cont exps vals env mapper)
-               (value-of-exps-helper/k exps (append vals (list val)) env saved-cont mapper)
+    (exps-cont (saved-cont exps vals env)
+               (value-of-exps-helper/k exps (append vals (list val)) env saved-cont)
                )
     (let-cont (saved-cont vars body saved-env)
               (let ((vals val))
@@ -77,7 +76,7 @@
               )
     (call-cont (saved-cont rands saved-env)
                (let ((rator val))
-                 (value-of-exps/k rands saved-env (call-cont-1 saved-cont rator) eval-operand-call-by-value)
+                 (value-of-exps/k rands saved-env (call-cont-1 saved-cont rator))
                  )
                )
     (call-cont-1 (saved-cont rator)
@@ -140,7 +139,7 @@
     (if-cont (saved-cont exp2 exp3 saved-env)
              (apply-handler saved-cont val)
              )
-    (exps-cont (saved-cont exps vals env mapper)
+    (exps-cont (saved-cont exps vals env)
                (apply-handler saved-cont val)
                )
     (let-cont (saved-cont vars body saved-env)
