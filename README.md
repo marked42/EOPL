@@ -9,6 +9,7 @@
 ```rkt
 #lang eopl
 ```
+
 EOPL 中使用 Scheme 的函数`identifier?`判断一个值是不是标识符，Racket 没有提供这个函数，但是有类似`symbol?`来判断一个值是不是符号，区别参考这个[问题](https://stackoverflow.com/questions/48393025/difference-between-an-identifier-and-symbol-in-scheme)。
 
 ## TODO:
@@ -17,8 +18,7 @@ EOPL 中使用 Scheme 的函数`identifier?`判断一个值是不是标识符，
   - [ ] at branch feat/free-variables
   - [ ] Exercise 3.42 with lexical addressing
 - chapter 5.1
-  - [ ] Exercise 5.16 在 Exercise 4.22的基础上，实现CPS解释器。
-
+  - [ ] Exercise 5.16 在 Exercise 4.22 的基础上，实现 CPS 解释器。
 
 ## Chapter 3 Expressions
 
@@ -315,22 +315,22 @@ Continuation 的作用和调用栈 stack 一样，记录着程序运行的控制
 
 在`src/ch5`下总共有四个版本的实现
 
-1. letrec-lang 是用普通数据结构代表Continuation的实现，函数调用使用了值传递（call by value）。
-1. call-by-ref 是在letrec-lang的基础上，函数调用使用了引用传递（call by reference）的版本。
-1. continuation-as-lambda 使用了原生`lambda`函数来代表Continuation的实现，函数调用使用了值传递（call by value）。
-1. continuation-as-list 是使用了`list`来代表Continuation的实现，`list`的每个元素代表一个表达式的求值过程，等同于栈帧（stack frame），空`list`代表`end-cont`，也就是整个程序的最后运算。函数调用使用了值传递（call by value）。
+1. letrec-lang 是用普通数据结构代表 Continuation 的实现，函数调用使用了值传递（call by value）。
+1. call-by-ref 是在 letrec-lang 的基础上，函数调用使用了引用传递（call by reference）的版本。
+1. continuation-as-lambda 使用了原生`lambda`函数来代表 Continuation 的实现，函数调用使用了值传递（call by value）。
+1. continuation-as-list 是使用了`list`来代表 Continuation 的实现，`list`的每个元素代表一个表达式的求值过程，等同于栈帧（stack frame），空`list`代表`end-cont`，也就是整个程序的最后运算。函数调用使用了值传递（call by value）。
 
-CPS解释器的实现核心思路如下，
+CPS 解释器的实现核心思路如下，
 
 整个程序有个初始的`end-cont`代表程序结束运算时的回调。对不同表达式分类处理，每类表达式分成若干个计算步骤，每个步骤进行时递归的调用`value-of/k`计算当前步骤的表达式`exp1`，并且将之前的`cont`拼接当前表达式`exp1`求值后应该进行的操作，形成新的`cont1`，`cont1`被回调时拿到了`exp1`的值，进行相应计算得到结果，并用于调用`cont`。每一步计算都形成新的`cont`嵌套了旧的`cont`，`end-cont`被嵌套在最内层，效果等价于调用栈增长。
 
-letrec-lang/continuation-as-lambda的实现中，`cont`的数据都是嵌套的；continuation-as-list稍有不同，将每帧拆分开，使用线性的结构表示。
+letrec-lang/continuation-as-lambda 的实现中，`cont`的数据都是嵌套的；continuation-as-list 稍有不同，将每帧拆分开，使用线性的结构表示。
 
 需要注意的是`let-exp/call-exp/begin-exp/list-exp`这几个要对若干表达式顺序求值的情况，统一使用了`value-of-exps/k`进行处理。
 
 ### 5.2 Trampoline Interpreter
 
-5.1 中的CPS解释器执行时，函数递归调用，调用栈不断增长，在过程式语言中会造成栈溢出错误，可以使用蹦床（trampoline）的技巧来解决这个问题。
+5.1 中的 CPS 解释器执行时，函数递归调用，调用栈不断增长，在过程式语言中会造成栈溢出错误，可以使用蹦床（trampoline）的技巧来解决这个问题。
 
 修改`apply-procedure/k`使其返回一个代表了后续运算的值`thunk`中，这样在`apply-procedure/k`返回时，递归函数调用栈会被弹出，将返回值逐层向上传递直到最顶层，效果是将`apply-procedure/k`所代表的后续运算存储`thunk`起来，然后在顶层使用`trampoline`函数重新激活`thunk`继续之前运算，就像蹦床一样，当`trampoline`得到的值不是`thunk`，而是一个值，就得到了最终的运算结果。
 
@@ -362,7 +362,7 @@ apply-cont -> bounce
 bounce = expval | thunk
 ```
 
-ch5/trampoline/bounce.rkt中`apply-procedure/k`返回参数为空的函数包裹原来的函数体，使用函数表示实现`thunk`。
+ch5/trampoline/bounce.rkt 中`apply-procedure/k`返回参数为空的函数包裹原来的函数体，使用函数表示实现`thunk`。
 
 ```racket
 (define (create-bounced-apply-procedure/k apply-procedure/k)
@@ -375,7 +375,7 @@ ch5/trampoline/bounce.rkt中`apply-procedure/k`返回参数为空的函数包裹
   )
 ```
 
-ch5/trampoline/bounce-ds.rkt中`apply-procedure/k`返回一个数据结构`a-bounce`表示`thunk`。
+ch5/trampoline/bounce-ds.rkt 中`apply-procedure/k`返回一个数据结构`a-bounce`表示`thunk`。
 
 ```racket
 (define (create-bounced-apply-procedure/k apply-procedure/k)
@@ -412,7 +412,7 @@ ch5/trampoline/bounce-ds.rkt中`apply-procedure/k`返回一个数据结构`a-bou
 另外一个问题是返回`thunk`消除了`value-of/k`/`apply-cont`/`apply-procedure/k`造成的栈无限增长，但是`trampoline`函数本身也是递归调用的，也可能造成栈无限增长。
 可以通过将`trampoline`函数从递归形式改写为循环来解决这个问题（Exercise 5.21）。
 
-参考代码ch5/trampoline.rkt中`trampoline-loop`实现。
+参考代码 ch5/trampoline.rkt 中`trampoline-loop`实现。
 
 ```racket
 (define (trampoline-loop bounce)
@@ -426,7 +426,7 @@ ch5/trampoline/bounce-ds.rkt中`apply-procedure/k`返回一个数据结构`a-bou
 
 ### 5.4 Exception
 
-支持简单的异常语法，因为Continuation抽象了程序运行的后续运算，因此完全可以控制程序进行任意流程的运算，实现异常控制流。
+支持简单的异常语法，因为 Continuation 抽象了程序运行的后续运算，因此完全可以控制程序进行任意流程的运算，实现异常控制流。
 
 ```
 try Expression catch (identifier) Expression
@@ -435,6 +435,7 @@ try-exp (exp1 var handler-exp)
 raise Expression
 raise-exp (exp2)
 ```
+
 表达式对第一个`exp1`求值，如果没有抛出异常，那么表达式的值就作为整个`try`表达式的值；如果`exp1`中使用`raise`抛出异常，那么对抛出的表达式`exp2`进行求值，得到的结果绑定绑定到变量`var`上，然后对`handler-exp`进行求值，变量`var`的值在运行时绑定，因此是**动态作用域的（dynamic scope）**。
 
 `raise`表达式对应的`try`是包裹着`raise`的**最近的**`try`，包裹指的是`raise`在`try`的`exp1`部分，而不是`handler-exp`部分。这里的异常机制比较简单，不会对抛出的异常值类型和`try`捕获的异常类型匹配，或者说`try`捕获所有的异常类型。
@@ -455,7 +456,7 @@ raise-exp (exp2)
 )
 ```
 
-抛出异常的情况下，`try-cont`不会被执行到，`raise-cont`被执行，这时候使用`apply-handler`向上沿着嵌套的Continuation找到最近一层的`try-cont`，然后将抛出的异常值`val`动态绑定到`var`上，并在此环境下对`handler-exp`求值，得到的结果作为整个`try`的返回值，继续执行后续运算。
+抛出异常的情况下，`try-cont`不会被执行到，`raise-cont`被执行，这时候使用`apply-handler`向上沿着嵌套的 Continuation 找到最近一层的`try-cont`，然后将抛出的异常值`val`动态绑定到`var`上，并在此环境下对`handler-exp`求值，得到的结果作为整个`try`的返回值，继续执行后续运算。
 
 ```racket
 ; search upward linearly for corresponding try-exp
@@ -481,7 +482,7 @@ raise-exp (exp2)
   )
 ```
 
-如果没有找到`raise`对应的外层`try`会沿着嵌套的Continuation找到`end-cont`，说明异常未被捕获。
+如果没有找到`raise`对应的外层`try`会沿着嵌套的 Continuation 找到`end-cont`，说明异常未被捕获。
 
 没有捕获异常的情况下，`try`表达式的`handler-exp`**不会执行**，因此下面的未知变量`some-unbound-variable`不会报错。
 
@@ -528,11 +529,11 @@ catch (m) m
 
 #### 常量时间异常展开
 
-沿着嵌套Continuation进行异常展开的时间复杂度是O(N)，效率较低，可以将`try-cont`记录下来，忽略中间的其他类型Continuation，做到常量时间O(1)的异常展开。
+沿着嵌套 Continuation 进行异常展开的时间复杂度是 O(N)，效率较低，可以将`try-cont`记录下来，忽略中间的其他类型 Continuation，做到常量时间 O(1)的异常展开。记录当前表达式对应的`try-cont`的方式有不同的做法。
 
-##### 方法1 记录try-cont栈
+##### 方法 1 全局 try-cont 栈
 
-使用一个`list`记录嵌套的`try-cont`，在`try`表达式执行前，将`try-cont`入栈。
+使用一个`list`作为栈记录嵌套的`try-cont`，在`try`表达式执行前，将`try-cont`入栈。
 
 ```racket
 (define (value-of/k exp env cont)
@@ -581,9 +582,97 @@ catch (m) m
 )
 ```
 
-##### 方法2 向下逐层传递try-cont
+##### 方法 2 cont 中记录外层 try-cont
 
-CPS解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归下降调用的过程，将当前表达式对应的最内层`try-cont`作为函数参数传递，可以常量时间读取`try-cont`（Exercise 5.35）。
+当前的`cont`定义记录了`saved-cont`表示的含义是当前`cont`正常流程执行完成应该继续执行的运算；增加一个字段`saved-try-cont`记录异常流程下应该继续执行的运算。
+
+```racket
+(define-datatype continuation cont?
+  ; end-cont 特殊处理，不增加saved-try-cont字段
+  (end-cont)
+  (diff-cont (saved-cont cont?) (saved-try-cont cont?) (exp2 expression?) (saved-env environment?))
+  (diff-cont-1 (saved-cont cont?) (saved-try-cont cont?) (val1 expval?))
+  ...
+  (try-cont (saved-cont cont?) (saved-try-cont cont?) (var identifier?) (handler-exp expression?) (saved-env environment?))
+  (raise-cont (saved-cont cont?) (saved-try-cont cont?))
+)
+```
+
+首先`value-of/k`计算表达式时，使用`get-saved-try-cont`获得当前 cont 保存的外层 `try-cont`，在创建 Continuation 时传入`saved-try-cont`，在`apply-cont`中也需要同样的处理。
+
+```racket
+(define (value-of/k exp env cont)
+  (let ((saved-try-cont (get-saved-try-cont cont)))
+    (cases expression exp
+      (diff-exp (exp1 exp2)
+                ; 新建 diff-cont 时传入获取的 saved-try-cont
+                (value-of/k exp1 env (diff-cont cont saved-try-cont exp2 env))
+                )
+      ...
+      (try-exp (exp1 var handler-exp)
+              (value-of/k exp1 env (try-cont cont saved-try-cont var handler-exp env))
+              )
+      (raise-exp (exp1)
+                (value-of/k exp1 env (raise-cont cont saved-try-cont))
+                )
+    )
+  )
+)
+```
+
+注意对于`try-exp`的处理，其中包围`exp1`的表达式就是`try-exp`本身，所对应的`try-cont`也就是这个新创建的`try-cont`，在`value-of/k`递归调用对`exp1`求值时，`get-saved-try-cont`应该返回`try-cont`本身，而不是`try-cont`记录的`saved-try-cont`。`get-saved-try-cont`中其他`cont`类型对应的`try-cont`就是自身的`saved-try-cont`字段。
+
+```racket
+(define (get-saved-try-cont cont)
+  (cases continuation cont
+    (end-cont () cont)
+    ...
+    ; return current try-cont
+    (try-cont (saved-cont saved-try-cont var handler-exp saved-env) cont)
+    (raise-cont (saved-cont saved-try-cont) saved-try-cont)
+    (else (eopl:error 'get-saved-try-cont "invalid cont ~s " cont))
+  )
+)
+```
+
+这里`end-cont`特殊处理，没有添加`saved-try-cont`字段，`get-saved-try-cont`中也直接返回自身，`end-cont`作为创建`cont`时需要`saved-try-cont`字段的一个递归出口，否则创建一个`cont`需要`saved-try-cont`，而`saved-try-cont`本身也是`cont`，形成了互相依赖的死循环。
+
+在`apply-cont`中`try-cont`和`raise-cont`的处理和方法一类似，区别在于从`saved-try-cont`字段在 O(1)时间拿到了外层`try-cont`，而不是通过`apply-handler`。相当于将`apply-handler`逐层寻找的线性操作，通过逐层传递记录的方式，进行平摊，最终达到 O(1)时间复杂度的效果。
+
+```racket
+(define (apply-cont cont val)
+  (cases continuation cont
+    (end-cont () val)
+    (diff-cont (saved-cont saved-try-cont exp2 saved-env)
+               (value-of/k exp2 saved-env (diff-cont-1 saved-cont saved-try-cont val))
+               )
+    (diff-cont-1 (saved-cont saved-try-cont val1)
+                 (apply-cont saved-cont (eval-diff-exp val1 val))
+                 )
+    ...
+    (try-cont (saved-cont saved-try-cont var handler-exp saved-env)
+              ; returns normally
+              (apply-cont saved-cont val)
+              )
+    (raise-cont (saved-cont saved-try-cont)
+                (cases continuation saved-try-cont
+                  (try-cont (saved-cont saved-try-cont var handler-exp saved-env)
+                    (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
+                  )
+                  ; 程序执行到了最后，异常未被捕捉
+                  (end-cont () (report-uncaught-exception val))
+                  ; saved-try-cont 类型不对
+                  (else (eopl:error 'saved-try-cont "invalid saved-try-cont ~s " saved-try-cont))
+                 )
+                )
+  )
+
+)
+```
+
+##### 方法 3 函数参数向下逐层传递 try-cont
+
+CPS 解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归下降调用的过程，将当前表达式对应的最内层`try-cont`作为函数参数传递，可以常量时间读取`try-cont`（Exercise 5.36）。
 
 `value-of/k`增加参数`try`，遇到`try-exp`时，递归使用`value-of/k`对`exp1`求值，这时候使用`new-try-cont`，效果等同于方法一的入栈;其他的表达式类型将`try`递归向下传递即可。
 
@@ -631,7 +720,7 @@ CPS解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归�
 )
 ```
 
-另外在程序入口使用`end-cont`作为初始的`value-of/k`函数`try-cont`参数，如果异常展开得到的try不是`try-cont`类型，表明没有对应`try`，抛出异常。
+另外在程序入口使用`end-cont`作为初始的`value-of/k`函数`try-cont`参数，如果异常展开得到的 try 不是`try-cont`类型，表明没有对应`try`，抛出异常。
 
 ```racket
 (define (value-of-program prog)
