@@ -35,6 +35,7 @@
                       set-rhs-cont
                       try-cont
                       raise-cont
+                      div-cont
                       )]
  )
 
@@ -107,6 +108,9 @@
     (raise-exp (exp1)
                (value-of/k exp1 env (raise-cont cont))
                )
+    (div-exp (exp1 exp2)
+             (value-of/k exp2 env (div-cont cont exp1 env))
+    )
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
