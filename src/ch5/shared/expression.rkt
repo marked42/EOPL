@@ -34,6 +34,8 @@
 
   (try-exp (exp1 expression?) (var identifier?) (handler-exp expression?))
   (raise-exp (exp1 expression?))
+
+  (div-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?

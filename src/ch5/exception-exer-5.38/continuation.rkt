@@ -17,7 +17,7 @@
                         )]
  ["../shared/environment.rkt" (extend-env environment?)]
  ["../shared/store.rkt" (setref reference? newref)]
- ["../shared/value.rkt" (expval? expval->proc)]
+ ["../shared/value.rkt" (expval? expval->proc expval->num num-val)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
@@ -49,6 +49,8 @@
 
   (try-cont (saved-cont cont?) (var identifier?) (handler-exp expression?) (saved-env environment?))
   (raise-cont (saved-cont cont?))
+  (div-cont (saved-cont cont?) (exp1 expression?) (env environment?))
+  (div-cont-1 (saved-cont cont?) (num2 number?))
   )
 
 (define (apply-cont cont val)
@@ -120,6 +122,19 @@
     (raise-cont (saved-cont)
                 (apply-handler saved-cont val)
                 )
+    (div-cont (saved-cont exp1 saved-env)
+              (let ((num (expval->num val)))
+                (if (= num 0)
+                  (apply-handler saved-cont '())
+                  (value-of/k exp1 saved-env (div-cont-1 saved-cont num))
+                )
+              )
+    )
+    (div-cont-1 (saved-cont num2)
+              (let ((num1 (expval->num val)))
+                (apply-cont saved-cont (num-val (/ num1 num2)))
+              )
+    )
     )
   )
 
@@ -182,6 +197,12 @@
     (raise-cont (saved-cont)
                 (apply-handler saved-cont val)
                 )
+    (div-cont (saved-cont exp1 saved-env)
+              (apply-handler saved-cont val)
+    )
+    (div-cont-1 (saved-cont num2)
+              (apply-handler saved-cont val)
+    )
     )
   )
 

@@ -35,5 +35,7 @@
     ; try-catch
     (expression ("try" expression "catch" "(" identifier ")" expression) try-exp)
     (expression ("raise" expression) raise-exp)
+
+    (expression ("div" "(" expression "," expression ")") div-exp)
     )
   )
