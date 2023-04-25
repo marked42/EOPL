@@ -531,7 +531,7 @@ catch (m) m
 
 沿着嵌套 Continuation 进行异常展开的时间复杂度是 O(N)，效率较低，可以将`try-cont`记录下来，忽略中间的其他类型 Continuation，做到常量时间 O(1)的异常展开。记录当前表达式对应的`try-cont`的方式有不同的做法。
 
-##### 方法 1 全局 try-cont 栈
+##### [方法 1 全局 try-cont 栈](./src/ch5/exception-list)
 
 使用一个`list`作为栈记录嵌套的`try-cont`，在`try`表达式执行前，将`try-cont`入栈。
 
@@ -582,7 +582,7 @@ catch (m) m
 )
 ```
 
-##### 方法 2 cont 中记录外层 try-cont
+##### [方法 2 cont 中记录外层 try-cont](./src/ch5/exception-exer-5.35)
 
 当前的`cont`定义记录了`saved-cont`表示的含义是当前`cont`正常流程执行完成应该继续执行的运算；增加一个字段`saved-try-cont`记录异常流程下应该继续执行的运算。
 
@@ -670,7 +670,7 @@ catch (m) m
 )
 ```
 
-##### 方法 3 函数参数向下逐层传递 try-cont
+##### [方法 3 函数参数向下逐层传递 try-cont](./src/ch5/exception-exer-5.36)
 
 CPS 解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归下降调用的过程，将当前表达式对应的最内层`try-cont`作为函数参数传递，可以常量时间读取`try-cont`（Exercise 5.36）。
 
