@@ -216,3 +216,11 @@
               in ((index 5) list(2, 3, 4))
   ") -1 "test-example-1.1")
   )
+
+(define (run-test-wrong-number-of-args run)
+  (equal-answer? (run "
+  let f = proc (x) x
+    in try (f 1 2)
+       catch (m) 44
+  ") 44 "wrong number of args, f accepts only single parameter x, get (1, 2)")
+)
