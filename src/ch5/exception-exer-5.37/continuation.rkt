@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require)
+(require racket/lazy-require racket/list)
 (lazy-require
  ["../shared/basic.rkt" (identifier?)]
  ["../shared/eval.rkt" (
@@ -15,11 +15,11 @@
                         eval-list-exp
                         eval-begin-exp
                         )]
- ["../shared/environment.rkt" (extend-env environment?)]
- ["../shared/store.rkt" (setref reference? newref)]
+ ["../shared/environment.rkt" (extend-env extend-mul-env environment?)]
+ ["../shared/store.rkt" (setref reference? newref vals->refs)]
  ["../shared/value.rkt" (expval? expval->proc)]
  ["../shared/expression.rkt" (expression?)]
- ["../shared/procedure.rkt" (apply-procedure/k)]
+ ["../shared/procedure.rkt" (proc->procedure)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  )
 
@@ -82,9 +82,9 @@
     (call-cont-1 (saved-cont rator)
                  (let ((procedure (proc->procedure (expval->proc rator))) (rands val))
                   (let ((vars (first procedure)) (body (second procedure)) (saved-env (third procedure)))
-                    (if (eqv? (length vars) (length rands))
+                    (if (not (eqv? (length vars) (length rands)))
                       (apply-handler saved-cont (list vars rands))
-                      (apply-procedure/k value-of/k proc1 rands saved-cont)
+                      (value-of/k body (extend-mul-env vars (vals->refs rands) saved-env) saved-cont)
                       )
                     )
                    )
