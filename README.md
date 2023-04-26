@@ -733,7 +733,7 @@ CPS 解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归�
   )
 ```
 
-#### 异常捕获 continue语句
+#### 异常捕获 continue 语句
 
 当前的 `try-catch`异常捕获后`handler-exp`的值被作为整个`try-catch`表达式的值继续执行，在`handler-exp`中新增`continue(exp)`语句，执行`continue(exp)`语句后，对表达式`exp`求值并将得到的值作为对应`raise`语句的值，返回
 到`raise`语句后继续执行；如果`handler-exp`中不包含`continue(exp)`，行为跟之前一致。
@@ -790,4 +790,110 @@ CPS 解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归�
 
 ```racket
 try -(1, raise raise 44) catch (m) continue(-(m, 1))
+```
+
+#### letcc 表达式
+
+`letcc`表达式可以将表达式本身使用的 Continuation 暴露给用户，由用户根据需要实现更灵活的控制流。
+
+##### throw
+
+设计`throw`语法配合`letcc`使用，在`letcc-exp`的`body`表达式求值的时候，应该将对应的`cont`绑定到变量`var`上形成新的环境变量，然后`throw`可以将表达式`exp1`的值应用到`exp2`代表的 Continuation 上，效果相当于`exp1`值作为整个`letcc`表达式的值继续执行运算。
+
+```racket
+letcc identifier in Expression
+letcc-exp (var body)
+
+throw Expression to Expression
+throw-exp (exp1 exp2)
+```
+
+`letcc-exp`表达式正常计算，cont 需要保存到新的环境变量中，因此需要增加新的值类型`cont-val`。
+
+```racket
+(define (value-of/k exp env cont)
+  (cases expression exp
+    ...
+    (letcc-exp (var body)
+               (value-of/k body (extend-env var (newref (cont-val cont)) env) cont)
+    )
+    (throw-exp (exp1 exp2)
+               (value-of/k exp1 env (throw-cont cont exp2 env))
+    )
+  )
+)
+```
+
+`throw`表达式执行时从`exp2`的值`val2`取出对应的`letcc`的`cont`，然后使用`val1`进行运算，`throw`表达式本身的`saved-cont`被忽略了。
+
+```racket
+(define (apply-cont cont val)
+  (cases continuation cont
+    (throw-cont (saved-cont exp2 saved-env)
+                (value-of/k exp2 saved-env (throw-cont-1 saved-cont val))
+                )
+    (throw-cont-1 (saved-cont val1)
+                  (let ((cont (expval->cont val)))
+                    (apply-cont cont val1)
+                    )
+                  )
+  )
+)
+```
+
+```
+; 3
+% 没有使用throw时，body字段表达式的值作为整个letcc表达式的值
+letcc i in -(2, 1)
+```
+
+##### procedure
+
+不使用`throw`语法应用 Continuation，而是将`letcc`的 Continuation 映射为一种新的函数类型，这样就可以用函数调用语法触发 Continuation。这种策略需要新增一种`procedure`类型来保存 Continuation，只需要一个字段`cont`即可，不需要函数参数名称。
+
+```racket
+(define-datatype proc proc?
+  (procedure
+   (vars (list-of identifier?))
+   (body expression?)
+   (saved-env environment?)
+   )
+  (cont-procedure
+    (cont cont?)
+  )
+)
+```
+
+`letcc`计算时生成新的`cont-procedure`保存 Continuation，并且包装在`proc-val`中。
+
+```
+(define (value-of/k exp env cont)
+  (cases expression exp
+    ...
+    (letcc-exp (var body)
+               (value-of/k body (extend-env var (newref (proc-val (cont-procedure cont))) env) cont)
+    )
+  )
+)
+```
+
+函数调用时应用保存的 Continuation，`cont-procedure`只接受一个参数。
+
+```racket
+(define (apply-procedure/k value-of/k proc1 args saved-cont)
+  (cases proc proc1
+    (procedure (vars body saved-env)
+               ; create new ref under implicit refs, aka call-by-value
+               (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
+               )
+    (cont-procedure (cont)
+                    ; 这里不需要将args转换为ref，直接应用值即可
+                    (if (not (= (length args) 1))
+                      (eopl:error "cont-procedure accept only single argument, get ~s " args)
+                      (apply-cont cont (car args))
+                    )
+                    )
+    )
+  )
+
 ```
