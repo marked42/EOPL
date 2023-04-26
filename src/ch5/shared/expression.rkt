@@ -38,6 +38,9 @@
   (div-exp (exp1 expression?) (exp2 expression?))
 
   (continue-exp (exp1 expression?))
+
+  (letcc-exp (var identifier?) (body expression?))
+  (throw-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?

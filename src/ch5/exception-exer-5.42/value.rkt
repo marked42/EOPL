@@ -4,6 +4,7 @@
 (lazy-require
  ["../shared/basic.rkt" (report-expval-extractor-error)]
  ["procedure.rkt" (proc?)]
+ ["continuation.rkt" (cont?)]
  )
 
 (provide (all-defined-out))
@@ -21,6 +22,7 @@
    (second expval?)
    )
   (proc-val (proc1 proc?))
+  (cont-val (cont1 cont?))
   )
 
 (define (expval->num val)
@@ -41,6 +43,13 @@
   (cases expval val
     (proc-val (proc1) proc1)
     (else (report-expval-extractor-error 'proc val))
+    )
+  )
+
+(define (expval->cont val)
+  (cases expval val
+    (cont-val (cont1) cont1)
+    (else (report-expval-extractor-error 'cont val))
     )
   )
 

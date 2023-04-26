@@ -8,7 +8,7 @@
  ["environment.rkt" (extend-env environment?)]
  ["procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
- ["value.rkt" (expval? expval->proc)]
+ ["value.rkt" (expval? expval->proc expval->cont)]
  ["eval.rkt" (
               eval-diff-exp
               eval-zero?-exp
@@ -49,6 +49,9 @@
 
   (try-cont (saved-cont cont?) (var identifier?) (handler-exp expression?) (saved-env environment?))
   (raise-cont (saved-cont cont?))
+
+  (throw-cont (saved-cont cont?) (exp2 expression?) (saved-env environment?))
+  (throw-cont-1 (saved-cont cont?) (val1 expval?))
   )
 
 (define (apply-cont cont val)
@@ -120,6 +123,14 @@
     (raise-cont (saved-cont)
                 (apply-handler saved-cont val)
                 )
+    (throw-cont (saved-cont exp2 saved-env)
+                (value-of/k exp2 saved-env (throw-cont-1 saved-cont val))
+                )
+    (throw-cont-1 (saved-cont val1)
+                  (let ((cont (expval->cont val)))
+                    (apply-cont cont val1)
+                    )
+                  )
     )
   )
 
@@ -180,6 +191,12 @@
               (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
               )
     (raise-cont (saved-cont)
+                (apply-handler saved-cont val)
+                )
+    (throw-cont (saved-cont exp2 saved-env)
+                (apply-handler saved-cont val)
+                )
+    (throw-cont-1 (saved-cont val1)
                 (apply-handler saved-cont val)
                 )
     )

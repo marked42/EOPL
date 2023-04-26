@@ -38,5 +38,9 @@
     (expression ("continue" "(" expression ")") continue-exp)
 
     (expression ("div" "(" expression "," expression ")") div-exp)
+
+    ; exer 5.42
+    (expression ("letcc" identifier "in" expression) letcc-exp)
+    (expression ("throw" expression "to" expression) throw-exp)
     )
   )
