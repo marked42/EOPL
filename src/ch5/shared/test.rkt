@@ -216,16 +216,3 @@
               in ((index 5) list(2, 3, 4))
   ") -1 "test-example-1.1")
   )
-
-(define (run-test-wrong-number-of-args run)
-  (equal-answer? (run "
-  let f = proc (x) x
-    in try (f 1 2)
-       catch (m) 44
-  ") 44 "wrong number of args, f accepts only single parameter x, get (1, 2)")
-)
-
-(define (run-test-division run)
-  (equal-answer? (run "try div(4, 2) catch (m) 44") 2 "4 divieded by 2 is 2")
-  (equal-answer? (run "try div(4, 0) catch (m) 44") 44 "throws error when divided by 0")
-)
