@@ -36,6 +36,8 @@
   (raise-exp (exp1 expression?))
 
   (div-exp (exp1 expression?) (exp2 expression?))
+
+  (continue-exp (exp1 expression?))
   )
 
 (define-datatype program program?

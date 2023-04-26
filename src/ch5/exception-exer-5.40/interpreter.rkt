@@ -35,6 +35,8 @@
                       set-rhs-cont
                       try-cont
                       raise-cont
+                      continue-cont
+                      top-raise-cont
                       )]
  )
 
@@ -107,6 +109,9 @@
     (raise-exp (exp1)
                (value-of/k exp1 env (raise-cont cont))
                )
+    (continue-exp (exp1)
+                  (value-of/k exp1 env (continue-cont (top-raise-cont)))
+                  )
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
@@ -120,8 +125,8 @@
       (apply-cont saved-cont vals)
       (let ((first-exp (car exps)) (rest-exps (cdr exps)))
         (value-of/k first-exp saved-env
-                (exps-cont saved-cont rest-exps vals saved-env)
-                )
+                    (exps-cont saved-cont rest-exps vals saved-env)
+                    )
         )
       )
   )
