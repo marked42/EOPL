@@ -6,6 +6,7 @@
  ["../shared/basic.rkt" (identifier?)]
  ["../shared/store.rkt" (vals->refs)]
  ["environment.rkt" (environment? extend-mul-env)]
+ ["continuation.rkt" (cont? apply-cont)]
  )
 
 (provide (all-defined-out))
@@ -16,15 +17,9 @@
    (body expression?)
    (saved-env environment?)
    )
-  )
-
-(define (proc->procedure proc1)
-  (cases proc proc1
-    (procedure (vars body saved-env)
-               (list vars body saved-env)
-               )
-    (else (eopl:error 'proc->procedure "invalid proc ~s " proc1))
-    )
+  (cont-procedure
+    (cont cont?)
+   )
   )
 
 (define (apply-procedure/k value-of/k proc1 args saved-cont)
@@ -33,5 +28,11 @@
                ; create new ref under implicit refs, aka call-by-value
                (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
                )
+    (cont-procedure (cont)
+                    (if (not (= (length args) 1))
+                      (eopl:error "cont-procedure accept only single argument, get ~s " args)
+                      (apply-cont cont (car args))
+                    )
+                    )
     )
   )
