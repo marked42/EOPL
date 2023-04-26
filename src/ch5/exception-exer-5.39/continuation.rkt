@@ -121,7 +121,7 @@
                 (let ((saved-try-cont (find-handler cont)))
                   (cases continuation saved-try-cont
                     (try-cont (saved-cont var handler-exp saved-env)
-                              (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
+                              (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-raise-cont)
                               )
                     (end-cont () (report-uncaught-exception))
                     (else (eopl:error "invalid saved-try-cont, requires try-cont, got ~s " saved-try-cont))
