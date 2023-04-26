@@ -732,3 +732,62 @@ CPS 解释器的执行是`value-of/k`/`apply-cont`/`apply-procedure/k`的递归�
     )
   )
 ```
+
+#### 异常捕获 continue语句
+
+当前的 `try-catch`异常捕获后`handler-exp`的值被作为整个`try-catch`表达式的值继续执行，在`handler-exp`中新增`continue(exp)`语句，执行`continue(exp)`语句后，对表达式`exp`求值并将得到的值作为对应`raise`语句的值，返回
+到`raise`语句后继续执行；如果`handler-exp`中不包含`continue(exp)`，行为跟之前一致。
+
+这个设计不改变之前的语法，而是新增语法，使用一个`raise-cont-stack`记录`raise-cont`的栈，记录`continue(exp)`对应需要继续运算的`raise-cont`。
+
+在`handler-exp`求值之前，需要将代表当前`raise-cont`的后续运算的`saved-raise-cont`入栈，`handler-exp`正常求值后退出了`try-catch`表达式，此时需要出栈，新增一个`pop-off-raise-cont`来实现。
+
+```racket
+(define (apply-cont cont val)
+  (cases continuation cont
+    ...
+    (raise-cont (saved-raise-cont)
+                (let ((saved-try-cont (find-handler cont)))
+                  (cases continuation saved-try-cont
+                    (try-cont (saved-cont var handler-exp saved-env)
+                              ; push into stack
+                              (push-raise-cont saved-raise-cont)
+                              (value-of/k handler-exp (extend-env var (newref val) saved-env) (pop-off-raise-cont saved-cont))
+                              )
+                    (end-cont () (report-uncaught-exception))
+                    (else (eopl:error "invalid saved-try-cont, requires try-cont, got ~s " saved-try-cont))
+                    )
+                  )
+                )
+    (pop-off-raise-cont (saved-cont)
+                        ; pop raise cont when returns normally in catch handler
+                        (pop-raise-cont)
+                        (apply-cont saved-cont val)
+                        )
+    (continue-cont (saved-cont)
+                   ; pop raise cont when continue from catch handler
+                   (pop-raise-cont)
+                   (apply-cont saved-cont val)
+                   )
+  )
+)
+```
+
+`handler-exp`中包含`continue`表达式执行回跳到`raise`语句之前，同样要将栈顶记录的`saved-raise-cont`出栈。`continue-cont`记录的`saved-cont`就是要跳回继续执行的运算，在`value-of/k`创建时使用当前栈顶的元素。
+
+```racket
+(define (value-of/k exp env cont)
+  (cases expression exp
+    ...
+    (continue-exp (exp1)
+                  (value-of/k exp1 env (continue-cont (top-raise-cont)))
+                  )
+  )
+)
+```
+
+嵌套的`raise`表达式，每个`raise`都会触发一次`continue`，下面表达式的结果是`-41`。
+
+```racket
+try -(1, raise raise 44) catch (m) continue(-(m, 1))
+```
