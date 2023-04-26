@@ -102,7 +102,7 @@
                (value-of-exps/k (cons exp1 exps) env (begin-cont cont) eval-operand-call-by-value)
                )
     (assign-exp (var exp1)
-                (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont))
+                (value-of/k exp1 env (set-rhs-cont cont (apply-env env var)))
                 )
     (try-exp (exp1 var handler-exp)
              (let ((new-try-cont (try-cont cont var handler-exp env)))
