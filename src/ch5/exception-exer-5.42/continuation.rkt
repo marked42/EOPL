@@ -3,24 +3,24 @@
 (require racket/lazy-require)
 (lazy-require
  ["../shared/basic.rkt" (identifier?)]
- ["../shared/eval.rkt" (
-                        eval-diff-exp
-                        eval-zero?-exp
-                        eval-if-exp
-                        eval-let-exp
-                        eval-null?-exp
-                        eval-cons-exp
-                        eval-car-exp
-                        eval-cdr-exp
-                        eval-list-exp
-                        eval-begin-exp
-                        )]
- ["../shared/environment.rkt" (extend-env environment?)]
  ["../shared/store.rkt" (setref reference? newref)]
- ["../shared/value.rkt" (expval? expval->proc)]
  ["../shared/expression.rkt" (expression?)]
- ["../shared/procedure.rkt" (apply-procedure/k)]
+ ["environment.rkt" (extend-env environment?)]
+ ["procedure.rkt" (apply-procedure/k)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
+ ["value.rkt" (expval? expval->proc)]
+ ["eval.rkt" (
+              eval-diff-exp
+              eval-zero?-exp
+              eval-if-exp
+              eval-let-exp
+              eval-null?-exp
+              eval-cons-exp
+              eval-car-exp
+              eval-cdr-exp
+              eval-list-exp
+              eval-begin-exp
+              )]
  )
 
 (provide (all-defined-out))

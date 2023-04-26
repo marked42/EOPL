@@ -7,16 +7,16 @@
   "../shared/expression.rkt"
   )
 (lazy-require
- ["../shared/environment.rkt" (init-env apply-env)]
  ["../shared/store.rkt" (initialize-store!)]
  ["../shared/parser.rkt" (scan&parse)]
- ["../shared/eval.rkt" (
-                        eval-const-exp
-                        eval-var-exp
-                        eval-proc-exp
-                        eval-letrec-exp
-                        eval-emptylist-exp
-                        )]
+ ["environment.rkt" (init-env apply-env)]
+ ["eval.rkt" (
+              eval-const-exp
+              eval-var-exp
+              eval-proc-exp
+              eval-letrec-exp
+              eval-emptylist-exp
+              )]
  ["continuation.rkt" (
                       end-cont
                       apply-cont
