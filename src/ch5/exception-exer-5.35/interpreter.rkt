@@ -101,7 +101,7 @@
                 (value-of-exps/k (cons exp1 exps) env (begin-cont cont saved-try-cont))
                 )
       (assign-exp (var exp1)
-                  (value-of/k exp1 env (set-rhs-cont (apply-env env var) cont saved-try-cont))
+                  (value-of/k exp1 env (set-rhs-cont cont saved-try-cont (apply-env env var)))
                   )
       (try-exp (exp1 var handler-exp)
               (value-of/k exp1 env (try-cont cont saved-try-cont var handler-exp env))

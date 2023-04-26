@@ -45,7 +45,7 @@
 
   (begin-cont (saved-cont cont?) (saved-try-cont cont?))
 
-  (set-rhs-cont (ref reference?) (saved-cont cont?) (saved-try-cont cont?))
+  (set-rhs-cont (saved-cont cont?) (saved-try-cont cont?) (ref reference?))
 
   (try-cont (saved-cont cont?) (saved-try-cont cont?) (var identifier?) (handler-exp expression?) (saved-env environment?))
   (raise-cont (saved-cont cont?) (saved-try-cont cont?))
@@ -109,7 +109,7 @@
                   (apply-cont saved-cont (eval-begin-exp vals))
                   )
                 )
-    (set-rhs-cont (ref saved-cont saved-try-cont)
+    (set-rhs-cont (saved-cont saved-try-cont ref)
                   (setref ref val)
                   (apply-cont saved-cont val)
                   )
@@ -120,11 +120,11 @@
     (raise-cont (saved-cont saved-try-cont)
                 (cases continuation saved-try-cont
                   (try-cont (saved-cont saved-try-cont var handler-exp saved-env)
-                    (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
-                  )
+                            (value-of/k handler-exp (extend-env var (newref val) saved-env) saved-cont)
+                            )
                   (end-cont () (report-uncaught-exception val))
                   (else (eopl:error 'saved-try-cont "invalid saved-try-cont ~s " saved-try-cont))
-                 )
+                  )
                 )
     )
   )

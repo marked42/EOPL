@@ -45,7 +45,7 @@
 
   (begin-cont (saved-cont cont?))
 
-  (set-rhs-cont (ref reference?) (saved-cont cont?))
+  (set-rhs-cont (saved-cont cont?) (ref reference?))
 
   (try-cont (saved-cont cont?) (var identifier?) (handler-exp expression?) (saved-env environment?) (parent cont?))
   (raise-cont (saved-cont cont?))
@@ -109,7 +109,7 @@
                   (apply-cont saved-cont (eval-begin-exp vals) try)
                   )
                 )
-    (set-rhs-cont (ref saved-cont)
+    (set-rhs-cont (saved-cont ref)
                   (setref ref val)
                   (apply-cont saved-cont val try)
                   )

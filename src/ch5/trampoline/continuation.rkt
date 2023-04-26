@@ -49,7 +49,7 @@
 
   (begin-cont (saved-cont cont?))
 
-  (set-rhs-cont (ref reference?) (saved-cont cont?))
+  (set-rhs-cont (saved-cont cont?) (ref reference?))
   )
 
 (define (apply-cont cont val)
@@ -110,7 +110,7 @@
                   (apply-cont saved-cont (eval-begin-exp vals))
                   )
                 )
-    (set-rhs-cont (ref saved-cont)
+    (set-rhs-cont (saved-cont ref)
                   (setref ref val)
                   (apply-cont saved-cont val)
                   )
