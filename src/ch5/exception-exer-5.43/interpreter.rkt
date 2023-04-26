@@ -7,9 +7,11 @@
   "../shared/expression.rkt"
   )
 (lazy-require
- ["../shared/store.rkt" (initialize-store!)]
+ ["../shared/store.rkt" (initialize-store! newref)]
  ["../shared/parser.rkt" (scan&parse)]
- ["environment.rkt" (init-env apply-env)]
+ ["environment.rkt" (init-env apply-env extend-env)]
+ ["procedure.rkt" (cont-procedure)]
+ ["value.rkt" (proc-val)]
  ["eval.rkt" (
               eval-const-exp
               eval-var-exp
@@ -107,6 +109,9 @@
     (raise-exp (exp1)
                (value-of/k exp1 env (raise-cont cont))
                )
+    (letcc-exp (var body)
+               (value-of/k body (extend-env var (newref (proc-val (cont-procedure cont))) env) cont)
+    )
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
