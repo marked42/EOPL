@@ -205,18 +205,16 @@
   ") -1 "test-example-1.1")
   )
 
-(define (run-test-letcc run)
+(define (run-test-call/cc run)
   (equal-answer? (run "
-  letcc i in -(2, 1)
-  ") 1 "letcc body value is used as value of whole expression when no throw called")
+  (callcc proc (cont) -(1, (cont 42)))
+  ") 42 "callcc")
 
   (equal-answer? (run "
-  letcc i in -(2, throw 3 to i)
-  ") 3 "thrown value to i is used as value of letcc expression")
-
-  (check-exn exn:fail? (lambda () (run "letcc i in -(2, throw 3 to 2)")))
-)
+  (callcc proc (cont) 42)
+  ") 42 "callcc")
+  )
 
 (run-tests run)
 (run-test-exception run)
-(run-test-letcc run)
+(run-test-call/cc run)

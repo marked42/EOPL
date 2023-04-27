@@ -4,7 +4,7 @@
 (lazy-require
  ["../shared/store.rkt" (reference? newref)]
  ["value.rkt" (num-val proc-val)]
- ["procedure.rkt" (procedure)]
+ ["procedure.rkt" (procedure call/cc-procedure)]
  )
 (provide (all-defined-out))
 
@@ -52,10 +52,12 @@
   )
 
 (define (init-env)
-  (extend-env 'i (newref (num-val 1))
-              (extend-env 'v (newref (num-val 5))
-                          (extend-env 'x (newref (num-val 10))
-                                      (empty-env)
+  (extend-env 'callcc (newref (proc-val (call/cc-procedure)))
+              (extend-env 'i (newref (num-val 1))
+                          (extend-env 'v (newref (num-val 5))
+                                      (extend-env 'x (newref (num-val 10))
+                                                  (empty-env)
+                                                  )
                                       )
                           )
               )
