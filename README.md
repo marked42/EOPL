@@ -897,3 +897,66 @@ letcc i in -(2, 1)
   )
 
 ```
+
+#### call/cc
+
+`call/cc`跟`letcc`一样可以暴漏当前的Continuation给用户使用，区别在于接收一个函数作为参数，并且将Continuation作为参数传递给这个函数进行调用。下面`call/cc`调用的值是`2`，整个表达式的值是`1`。
+
+```racket
+-((call/cc proc (cont) (cont 2)), 1)
+```
+
+新增函数类型`call/cc-procedure`作为内置变量`call/cc`的值，在`apply-procedure/k`中对`call/cc-procedure`进行处理，调用第一个参数，并且将`saved-cont`包装成`cont-procedure`传入。
+`cont-procedure`的处理跟上边`letcc`中相同。
+
+```racket
+(define (apply-procedure/k value-of/k proc1 args saved-cont)
+  (cases proc proc1
+    (procedure (vars body saved-env)
+               ; create new ref under implicit refs, aka call-by-value
+               (value-of/k body (extend-mul-env vars (vals->refs args) saved-env) saved-cont)
+               )
+    (call/cc-procedure ()
+                       (if (not (= (length args)))
+                           (eopl:error 'callcc "accepts only single argument, got ~s " args)
+                           (let ((invoked-proc (expval->proc (car args))))
+                             (apply-procedure/k value-of/k invoked-proc (list (proc-val (cont-procedure saved-cont))) saved-cont)
+                             )
+                           )
+                       )
+    (cont-procedure (cont) cont
+                    (if (not (= (length args)))
+                        (eopl:error 'cont-procedure "accepts only single argument, got ~s " args)
+                        (apply-cont cont (car args))
+                        )
+                    )
+    )
+  )
+
+```
+
+`letcc`/`throw`可以通过转换为`call/cc`来实现，参考下边例子。
+
+```racket
+letcc cont in throw 2 to cont
+```
+
+转换为
+
+```racket
+(call/cc proc (cont) (cont 2))
+```
+
+主要是对`letcc`/`throw`表达式进行转换处理，`letcc`转换为`call/cc`函数调用，`throw`转换为`cont`函数调用，其他表达式需要递归转换。
+
+```racket
+(define (translate-exp exp1)
+  (cases expression exp1
+    ...
+    (letcc-exp (var body)
+               (call-exp (var-exp 'callcc) (list (proc-exp var '() (translate-exp body))))
+               )
+    (throw-exp (exp1 exp2) (call-exp (translate-exp exp2) (list (translate-exp exp1))))
+  )
+)
+```
