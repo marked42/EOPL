@@ -900,7 +900,7 @@ letcc i in -(2, 1)
 
 #### call/cc
 
-`call/cc`跟`letcc`一样可以暴漏当前的Continuation给用户使用，区别在于接收一个函数作为参数，并且将Continuation作为参数传递给这个函数进行调用。下面`call/cc`调用的值是`2`，整个表达式的值是`1`。
+`call/cc`跟`letcc`一样可以暴漏当前的 Continuation 给用户使用，区别在于接收一个函数作为参数，并且将 Continuation 作为参数传递给这个函数进行调用。下面`call/cc`调用的值是`2`，整个表达式的值是`1`。
 
 ```racket
 -((call/cc proc (cont) (cont 2)), 1)
@@ -959,4 +959,58 @@ letcc cont in throw 2 to cont
     (throw-exp (exp1 exp2) (call-exp (translate-exp exp2) (list (translate-exp exp1))))
   )
 )
+```
+
+#### 使用函数对实现 Continuation
+
+5.1 中 continuation-as-lambda 方法中 Continuation 只有一个`apply-cont`的观察者（Observer），因此使用函数实现 Continuation 很直接。支持异常功能的情况下 Continuation 多了一个观察者`apply-handler`，具有多个观察者的函数不能直接为一个函数。
+
+一种方式是实现一个复合函数，内部包括多个函数功能，添加一个额外的参数，代表对应的观察者。
+
+```racket
+(define (continuation observer args)
+  (define (apply-cont args)
+    ...
+  )
+
+  (define (apply-handler args)
+    ...
+  )
+
+  (cond
+    ((= observer 'apply-cont) (apply-cont args))
+    ((= observer 'apply-handler ) (apply-handler args))
+    (else (error "wrong observer"))
+  )
+)
+
+(define (apply-cont cont args)
+  (cont 'apply-cont args)
+)
+
+(define (apply-handler cont args)
+  (cont 'apply-handler args)
+)
+```
+
+习题 5.41 中使用函数对的方式实现同样的功能，`car`元素代表`apply-cont`的功能，`cdr`代表`apply-handler`的功能。
+
+```racket
+(define (diff-cont saved-cont exp2 saved-env)
+  (cons
+    (lambda (val)
+      (value-of/k exp2 saved-env (diff-cont-1 saved-cont val))
+    )
+    (lambda (val) (apply-handler saved-cont val))
+  )
+)
+```
+
+对应的修改两个观察者的实现。
+
+```racket
+(define (apply-cont cont val) ((car cont) val))
+
+; search upward linearly for corresponding try-exp
+(define (apply-handler saved-cont val) ((cdr saved-cont) val))
 ```
