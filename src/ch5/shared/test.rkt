@@ -214,5 +214,5 @@
                       try (inner2 lst)
                       catch (x) -1
               in ((index 5) list(2, 3, 4))
-  ") -1 "test-example-1.1")
+  ") -1 "test-example-1.2")
   )
