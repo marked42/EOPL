@@ -1,8 +1,15 @@
 #lang eopl
 
-(require racket/lazy-require "parser.rkt" "expression.rkt")
+(require
+  racket/lazy-require
+  "../../base/expression.rkt"
+  "../../base/procedure.rkt"
+  "../../base/continuation.rkt"
+  )
 (lazy-require
- ["basic.rkt" (identifier? report-expval-extractor-error report-no-binding-found)]
+ ["../../base/parser.rkt" (scan&parse)]
+ ["../../base/value.rkt" (num-val bool-val proc-val expval->num expval->bool expval->proc)]
+ ["../../base/environment.rkt" (init-env apply-env extend-env)]
  )
 
 (provide (all-defined-out))
@@ -88,19 +95,8 @@
               (set! cont (call-cont cont rand env))
               (value-of/k)
               )
-    (else 42)
+    (else (eopl:error 'value-of/k "unsupported expression ~s" expr))
     )
-  )
-
-(define-datatype continuation cont?
-  (end-cont)
-  (diff-cont (saved-cont cont?) (exp2 expression?) (saved-env environment?))
-  (diff-cont-1 (saved-cont cont?) (val1 expval?))
-  (zero?-cont (saved-cont cont?))
-  (if-cont (saved-cont cont?) (exp2 expression?) (exp3 expression?) (saved-env environment?))
-  (let-cont (saved-cont cont?) (var identifier?) (body expression?) (env environment?))
-  (call-cont (saved-cont cont?) (rands expression?) (saved-env environment?))
-  (call-cont-1 (saved-cont cont?) (rator expval?))
   )
 
 (define (apply-cont)
@@ -154,16 +150,8 @@
                  (set! cont saved-cont)
                  (apply-procedure/k)
                  )
-    (else "error")
+    (else (eopl:error 'apply-cont "unsupported continuation ~s " cont))
     )
-  )
-
-(define-datatype proc proc?
-  (procedure
-   (var identifier?)
-   (body expression?)
-   (saved-env environment?)
-   )
   )
 
 (define (apply-procedure/k)
@@ -173,65 +161,6 @@
                (set! env (extend-env var val saved-env))
                (value-of/k)
                )
-    )
-  )
-
-(define-datatype expval expval?
-  (num-val (num number?))
-  (bool-val (bool boolean?))
-  (proc-val (proc1 proc?))
-  )
-
-(define (expval->num val)
-  (cases expval val
-    (num-val (num) num)
-    (else (report-expval-extractor-error 'num val))
-    )
-  )
-
-(define (expval->bool val)
-  (cases expval val
-    (bool-val (bool) bool)
-    (else (report-expval-extractor-error 'bool val))
-    )
-  )
-
-(define (expval->proc val)
-  (cases expval val
-    (proc-val (proc1) proc1)
-    (else (report-expval-extractor-error 'proc val))
-    )
-  )
-
-(define-datatype environment environment?
-  (empty-env)
-  (extend-env
-   (var identifier?)
-   (val expval?)
-   (env environment?)
-   )
-  )
-
-; use a vec to build circular refs to avoid create same proc-val multiple times
-
-(define (init-env)
-  (extend-env 'i (num-val 1)
-              (extend-env 'v (num-val 5)
-                          (extend-env 'x (num-val 10)
-                                      (empty-env)
-                                      )
-                          )
-              )
-  )
-
-(define (apply-env env search-var)
-  (cases environment env
-    (extend-env (var val saved-env)
-                (if (eqv? search-var var)
-                    val
-                    (apply-env saved-env search-var)
-                    )
-                )
-    (else (report-no-binding-found search-var))
+    (else (eopl:error 'apply-procedure/k "unsupported procedure ~s " proc1))
     )
   )

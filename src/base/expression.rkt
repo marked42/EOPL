@@ -1,6 +1,7 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt")
+(require racket/lazy-require)
+(lazy-require ["basic.rkt" (identifier?)])
 
 (provide (all-defined-out))
 
