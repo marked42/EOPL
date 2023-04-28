@@ -101,8 +101,8 @@
 
 (define (apply-cont)
   (cases continuation cont
-    ; end-cont is useless
-    ; (end-cont () val)
+    ; do nothing, val is already result
+    (end-cont () val)
     (diff-cont (saved-cont exp2 saved-env)
                (set! cont (diff-cont-1 saved-cont val))
                (set! expr exp2)
