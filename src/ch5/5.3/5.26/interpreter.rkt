@@ -24,15 +24,17 @@
   (value-of-program (scan&parse str))
   )
 
+(define (trampoline pc)
+  (if pc (trampoline (pc)) val)
+  )
+
 (define (value-of-program prog)
   (cases program prog
     (a-program (exp1)
                (set! expr exp1)
                (set! env (init-env))
                (set! cont (end-cont))
-               (value-of/k)
-               ; return val which stores the result
-               val
+               (trampoline value-of/k)
                )
     )
   )
@@ -101,8 +103,8 @@
 
 (define (apply-cont)
   (cases continuation cont
-    ; do nothing, val is already result
-    (end-cont () val)
+    ; return #f to stop trampoline recursive call
+    (end-cont () #f)
     (diff-cont (saved-cont exp2 saved-env)
                (set! cont (diff-cont-1 saved-cont val))
                (set! expr exp2)
@@ -148,7 +150,9 @@
     (call-cont-1 (saved-cont rator)
                  (set! proc1 (expval->proc rator))
                  (set! cont saved-cont)
-                 (apply-procedure/k)
+                 ; return apply-procedure/k to unwind stack to top,
+                 ; trampoline will trigger another round by calling apply-procedure/k
+                 apply-procedure/k
                  )
     (else (eopl:error 'apply-cont "unsupported continuation ~s " cont))
     )
