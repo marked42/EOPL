@@ -2,8 +2,7 @@
 
 (require racket)
 (require rackunit)
-(require "../../base/value.rkt")
-(require "interpreter.rkt")
+(require "value.rkt")
 
 (provide (all-defined-out))
 
@@ -43,5 +42,3 @@
   (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
   (equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
   )
-
-(test-basic run)
