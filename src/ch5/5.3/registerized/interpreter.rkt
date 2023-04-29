@@ -31,8 +31,6 @@
                (set! env (init-env))
                (set! cont (end-cont))
                (value-of/k)
-               ; return val which stores the result
-               val
                )
     )
   )
