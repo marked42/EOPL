@@ -445,6 +445,54 @@ function trampoline(thunk) {
 
 ### 5.3 An Imperative Interpreter
 
+上述解释器的实现核心是三个函数的递归调用，每次递归调用都使用了闭包将外层局部变量保存起来，在不支持闭包的过程式语言中需要对解释器进行改造。由于所有的函数调用都是尾调用，所以可以将每个函数使用的局部变量转换为全局变量（registerization）。
+
+每个函数接收的参数如下。
+
+```racket
+(value-of/k exp env cont)
+(apply-cont cont val)
+(apply-procedure/k proc1 val cont)
+```
+
+首先初始化五个全局变量。
+
+```racket
+(define expr 'uninitialized)
+(define env 'uninitialized)
+(define cont 'uninitialized)
+(define val 'uninitialized)
+(define proc1 'uninitialized)
+```
+
+然后在每次函数调用时，设置函数使用的全局变量，再调用相应函数。
+
+```racket
+(define (value-of-program prog)
+  (cases program prog
+    (a-program (exp1)
+               (set! expr exp1)
+               (set! env (init-env))
+               (set! cont (end-cont))
+               (value-of/k)
+               )
+    )
+  )
+```
+
+对于递归调用时函数参数值不变的情况，不需要修改对应全局变量，例如`(set! cont cont)`。
+
+```racket
+(const-exp (num)
+            (set! val (num-val num))
+            ; useless
+            ; (set! cont cont)
+            (apply-cont)
+            )
+```
+
+最终返回值保存在`val`变量中，在`end-cont`的处理中返回。
+
 ### 5.4 Exception
 
 支持简单的异常语法，因为 Continuation 抽象了程序运行的后续运算，因此完全可以控制程序进行任意流程的运算，实现异常控制流。
