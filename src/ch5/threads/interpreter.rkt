@@ -10,6 +10,7 @@
  ["../shared/environment.rkt" (init-env apply-env)]
  ["../shared/store.rkt" (initialize-store!)]
  ["../shared/parser.rkt" (scan&parse)]
+ ["../shared/value.rkt" (mutex-val)]
  ["../shared/eval.rkt" (
                         eval-const-exp
                         eval-var-exp
@@ -34,9 +35,12 @@
                       begin-cont
                       set-rhs-cont
                       spawn-cont
+                      wait-cont
+                      signal-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
  ["scheduler.rkt" (initialize-scheduler!)]
+ ["mutex.rkt" (new-mutex)]
  )
 
 (provide (all-defined-out))
@@ -104,6 +108,9 @@
                 (value-of/k exp1 env (set-rhs-cont cont (apply-env env var)))
                 )
     (spawn-exp (exp1) (value-of/k exp1 env (spawn-cont cont)))
+    (mutex-exp () (apply-cont cont (mutex-val (new-mutex))))
+    (wait-exp (exp1) (value-of/k exp1 env (wait-cont cont)))
+    (signal-exp (exp1) (value-of/k exp1 env (signal-cont cont)))
     (else (eopl:error "invalid exp ~s" exp))
     )
   )

@@ -216,3 +216,8 @@
               in ((index 5) list(2, 3, 4))
   ") -1 "test-example-1.2")
   )
+
+(define (run-test-mutex run)
+  ; new-mutex
+  (equal-answer? (run "mutex()") 1 "const exp")
+  )
