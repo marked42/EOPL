@@ -18,7 +18,7 @@
                         eval-emptylist-exp
                         )]
  ["continuation.rkt" (
-                      end-cont
+                      end-main-thread-cont
                       apply-cont
                       diff-cont
                       zero?-cont
@@ -33,20 +33,23 @@
                       list-cont
                       begin-cont
                       set-rhs-cont
+                      spawn-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
+ ["scheduler.rkt" (initialize-scheduler!)]
  )
 
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program (scan&parse str))
+  (value-of-program 10 (scan&parse str))
   )
 
-(define (value-of-program prog)
+(define (value-of-program timeslice prog)
   (initialize-store!)
+  (initialize-scheduler! timeslice)
   (cases program prog
-    (a-program (exp1) (value-of/k exp1 (init-env) (end-cont)))
+    (a-program (exp1) (value-of/k exp1 (init-env) (end-main-thread-cont)))
     )
   )
 
@@ -100,6 +103,7 @@
     (assign-exp (var exp1)
                 (value-of/k exp1 env (set-rhs-cont cont (apply-env env var)))
                 )
+    (spawn-exp (exp1) (value-of/k exp1 env (spawn-cont cont)))
     (else (eopl:error "invalid exp ~s" exp))
     )
   )

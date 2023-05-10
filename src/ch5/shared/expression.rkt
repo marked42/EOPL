@@ -41,6 +41,8 @@
 
   (letcc-exp (var identifier?) (body expression?))
   (throw-exp (exp1 expression?) (exp2 expression?))
+
+  (spawn-exp (exp1 expression?))
   )
 
 (define-datatype program program?

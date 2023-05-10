@@ -17,9 +17,10 @@
                         )]
  ["../shared/environment.rkt" (environment?)]
  ["../shared/store.rkt" (setref reference?)]
- ["../shared/value.rkt" (expval? expval->proc)]
+ ["../shared/value.rkt" (expval? expval->proc num-val)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
+ ["scheduler.rkt" (set-final-answer! run-next-thread place-on-ready-queue!)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
  )
@@ -27,7 +28,8 @@
 (provide (all-defined-out))
 
 (define-datatype continuation cont?
-  (end-cont)
+  (end-main-thread-cont)
+  (end-subthread-cont)
   (diff-cont (saved-cont cont?) (exp2 expression?) (saved-env environment?))
   (diff-cont-1 (saved-cont cont?) (val1 expval?))
   (zero?-cont (saved-cont cont?))
@@ -47,11 +49,17 @@
   (begin-cont (saved-cont cont?))
 
   (set-rhs-cont (saved-cont cont?) (ref reference?))
+
+  (spawn-cont (saved-cont cont?))
   )
 
 (define (apply-cont cont val)
   (cases continuation cont
-    (end-cont () val)
+    (end-main-thread-cont ()
+                          (set-final-answer! val)
+                          (run-next-thread)
+                          )
+    (end-subthread-cont () (run-next-thread))
     (diff-cont (saved-cont exp2 saved-env)
                (value-of/k exp2 saved-env (diff-cont-1 saved-cont val))
                )
@@ -111,5 +119,11 @@
                   (setref ref val)
                   (apply-cont saved-cont val)
                   )
+    (spawn-cont (saved-cont)
+                (let ((proc1 (expval->proc val)))
+                  (place-on-ready-queue! (lambda () (apply-procedure/k value-of/k proc1 (list (num-val 28)) (end-subthread-cont))))
+                  (apply-cont saved-cont (num-val 73))
+                  )
+                )
     )
   )
