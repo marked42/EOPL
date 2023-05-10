@@ -17,12 +17,13 @@
                         )]
  ["../shared/environment.rkt" (environment?)]
  ["../shared/store.rkt" (setref reference?)]
- ["../shared/value.rkt" (expval? expval->proc num-val)]
+ ["../shared/value.rkt" (expval? expval->proc expval->mutex num-val)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
  ["scheduler.rkt" (set-final-answer! run-next-thread place-on-ready-queue!)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
+ ["mutex.rkt" (wait-for-mutex signal-mutex)]
  )
 
 (provide (all-defined-out))
@@ -51,6 +52,8 @@
   (set-rhs-cont (saved-cont cont?) (ref reference?))
 
   (spawn-cont (saved-cont cont?))
+  (wait-cont (saved-cont cont?))
+  (signal-cont (saved-cont cont?))
   )
 
 (define (apply-cont cont val)
@@ -125,5 +128,7 @@
                   (apply-cont saved-cont (num-val 73))
                   )
                 )
+    (wait-cont (saved-cont) (wait-for-mutex (expval->mutex val) (lambda () (apply-cont saved-cont (num-val 52)))))
+    (signal-cont (saved-cont) (signal-mutex (expval->mutex val) (lambda () (apply-cont saved-cont (num-val 53)))))
     )
   )

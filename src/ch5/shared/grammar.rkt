@@ -44,5 +44,9 @@
     (expression ("throw" expression "to" expression) throw-exp)
 
     (expression ("spawn" "(" expression ")") spawn-exp)
+
+    (expression ("mutex" "(" ")") mutex-exp)
+    (expression ("wait" "(" expression ")") wait-exp)
+    (expression ("signal" "(" expression ")") signal-exp)
     )
   )

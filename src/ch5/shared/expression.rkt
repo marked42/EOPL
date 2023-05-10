@@ -43,6 +43,9 @@
   (throw-exp (exp1 expression?) (exp2 expression?))
 
   (spawn-exp (exp1 expression?))
+  (mutex-exp)
+  (wait-exp (exp1 expression?))
+  (signal-exp (exp1 expression?))
   )
 
 (define-datatype program program?

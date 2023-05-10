@@ -4,6 +4,7 @@
 (lazy-require
  ["basic.rkt" (report-expval-extractor-error)]
  ["procedure.rkt" (proc?)]
+ ["../threads/mutex.rkt" (mutex?)]
  )
 
 (provide (all-defined-out))
@@ -21,6 +22,7 @@
    (second expval?)
    )
   (proc-val (proc1 proc?))
+  (mutex-val (mutex1 mutex?))
   )
 
 (define (expval->num val)
@@ -78,5 +80,12 @@
   (cases expval val1
     (null-val () (bool-val #t))
     (else (bool-val #f))
+    )
+  )
+
+(define (expval->mutex val)
+  (cases expval val
+    (mutex-val (m) m)
+    (else (report-expval-extractor-error 'mutex val))
     )
   )
