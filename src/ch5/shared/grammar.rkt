@@ -42,5 +42,7 @@
     ; exer 5.42
     (expression ("letcc" identifier "in" expression) letcc-exp)
     (expression ("throw" expression "to" expression) throw-exp)
+
+    (expression ("spawn" "(" expression ")") spawn-exp)
     )
   )
