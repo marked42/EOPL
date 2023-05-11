@@ -19,18 +19,23 @@
   (set! the-time-remaining the-max-time-slice)
   )
 
-(define (place-on-ready-queue! th)
-  (set! the-ready-queue (enqueue the-ready-queue th))
+(define (place-on-ready-queue! th use-remaining-time-slice)
+  (if use-remaining-time-slice
+    (set! the-ready-queue (enqueue the-ready-queue (cons th the-time-remaining)))
+    (set! the-ready-queue (enqueue the-ready-queue (cons th the-max-time-slice)))
+    )
   )
 
 (define (run-next-thread)
   (if (empty? the-ready-queue)
       ; return final answer
       the-final-answer
-      (dequeue the-ready-queue (lambda (first-ready-thread other-ready-threads)
+      (dequeue the-ready-queue (lambda (head other-ready-threads)
                                  (set! the-ready-queue other-ready-threads)
-                                 (set! the-time-remaining the-max-time-slice)
-                                 (first-ready-thread)
+                                 (let ((first-ready-thread (car head)) (time-slice (cdr head)))
+                                    (set! the-time-remaining time-slice)
+                                    (first-ready-thread)
+                                  )
                                  ))
       )
   )
