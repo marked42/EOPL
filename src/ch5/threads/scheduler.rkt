@@ -39,7 +39,7 @@
   (set! the-final-answer val)
   )
 
-(define (time-expired?)
+(define (timer-expired?)
   (zero? the-time-remaining)
   )
 
