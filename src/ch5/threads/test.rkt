@@ -2,7 +2,7 @@
 
 (require racket/lazy-require)
 (lazy-require
- ["../shared/test.rkt" (run-test-mutex)]
+ ["../shared/test.rkt" (run-test-mutex equal-answer?)]
  ["interpreter.rkt" (run)]
  )
 
@@ -60,8 +60,6 @@ let buffer = 0
     ")
   )
 
-(unsafe-counter)
-
 (define (safe-counter)
   (run "
 let x = 0
@@ -82,3 +80,9 @@ end
   )
 
 ; (safe-counter)
+
+(equal-answer? (run "
+let x = 1
+  in let y = yield()
+    in y
+") 99 "yield-exp")

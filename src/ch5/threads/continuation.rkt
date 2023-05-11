@@ -56,6 +56,8 @@
   (signal-cont (saved-cont cont?))
 
   (print-cont (saved-cont cont?))
+
+  (yield-cont (saved-cont cont?))
   )
 
 (define (apply-cont cont val)
@@ -144,6 +146,10 @@
                       (eopl:pretty-print val)
                       (apply-cont saved-cont val)
                       )
+          (yield-cont (saved-cont)
+              (place-on-ready-queue! (lambda () (apply-cont saved-cont (num-val 99))))
+              (run-next-thread)
+            )
           )
         )
       )

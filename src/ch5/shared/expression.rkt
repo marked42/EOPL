@@ -48,6 +48,8 @@
   (signal-exp (exp1 expression?))
 
   (print-exp (exp1 expression?))
+
+  (yield-exp)
   )
 
 (define-datatype program program?
