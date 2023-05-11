@@ -44,7 +44,7 @@
                    (if (empty? wait-queue)
                        (setref ref-to-closed? #f)
                        (dequeue wait-queue (lambda (first-waiting-thread other-waiting-threads)
-                                             (place-on-ready-queue! first-waiting-thread)
+                                             (place-on-ready-queue! first-waiting-thread #f)
                                              (setref ref-to-wait-queue other-waiting-threads)
                                              ))
                        )

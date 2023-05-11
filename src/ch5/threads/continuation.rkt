@@ -63,7 +63,7 @@
 (define (apply-cont cont val)
   (if (timer-expired?)
       (begin
-        (place-on-ready-queue! (lambda () (apply-cont cont val)))
+        (place-on-ready-queue! (lambda () (apply-cont cont val)) #f)
         (run-next-thread)
         )
       (begin
@@ -136,7 +136,7 @@
                         )
           (spawn-cont (saved-cont)
                       (let ((proc1 (expval->proc val)))
-                        (place-on-ready-queue! (lambda () (apply-procedure/k value-of/k proc1 (list (num-val 28)) (end-subthread-cont))))
+                        (place-on-ready-queue! (lambda () (apply-procedure/k value-of/k proc1 (list (num-val 28)) (end-subthread-cont))) #f)
                         (apply-cont saved-cont (num-val 73))
                         )
                       )
@@ -147,7 +147,7 @@
                       (apply-cont saved-cont val)
                       )
           (yield-cont (saved-cont)
-              (place-on-ready-queue! (lambda () (apply-cont saved-cont (num-val 99))))
+              (place-on-ready-queue! (lambda () (apply-cont saved-cont (num-val 99))) #t)
               (run-next-thread)
             )
           )
