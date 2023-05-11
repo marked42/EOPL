@@ -37,6 +37,7 @@
                       spawn-cont
                       wait-cont
                       signal-cont
+                      print-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
  ["scheduler.rkt" (initialize-scheduler!)]
@@ -46,7 +47,7 @@
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program 10 (scan&parse str))
+  (value-of-program 2 (scan&parse str))
   )
 
 (define (value-of-program timeslice prog)
@@ -111,6 +112,7 @@
     (mutex-exp () (apply-cont cont (mutex-val (new-mutex))))
     (wait-exp (exp1) (value-of/k exp1 env (wait-cont cont)))
     (signal-exp (exp1) (value-of/k exp1 env (signal-cont cont)))
+    (print-exp (exp1) (value-of/k exp1 env (print-cont cont)))
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
