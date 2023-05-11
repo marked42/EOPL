@@ -50,5 +50,7 @@
     (expression ("signal" "(" expression ")") signal-exp)
 
     (expression ("print" "(" expression ")") print-exp)
+
+    (expression ("yield" "(" ")") yield-exp)
     )
   )

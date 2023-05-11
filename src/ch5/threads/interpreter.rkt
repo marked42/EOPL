@@ -10,7 +10,7 @@
  ["../shared/environment.rkt" (init-env apply-env)]
  ["../shared/store.rkt" (initialize-store!)]
  ["../shared/parser.rkt" (scan&parse)]
- ["../shared/value.rkt" (mutex-val)]
+ ["../shared/value.rkt" (mutex-val num-val)]
  ["../shared/eval.rkt" (
                         eval-const-exp
                         eval-var-exp
@@ -38,6 +38,7 @@
                       wait-cont
                       signal-cont
                       print-cont
+                      yield-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
  ["scheduler.rkt" (initialize-scheduler!)]
@@ -47,7 +48,7 @@
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program 2 (scan&parse str))
+  (value-of-program 100 (scan&parse str))
   )
 
 (define (value-of-program timeslice prog)
@@ -113,6 +114,8 @@
     (wait-exp (exp1) (value-of/k exp1 env (wait-cont cont)))
     (signal-exp (exp1) (value-of/k exp1 env (signal-cont cont)))
     (print-exp (exp1) (value-of/k exp1 env (print-cont cont)))
+    ; num-val -99 is unused dummy value
+    (yield-exp () (apply-cont (yield-cont cont) (num-val -99)))
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
