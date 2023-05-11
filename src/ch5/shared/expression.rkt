@@ -46,6 +46,8 @@
   (mutex-exp)
   (wait-exp (exp1 expression?))
   (signal-exp (exp1 expression?))
+
+  (print-exp (exp1 expression?))
   )
 
 (define-datatype program program?
