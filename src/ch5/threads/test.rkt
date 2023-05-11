@@ -48,6 +48,43 @@ let buffer = 0
   ")
   )
 
+; TODO: probably wrong
+(define (synchronize)
+  (run "
+let buffer = 0 m = mutex()
+  in let producer = proc (n)
+                      letrec wait1 (k) = if zero?(k)
+                                      then begin
+                                        set buffer = n;
+                                        signal(m)
+                                      end
+                                      else begin
+                                          print(-(k,-200));
+                                          (wait1 -(k,1))
+                                      end
+                        in begin
+                          wait(m);
+                          (wait1 5)
+                        end
+      in let consumer = proc (d)
+                          letrec busywait (k) = if zero?(buffer)
+                                                then begin
+                                                      print(-(k,-100));
+                                                      (busywait -(k,-1))
+                                                    end
+                                                else buffer
+                            in begin
+                              wait(m);
+                              (busywait 0)
+                            end
+        in begin
+          spawn(proc (d) (producer 44));
+          print(300);
+          (consumer 86)
+        end
+  ")
+  )
+
 (define (unsafe-counter)
   (run "
     let x = 0 in

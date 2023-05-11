@@ -48,7 +48,7 @@
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program 100 (scan&parse str))
+  (value-of-program 10 (scan&parse str))
   )
 
 (define (value-of-program timeslice prog)
