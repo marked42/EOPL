@@ -6,23 +6,64 @@
  ["interpreter.rkt" (run)]
  )
 
+; two threads showing interleaved output
+(define (two-non-cooperating-threads)
+  (run "
+    letrec noisy (l) = if null?(l)
+                    then 0
+                    else begin print(car(l)); (noisy cdr(l)) end
+        in begin
+            spawn(proc (d) (noisy list(1,2,3,4,5)));
+            spawn(proc (d) (noisy list(6,7,8,9,10)));
+            print(100);
+            33
+        end
+    ")
+  )
+
+(define (busywait)
+  (run "
+let buffer = 0
+  in let producer = proc (n)
+                      letrec wait1 (k) = if zero?(k)
+                                      then set buffer = n
+                                      else begin
+                                          print(-(k,-200));
+                                          (wait1 -(k,1))
+                                      end
+                        in (wait1 5)
+      in let consumer = proc (d)
+                          letrec busywait (k) = if zero?(buffer)
+                                                then begin
+                                                      print(-(k,-100));
+                                                      (busywait -(k,-1))
+                                                    end
+                                                else buffer
+                            in (busywait 0)
+        in begin
+          spawn(proc (d) (producer 44));
+          print(300);
+          (consumer 86)
+        end
+  ")
+  )
+
 (define (unsafe-counter)
-    (run "
+  (run "
     let x = 0 in
-        let incr_x = proc (id) proc (dummy) set x = -(x,-1)
+        let incr_x = proc (id) proc (dummy) begin set x = -(x,-1); print(x) end
             in begin
                 spawn((incr_x 100));
                 spawn((incr_x 200));
                 spawn((incr_x 300))
             end
     ")
-)
+  )
 
 (unsafe-counter)
 
-
 (define (safe-counter)
-    (run "
+  (run "
 let x = 0
       in let mut = mutex()
       in let incr_x = proc (id)
@@ -38,6 +79,6 @@ end
           spawn((incr_x 300))
 end
     ")
-)
+  )
 
-(safe-counter)
+; (safe-counter)
