@@ -20,7 +20,7 @@
  ["../shared/value.rkt" (expval? expval->proc expval->mutex num-val)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
- ["scheduler.rkt" (set-final-answer! run-next-thread place-on-ready-queue! timer-expired? decrement-timer!)]
+ ["scheduler.rkt" (set-final-answer! run-next-thread place-on-ready-queue! timer-expired? decrement-timer! new-thread get-the-time-remaining get-the-max-timeslice)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
  ["mutex.rkt" (wait-for-mutex signal-mutex)]
@@ -63,7 +63,7 @@
 (define (apply-cont cont val)
   (if (timer-expired?)
       (begin
-        (place-on-ready-queue! (lambda () (apply-cont cont val)) #f)
+        (place-on-ready-queue! (new-thread (lambda () (apply-cont cont val)) (get-the-max-timeslice)))
         (run-next-thread)
         )
       (begin
@@ -136,20 +136,33 @@
                         )
           (spawn-cont (saved-cont)
                       (let ((proc1 (expval->proc val)))
-                        (place-on-ready-queue! (lambda () (apply-procedure/k value-of/k proc1 (list (num-val 28)) (end-subthread-cont))) #f)
+                        (place-on-ready-queue!
+                         (new-thread
+                          (lambda () (apply-procedure/k value-of/k proc1 (list (num-val 28)) (end-subthread-cont)))
+                          (get-the-max-timeslice)
+                          )
+                         )
                         (apply-cont saved-cont (num-val 73))
                         )
                       )
           (wait-cont (saved-cont) (wait-for-mutex (expval->mutex val) (lambda () (apply-cont saved-cont (num-val 52)))))
-          (signal-cont (saved-cont) (signal-mutex (expval->mutex val) (lambda () (apply-cont saved-cont (num-val 53)))))
+          (signal-cont (saved-cont)
+                       (signal-mutex (expval->mutex val))
+                       apply-cont saved-cont (num-val 53)
+                       )
           (print-cont (saved-cont)
                       (eopl:pretty-print val)
                       (apply-cont saved-cont val)
                       )
           (yield-cont (saved-cont)
-              (place-on-ready-queue! (lambda () (apply-cont saved-cont (num-val 99))) #t)
-              (run-next-thread)
-            )
+                      (place-on-ready-queue!
+                       (new-thread
+                        (lambda () (apply-cont saved-cont (num-val 99)))
+                        (get-the-time-remaining)
+                        )
+                       )
+                      (run-next-thread)
+                      )
           )
         )
       )
