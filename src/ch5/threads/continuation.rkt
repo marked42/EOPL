@@ -20,7 +20,7 @@
  ["../shared/value.rkt" (expval? expval->proc expval->mutex num-val)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
- ["scheduler.rkt" (set-final-answer! run-next-thread place-on-ready-queue! timer-expired? decrement-timer! new-thread get-the-time-remaining get-the-max-timeslice)]
+ ["scheduler.rkt" (set-final-answer! run-next-thread place-on-ready-queue! timer-expired? decrement-timer! new-thread get-the-time-remaining get-the-max-timeslice thread->id)]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
  ["mutex.rkt" (wait-for-mutex signal-mutex)]
@@ -136,13 +136,15 @@
                         )
           (spawn-cont (saved-cont)
                       (let ((proc1 (expval->proc val)))
-                        (place-on-ready-queue!
-                         (new-thread
-                          (lambda () (apply-procedure/k value-of/k proc1 (list (num-val 28)) (end-subthread-cont)))
-                          (get-the-max-timeslice)
+                        (let ((thread
+                               (new-thread
+                                (lambda () (apply-procedure/k value-of/k proc1 (list (num-val 28)) (end-subthread-cont)))
+                                (get-the-max-timeslice)
+                                )
+                               ))
+                          (place-on-ready-queue! thread)
+                          (apply-cont saved-cont (num-val (thread->id thread)))
                           )
-                         )
-                        (apply-cont saved-cont (num-val 73))
                         )
                       )
           (wait-cont (saved-cont) (wait-for-mutex (expval->mutex val) (lambda () (apply-cont saved-cont (num-val 52)))))
