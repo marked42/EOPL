@@ -19,11 +19,8 @@
   (set! the-time-remaining the-max-time-slice)
   )
 
-(define (place-on-ready-queue! th use-remaining-time-slice)
-  (if use-remaining-time-slice
-    (set! the-ready-queue (enqueue the-ready-queue (cons th the-time-remaining)))
-    (set! the-ready-queue (enqueue the-ready-queue (cons th the-max-time-slice)))
-    )
+(define (place-on-ready-queue! th)
+  (set! the-ready-queue (enqueue the-ready-queue th))
   )
 
 (define (run-next-thread)
@@ -32,10 +29,7 @@
       the-final-answer
       (dequeue the-ready-queue (lambda (head other-ready-threads)
                                  (set! the-ready-queue other-ready-threads)
-                                 (let ((first-ready-thread (car head)) (time-slice (cdr head)))
-                                    (set! the-time-remaining time-slice)
-                                    (first-ready-thread)
-                                  )
+                                 (start-thread head)
                                  ))
       )
   )
@@ -44,10 +38,35 @@
   (set! the-final-answer val)
   )
 
+(define (get-the-max-timeslice)
+  the-max-time-slice
+  )
+
+(define (get-the-time-remaining)
+  the-time-remaining
+  )
+
 (define (timer-expired?)
   (zero? the-time-remaining)
   )
 
 (define (decrement-timer!)
   (set! the-time-remaining (- the-time-remaining 1))
+  )
+
+(define-datatype my-thread my-thread?
+  (a-thread (proc procedure?) (timeslice number?))
+  )
+
+(define (new-thread th timeslice)
+  (a-thread th timeslice)
+  )
+
+(define (start-thread th)
+  (cases my-thread th
+    (a-thread (proc timeslice)
+              (set! the-time-remaining timeslice)
+              (proc)
+              )
+    )
   )
