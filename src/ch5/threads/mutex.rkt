@@ -4,7 +4,7 @@
 (lazy-require
  ["../shared/store.rkt" (reference? newref deref setref)]
  ["queue.rkt" (enqueue dequeue empty?)]
- ["threads.rkt" (place-on-ready-queue! new-thread get-the-time-remaining)]
+ ["threads.rkt" (place-on-ready-queue! pause-current-thread)]
  )
 
 (provide (all-defined-out))
@@ -25,7 +25,7 @@
     (a-mutex (ref-to-closed? ref-to-wait-queue)
              (cond
                ((deref ref-to-closed?)
-                (setref ref-to-wait-queue (enqueue (deref ref-to-wait-queue) (new-thread th (get-the-time-remaining))))
+                (setref ref-to-wait-queue (enqueue (deref ref-to-wait-queue) (pause-current-thread th)))
                 )
                (else
                 (setref ref-to-closed? #t)

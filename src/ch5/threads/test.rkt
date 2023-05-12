@@ -116,13 +116,35 @@ end
     ")
   )
 
-(equal-answer? (run "
+(define (test-yield)
+  (equal-answer? (run "
 let x = 1
   in let y = yield()
     in y
 ") 99 "yield-exp")
+  )
 
-(equal-answer? (run "
+(define (test-thread-identifier)
+  (equal-answer? (run "
 let x = spawn(proc (y) y)
     in x
 ") 1 "spawn return first child thread identifier 1, main thread is 0")
+  )
+
+(define (test-lock-race)
+  (equal-answer? (run "
+let m = mutex()
+  in letrec prod (n) = letrec busy (y) = begin
+                                        wait(m);
+                                        print(n);
+                                        print(y);
+                                        signal(m);
+                                        (busy -(y,-2))
+                                      end
+                          in (busy n)
+    in let t1 = spawn((prod 0))
+      in let t2 = spawn((prod 1))
+        in 1
+") 1 "lock")
+  )
+(test-lock-race)

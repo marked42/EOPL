@@ -76,6 +76,15 @@
 
 (define current-thread 'unintialized)
 
+(define (pause-current-thread new-proc)
+  (cases my-thread current-thread
+    (a-thread (proc timeslice id parent)
+              (eopl:pretty-print (list "pause current thread " id parent new-proc))
+              (a-thread new-proc timeslice id parent)
+              )
+    )
+  )
+
 (define (start-thread th)
   (eopl:pretty-print (list "start thread " th))
   (set! current-thread th)

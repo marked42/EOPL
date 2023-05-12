@@ -20,7 +20,18 @@
  ["../shared/value.rkt" (expval? expval->proc expval->mutex num-val)]
  ["../shared/expression.rkt" (expression?)]
  ["../shared/procedure.rkt" (apply-procedure/k)]
- ["scheduler.rkt" (set-final-answer! run-next-thread place-on-ready-queue! timer-expired? decrement-timer! new-thread get-the-time-remaining get-the-max-timeslice thread->id)]
+ ["scheduler.rkt" (
+                   set-final-answer!
+                   run-next-thread
+                   place-on-ready-queue!
+                   timer-expired?
+                   decrement-timer!
+                   new-thread
+                   get-the-time-remaining
+                   get-the-max-timeslice
+                   thread->id
+                   pause-current-thread
+                   )]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
  ["mutex.rkt" (wait-for-mutex signal-mutex)]
@@ -157,12 +168,7 @@
                       (apply-cont saved-cont val)
                       )
           (yield-cont (saved-cont)
-                      (place-on-ready-queue!
-                       (new-thread
-                        (lambda () (apply-cont saved-cont (num-val 99)))
-                        (get-the-time-remaining)
-                        )
-                       )
+                      (place-on-ready-queue! (pause-current-thread (lambda () (apply-cont saved-cont (num-val 99)))))
                       (run-next-thread)
                       )
           )
