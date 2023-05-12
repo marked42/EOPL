@@ -57,7 +57,7 @@
   )
 
 (define-datatype my-thread my-thread?
-  (a-thread (proc procedure?) (timeslice number?) (id number?))
+  (a-thread (proc procedure?) (timeslice number?) (id number?) (parent number?))
   )
 
 (define thread-id -1)
@@ -68,9 +68,9 @@
   )
 
 (define (new-thread th timeslice)
-  (let ((id (next-thread-id)))
-    (eopl:pretty-print (list "creating thread " id th timeslice))
-    (a-thread th timeslice id)
+  (let ((id (next-thread-id)) (parent (if (eq? current-thread 'uninitialized) -1 (thread->id current-thread))))
+    (eopl:pretty-print (list "creating thread " id parent th timeslice))
+    (a-thread th timeslice id parent)
     )
   )
 
@@ -80,7 +80,7 @@
   (eopl:pretty-print (list "start thread " th))
   (set! current-thread th)
   (cases my-thread th
-    (a-thread (proc timeslice id)
+    (a-thread (proc timeslice id parent)
               (set! the-time-remaining timeslice)
               (proc)
               )
@@ -89,7 +89,7 @@
 
 (define (thread->id th)
   (cases my-thread th
-    (a-thread (proc timeslice id)
+    (a-thread (proc timeslice id parent)
               id
               )
     )
