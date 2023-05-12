@@ -116,10 +116,13 @@ end
     ")
   )
 
-; (safe-counter)
-
 (equal-answer? (run "
 let x = 1
   in let y = yield()
     in y
 ") 99 "yield-exp")
+
+(equal-answer? (run "
+let x = spawn(proc (y) y)
+    in x
+") 1 "spawn return first child thread identifier 1, main thread is 0")

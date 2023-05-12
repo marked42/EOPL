@@ -41,7 +41,7 @@
                       yield-cont
                       )]
  ["call.rkt" (eval-operand-call-by-value)]
- ["scheduler.rkt" (initialize-scheduler!)]
+ ["scheduler.rkt" (initialize-scheduler! new-thread start-thread get-the-max-timeslice)]
  ["mutex.rkt" (new-mutex)]
  )
 
@@ -54,8 +54,15 @@
 (define (value-of-program timeslice prog)
   (initialize-store!)
   (initialize-scheduler! timeslice)
-  (cases program prog
-    (a-program (exp1) (value-of/k exp1 (init-env) (end-main-thread-cont)))
+  (let ((main-thread (new-thread (lambda ()
+                                   (cases program prog
+                                     (a-program (exp1) (value-of/k exp1 (init-env) (end-main-thread-cont)))
+                                     )
+                                   )
+                                 (get-the-max-timeslice)
+                                 )
+                     ))
+    (start-thread main-thread)
     )
   )
 

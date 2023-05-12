@@ -17,6 +17,8 @@
   (set! the-final-answer 'uninitialized)
   (set! the-max-time-slice ticks)
   (set! the-time-remaining the-max-time-slice)
+  (set! thread-id -1)
+  (set! current-thread 'uninitialized)
   )
 
 (define (place-on-ready-queue! th)
@@ -55,18 +57,40 @@
   )
 
 (define-datatype my-thread my-thread?
-  (a-thread (proc procedure?) (timeslice number?))
+  (a-thread (proc procedure?) (timeslice number?) (id number?))
+  )
+
+(define thread-id -1)
+
+(define (next-thread-id)
+  (set! thread-id (+ thread-id 1))
+  thread-id
   )
 
 (define (new-thread th timeslice)
-  (a-thread th timeslice)
+  (let ((id (next-thread-id)))
+    (eopl:pretty-print (list "creating thread " id th timeslice))
+    (a-thread th timeslice id)
+    )
   )
 
+(define current-thread 'unintialized)
+
 (define (start-thread th)
+  (eopl:pretty-print (list "start thread " th))
+  (set! current-thread th)
   (cases my-thread th
-    (a-thread (proc timeslice)
+    (a-thread (proc timeslice id)
               (set! the-time-remaining timeslice)
               (proc)
+              )
+    )
+  )
+
+(define (thread->id th)
+  (cases my-thread th
+    (a-thread (proc timeslice id)
+              id
               )
     )
   )
