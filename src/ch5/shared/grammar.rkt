@@ -52,5 +52,7 @@
     (expression ("print" "(" expression ")") print-exp)
 
     (expression ("yield" "(" ")") yield-exp)
+
+    (expression ("kill" "(" expression ")") kill-exp)
     )
   )

@@ -123,6 +123,7 @@
     (print-exp (exp1) (value-of/k exp1 env (print-cont cont)))
     ; num-val -99 is unused dummy value
     (yield-exp () (apply-cont (yield-cont cont) (num-val -99)))
+    (kill-exp () (value-of/k exp1 (kill-cont cont)))
     (else (eopl:error "invalid exp ~s" exp))
     )
   )
