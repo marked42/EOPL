@@ -31,6 +31,7 @@
                    get-the-max-timeslice
                    thread->id
                    pause-current-thread
+                   remove-from-ready-queue
                    )]
  ["interpreter.rkt" (value-of/k value-of-exps/k value-of-exps-helper/k)]
  ["call.rkt" (eval-operand-call-by-value)]
@@ -69,6 +70,7 @@
   (print-cont (saved-cont cont?))
 
   (yield-cont (saved-cont cont?))
+  (kill-cont (saved-cont cont?))
   )
 
 (define (apply-cont cont val)
@@ -171,6 +173,11 @@
                       (place-on-ready-queue! (pause-current-thread (lambda () (apply-cont saved-cont (num-val 99)))))
                       (run-next-thread)
                       )
+          (kill-cont (saved-cont)
+                     (let ((id (expval->num val)))
+                      (remove-from-ready-queue id)
+                     )
+          )
           )
         )
       )

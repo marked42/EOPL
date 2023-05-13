@@ -50,6 +50,8 @@
   (print-exp (exp1 expression?))
 
   (yield-exp)
+
+  (kill-exp (exp1 expression?))
   )
 
 (define-datatype program program?

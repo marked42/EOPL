@@ -103,3 +103,7 @@
               )
     )
   )
+
+(define (remove-thread-from-queue id)
+  (set! the-ready-queue (filter (lambda (item) (= id (thread->id item))) the-ready-queue))
+)
