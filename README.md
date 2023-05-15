@@ -332,7 +332,7 @@ letrec-lang/continuation-as-lambda 的实现中，`cont`的数据都是嵌套的
 
 5.1 中的 CPS 解释器执行时，函数递归调用，每一层都是使用尾调用形式，被调用的函数结果作为上一层函数的返回值，因此调用栈随着递归调用只增不减，只有到最内层的函数计算得到最终结果时，栈帧才会依次弹出，将最终结果逐层传递到最外层函数`value-of-program`。这个过程每一步表达式的计算都是一个函数调用，栈增长速度非常快，即使一个非常简单的表达式需要的栈深度（步骤数）也很大，很容易触发栈溢出错误（stack overflow）。
 
-使用蹦床函数（trampoline）的技巧可以解决这个问题，核心的思想是将后续的递归调用保存起来，作为返回值传递到最外层，这时候栈被清空，深度恢复为0，然后在最外层重新激活保存的后续运算，重复这个过程直到最终结果时返回即可。
+使用蹦床函数（trampoline）的技巧可以解决这个问题，核心的思想是将后续的递归调用保存起来，作为返回值传递到最外层，这时候栈被清空，深度恢复为 0，然后在最外层重新激活保存的后续运算，重复这个过程直到最终结果时返回即可。
 
 修改`apply-procedure/k`使其返回一个代表了后续运算的值`thunk`中，这样在`apply-procedure/k`返回时，递归函数调用栈会被弹出，将返回值逐层向上传递直到最顶层，效果是将`apply-procedure/k`所代表的后续运算存储`thunk`起来，然后在顶层使用`trampoline`函数重新激活`thunk`继续之前运算，就像蹦床一样，当`trampoline`得到的值不是`thunk`，而是一个值，就得到了最终的运算结果。
 
@@ -1083,3 +1083,8 @@ letcc cont in throw 2 to cont
 ; search upward linearly for corresponding try-exp
 (define (apply-handler saved-cont val) ((cdr saved-cont) val))
 ```
+
+## Chapter 6 Continuation Passing Style
+
+TODO: how to implement a transformer
+tail-form?
