@@ -1,0 +1,204 @@
+#lang eopl
+
+(require racket/lazy-require racket/list "value.rkt" "parser.rkt" "expression.rkt")
+(lazy-require
+ ["environment.rkt" (
+                     init-env
+                     apply-env
+                     extend-env
+                     build-circular-extend-env-rec-mul-vec
+                     )]
+ ["continuation.rkt" (apply-cont end-cont)]
+ ["procedure.rkt" (apply-procedure procedure)])
+
+
+(provide (all-defined-out))
+
+(define (run str)
+  (let ((prog (scan&parse str)))
+    (let ((cps-prog (cps-of-program prog)))
+      (eopl:pretty-print prog)
+      (eopl:pretty-print cps-prog)
+      (value-of-program cps-prog)
+      )
+    )
+  )
+
+(define (value-of-program cps-prog)
+  (cases cps-program cps-prog
+    (cps-a-program (exp1)
+                   (value-of/k exp1 (init-env) (end-cont))
+                   )
+    )
+  )
+
+(define (cps-of-program prog)
+  (cases program prog
+    (a-program (exp1)
+               (cps-a-program
+                (cps-of-exps (list exp1) (lambda (args) (simple-exp->exp (car args))))
+                )
+               )
+    )
+  )
+
+(define fresh-identifier
+  (let ((sn 0))
+    (lambda (identifier)
+      (set! sn (+ sn 1))
+      (string->symbol
+       (string-append
+        (symbol->string identifier)
+        "%"             ; this can't appear in an input identifier
+        (number->string sn))))))
+
+(define (make-send-to-cont k-exp simple-exp)
+  (cps-call-exp k-exp (list simple-exp))
+  )
+
+(define (cps-of-exp exp cont)
+  (cases expression exp
+    (const-exp (num) (make-send-to-cont cont (cps-const-exp num)))
+    (else (eopl:error 'cps-of-exp "unsupported expression ~s " exp))
+    )
+  )
+
+(define (cps-of-exps exps builder)
+  (let cps-of-rest ((exps exps))
+    (let ((pos (index-where
+                exps
+                (lambda (exp) (not (inp-exp-simple? exp)))
+                )))
+      (if (not pos)
+          (builder (map cps-of-simple-exp exps))
+          (let ((var (fresh-identifier 'var)))
+            (cps-of-exps
+             (list-ref exps pos)
+             (cps-proc-exp (list var)
+                           (cps-of-rest (list-set exps pos (var-exp var)))
+                           )
+             )
+            )
+          )
+      )
+    )
+  )
+
+(define (inp-exp-simple? exp)
+  (cases expression exp
+    (const-exp (num) #t)
+    (var-exp (var) #t)
+    (diff-exp (exp1 exp2)
+              (and (inp-exp-simple? exp1) (inp-exp-simple? exp2))
+              )
+    (zero?-exp (exp1) (inp-exp-simple? exp1))
+    (proc-exp (vars exp) #t)
+    (sum-exp (exps) (every? inp-exp-simple? exps))
+    (else #f)
+    )
+  )
+
+(define (every? pred lst)
+  (if (null? lst)
+      #t
+      (let ((first (pred (car lst))))
+        (if first
+            (every? pred (cdr lst))
+            #f
+            )
+        )
+      )
+  )
+
+(define (cps-of-simple-exp exp)
+  (cases expression exp
+    (const-exp (num) (cps-const-exp num))
+    (var-exp (var) (cps-var-exp var))
+    (diff-exp (exp1 exp2) (cps-diff-exp (cps-of-simple-exp exp1) (cps-of-simple-exp exp2)))
+    (zero?-exp (exp1) (cps-zero?-exp (cps-of-simple-exp exp1)))
+    (proc-exp (vars exp)
+              (cps-proc-exp (append vars (list 'k%00)) (cps-of-exp exp (cps-var-exp 'k%00)))
+              )
+    (sum-exp (exps) (cps-sum-exp (map cps-of-simple-exp exps)))
+    (else (report-invalid-exp-to-cps-of-simple-exp exp))
+    )
+  )
+
+(define (report-invalid-exp-to-cps-of-simple-exp exp)
+  (eopl:error 'cps-of-simple-exp "non-simple expression to cps-of-simple-exp: ~s" exp)
+  )
+
+(define (value-of/k exp env cont)
+  (cases tfexp exp
+    (simple-exp->exp (simple)
+                     (apply-cont cont (value-of-simple-exp simple env))
+                     )
+    ; number constant
+    ; (const-exp (num) (num-val num))
+    ; subtraction of two numbers
+    ; (diff-exp (exp1 exp2)
+    ;           (let ((val1 (value-of-exp exp1 env))
+    ;                 (val2 (value-of-exp exp2 env)))
+    ;             (let ((num1 (expval->num val1))
+    ;                   (num2 (expval->num val2)))
+    ;               (num-val (- num1 num2))
+    ;               )
+    ;             )
+    ;           )
+    ; ; true only if exp1 is number 0
+    ; (zero?-exp (exp1)
+    ;            (let ((val (value-of-exp exp1 env)))
+    ;              (let ((num (expval->num val)))
+    ;                (if (zero? num)
+    ;                    (bool-val #t)
+    ;                    (bool-val #f)
+    ;                    )
+    ;                )
+    ;              )
+    ;            )
+    ; (if-exp (exp1 exp2 exp3)
+    ;         (let ((val1 (value-of-exp exp1 env)))
+    ;           (if (expval->bool val1)
+    ;               (value-of-exp exp2 env)
+    ;               (value-of-exp exp3 env)
+    ;               )
+    ;           )
+    ;         )
+    ; (var-exp (var)
+    ;          (apply-env env var)
+    ;          )
+    ; (let-exp (var exp1 body)
+    ;          (let ((val (value-of-exp exp1 env)))
+    ;            (value-of-exp body (extend-env var val env))
+    ;            )
+    ;          )
+    ; (letrec-exp (p-names b-vars-list p-bodies body)
+    ;             (let ((new-env (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies env)))
+    ;               (value-of-exp body new-env)
+    ;               )
+    ;             )
+    ; (proc-exp (first-var rest-vars body)
+    ;           (proc-val (procedure (cons first-var rest-vars) body env))
+    ;           )
+    (cps-call-exp (rator rands)
+                  (let ((rator-val (value-of-simple-exp rator env)) (rand-vals (value-of-simple-exps rands env)))
+                    (let ((proc1 (expval->proc rator-val)))
+                      (apply-procedure proc1 rand-vals)
+                      )
+                    )
+                  )
+    (else (eopl:error "invalid expression"))
+    )
+  )
+
+(define (value-of-simple-exp exp1 env)
+  (cases simple-expression exp1
+    (cps-const-exp (num) (num-val num))
+    (cps-var-exp (var) (apply-env env var))
+    (else (eopl:error "unsupported simple-expression ~s " exp1))
+    )
+  )
+
+(define (value-of-simple-exps exps env)
+  (map (lambda (exp1) (value-of-simple-exp exp1 env)) exps)
+  )
