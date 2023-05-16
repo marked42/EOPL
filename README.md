@@ -1088,3 +1088,19 @@ letcc cont in throw 2 to cont
 
 TODO: how to implement a transformer
 tail-form?
+
+```racket
+1 -> 1
+a -> a
+(f x) -> (f x cont)
+
+proc (x) 1 -> proc (x k) (k 1)
+proc (x) body -> proc (x k) (transform body k)
+
+-((f x) (f y)) -> (f x (lambda (v1)
+  (f y (lambda (v2)
+    -(v1 v2)
+    )
+  )
+))
+```

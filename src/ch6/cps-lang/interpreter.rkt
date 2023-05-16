@@ -11,7 +11,6 @@
  ["continuation.rkt" (apply-cont end-cont)]
  ["procedure.rkt" (apply-procedure procedure)])
 
-
 (provide (all-defined-out))
 
 (define (run str)
@@ -56,11 +55,35 @@
   (cps-call-exp k-exp (list simple-exp))
   )
 
-(define (cps-of-exp exp cont)
+(define (cps-of-exp exp k-exp)
   (cases expression exp
-    (const-exp (num) (make-send-to-cont cont (cps-const-exp num)))
+    (const-exp (num) (make-send-to-cont k-exp (cps-const-exp num)))
+    (var-exp (var) (make-send-to-cont k-exp (cps-var-exp var)))
+    (diff-exp (exp1 exp2) (cps-of-diff-exp exp1 exp2 k-exp))
+    (call-exp (rator rands) (cps-of-call-exp rator rands k-exp))
     (else (eopl:error 'cps-of-exp "unsupported expression ~s " exp))
     )
+  )
+
+(define (cps-of-diff-exp exp1 exp2 k-exp)
+  (cps-of-exps (list exp1 exp2)
+               (lambda (simples)
+                 (make-send-to-cont k-exp
+                                    (cps-diff-exp (car simples) (cadr simples))
+                                    )
+                 )
+               )
+  )
+
+(define (cps-of-call-exp rand rands k-exp)
+  (cps-of-exps (cons rand rands)
+               (lambda (simples)
+                 (cps-call-exp
+                  (car simples)
+                  (append (cdr simples) (list k-exp))
+                  )
+                 )
+               )
   )
 
 (define (cps-of-exps exps builder)
@@ -72,7 +95,7 @@
       (if (not pos)
           (builder (map cps-of-simple-exp exps))
           (let ((var (fresh-identifier 'var)))
-            (cps-of-exps
+            (cps-of-exp
              (list-ref exps pos)
              (cps-proc-exp (list var)
                            (cps-of-rest (list-set exps pos (var-exp var)))
@@ -116,8 +139,8 @@
     (var-exp (var) (cps-var-exp var))
     (diff-exp (exp1 exp2) (cps-diff-exp (cps-of-simple-exp exp1) (cps-of-simple-exp exp2)))
     (zero?-exp (exp1) (cps-zero?-exp (cps-of-simple-exp exp1)))
-    (proc-exp (vars exp)
-              (cps-proc-exp (append vars (list 'k%00)) (cps-of-exp exp (cps-var-exp 'k%00)))
+    (proc-exp (vars body)
+              (cps-proc-exp (append vars (list 'k%00)) (cps-of-exp body (cps-var-exp 'k%00)))
               )
     (sum-exp (exps) (cps-sum-exp (map cps-of-simple-exp exps)))
     (else (report-invalid-exp-to-cps-of-simple-exp exp))
@@ -154,7 +177,7 @@
     (cps-call-exp (rator rands)
                   (let ((rator-val (value-of-simple-exp rator env)) (rand-vals (value-of-simple-exps rands env)))
                     (let ((proc1 (expval->proc rator-val)))
-                      (apply-procedure proc1 rand-vals)
+                      (apply-procedure proc1 rand-vals cont)
                       )
                     )
                   )
