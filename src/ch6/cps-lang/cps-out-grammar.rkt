@@ -22,7 +22,7 @@
         cps-sum-exp)
 
       (simple-expression
-       ("proc" "(" (arbno identifier) ")" tfexp)
+       ("proc" "(" (separated identifier ",") ")" tfexp)
        cps-proc-exp)
 
       (tfexp

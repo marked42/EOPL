@@ -39,7 +39,7 @@
   (cps-var-exp (var identifier?))
   (cps-diff-exp (exp1 simple-expression?) (exp2 simple-expression?))
   (cps-zero?-exp (exp1 simple-expression?))
-  (cps-proc-exp (vars (list-of identifier?)) (body simple-expression?))
+  (cps-proc-exp (vars (list-of identifier?)) (body tfexp?))
   (cps-sum-exp (exps (simple-expression?)))
   )
 
