@@ -1089,6 +1089,15 @@ letcc cont in throw 2 to cont
 TODO: how to implement a transformer
 tail-form?
 
+普通代码转换到CPS代码，将代码Control Context从栈转移到堆上。
+
+普通代码转换到只包含尾递归的CPS代码，将Control Context消除。
+
+> It is evaluation of operands, not the calling of procedures, that makes the control context grow.
+
+> Tail Calls Don't Grow Control Context
+> If the value of exp1 is returned as the value of exp2, then exp1 and exp2 should run in the same continuation.
+
 ```racket
 1 -> 1
 a -> a
@@ -1104,3 +1113,6 @@ proc (x) body -> proc (x k) (transform body k)
   )
 ))
 ```
+
+设计CPS-OUT语法，将非tail position处的表达式转换为简单表达式，简单表达式计算不需要调用栈（Control Context）。
+这样CPS-OUT语法代表的代码就是尾调用形式（tail-form）形式。
