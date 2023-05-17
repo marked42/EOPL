@@ -74,8 +74,15 @@
     (letrec-exp (p-names b-varss p-bodies body)
                 (cps-of-letrec-exp p-names b-varss p-bodies body k-exp)
                 )
+    (sum-exp (exps) (cps-of-sum-exp exps k-exp))
     (else (eopl:error 'cps-of-exp "unsupported expression ~s " exp))
     )
+  )
+
+(define (cps-of-sum-exp exps k-exp)
+  (cps-of-exps exps (lambda (simples)
+                      (make-send-to-cont k-exp (cps-sum-exp simples))
+                      ))
   )
 
 (define (cps-of-letrec-exp p-names b-varss p-bodies body k-exp)
@@ -255,6 +262,16 @@
     (cps-proc-exp (vars body)
                   (proc-val (procedure vars body env))
                   )
+    (cps-sum-exp (exps)
+                 (let ((nums (map
+                              (lambda (exp)
+                                (expval->num
+                                 (value-of-simple-exp exp env)))
+                              exps)))
+                   (num-val
+                    (let sum-loop ((nums nums))
+                      (if (null? nums) 0
+                          (+ (car nums) (sum-loop (cdr nums))))))))
     (else (eopl:error 'value-of-simple-exp "unsupported simple-expression ~s " exp1))
     )
   )
