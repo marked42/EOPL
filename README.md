@@ -1091,7 +1091,8 @@ tail-form?
 
 普通代码转换到CPS代码，将代码Control Context从栈转移到堆上。
 
-普通代码转换到只包含尾递归的CPS代码，将Control Context消除。
+普通代码转换到只包含尾递归的CPS代码，将Control Context消除，全局只有一个continuation（Exer 6.15），同样可以进行registerize（Exer 6.16）
+和trampoline（Exer 6.17）的优化操作。
 
 > It is evaluation of operands, not the calling of procedures, that makes the control context grow.
 
