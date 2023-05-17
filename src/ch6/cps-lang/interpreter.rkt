@@ -64,6 +64,10 @@
     (let-exp (var exp1 body)
              (cps-of-let-exp var exp1 body k-exp)
              )
+    (proc-exp (vars body)
+              (make-send-to-cont k-exp
+                                 (cps-proc-exp (append vars (list 'k%00)) (cps-of-exp body (cps-var-exp 'k%00))))
+              )
     (if-exp (exp1 exp2 exp3)
             (cps-of-if-exp exp1 exp2 exp3 k-exp)
             )

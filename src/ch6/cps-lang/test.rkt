@@ -27,9 +27,9 @@
 ; (equal-answer? (run "v") 5 "built in var i is 5")
 ; (equal-answer? (run "x") 10 "built in var i is 10")
 
-; (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
+(equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
 ; (equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
-(equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
+; (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
 
 ; (equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
 ; ; IIFE
