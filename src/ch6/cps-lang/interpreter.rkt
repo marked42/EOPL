@@ -232,7 +232,6 @@
   (cases simple-expression exp1
     (cps-const-exp (num) (num-val num))
     (cps-var-exp (var) (apply-env env var))
-    ; subtraction of two numbers
     (cps-diff-exp (exp1 exp2)
                   (let ((val1 (value-of-simple-exp exp1 env))
                         (val2 (value-of-simple-exp exp2 env)))
@@ -256,7 +255,7 @@
     (cps-proc-exp (vars body)
                   (proc-val (procedure vars body env))
                   )
-    (else (eopl:error "unsupported simple-expression ~s " exp1))
+    (else (eopl:error 'value-of-simple-exp "unsupported simple-expression ~s " exp1))
     )
   )
 
