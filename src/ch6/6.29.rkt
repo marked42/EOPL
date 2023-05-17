@@ -1,0 +1,21 @@
+#lang eopl
+
+; this method scans exps once from left to right, so it's O(N)
+; original implementation searchs for first non-simple exp multiple times, so it's O(N^2)
+(define (cps-of-exps exps builder)
+    (let cps-of-of-rest ((exps exps) acc '())
+        (cond
+            ((null? exps) (builder (reverse acc)))
+            ((inp-simple-exp? (car exps))
+                (cps-of-rest (cdr exps) (cons (cps-of-simple-exp (car exps)) acc))
+            )
+            (else (let ((var (fresh-identifier 'var))))
+                (cps-of-exp (car exps)
+                    (cps-proc-exp (list var)
+                        (cps-of-rest (cdr exps) (cons (cps-of-simple-exp (var-exp var)) acc))
+                    )
+                )
+            )
+        )
+    )
+)
