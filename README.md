@@ -1086,6 +1086,19 @@ letcc cont in throw 2 to cont
 
 ## Chapter 6 Continuation Passing Style
 
+### 6.1 Writing Programs in Continuation-Passing Style
+
+1. cps represented
+  1. data structure
+  1. procedural
+  1. inlined procedural
+  1. 可交换的运算，smarter representation
+1. evaluation order by cps
+1. registerized
+  1. 全局参数名称与函数参数名称冲突
+  1. 参数多处使用，读写冲突，需要注意顺序
+1. trampoline
+
 TODO: how to implement a transformer
 tail-form?
 
@@ -1093,6 +1106,13 @@ tail-form?
 
 普通代码转换到只包含尾递归的CPS代码，将Control Context消除，全局只有一个continuation（Exer 6.15），同样可以进行registerize（Exer 6.16）
 和trampoline（Exer 6.17）的优化操作。
+
+> CPS Recipe
+> To convert a program to continuation-passing style
+> 1. Pass each procedure an extra parameter (typically cont or k).
+> 2. Whenever the procedure returns a constant or variable, return that value to the continuation instead, as we did with (cont 7) above.
+> 3. Whenever a procedure call occurs in a tail position, call the procedure with the same continuation cont.
+> 4. Whenever a procedure call occurs in an operand position, evaluate the procedure call in a new continuation that gives a name to the result and continues with the computation.
 
 > It is evaluation of operands, not the calling of procedures, that makes the control context grow.
 
