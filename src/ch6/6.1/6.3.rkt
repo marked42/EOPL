@@ -28,15 +28,6 @@
          ))
 
 ; 4. (zero? (if a (p x) (p y)))
-; wrong (p x)/(p y) 副作用问题
-; (p x (lambda (val1)
-;        (p y (lambda (val2)
-;               (let ((cont (lambda (val) val)))
-;                 (cont (zero? (if a val1 val2)))
-;                 )
-;               ))
-;        ))
-
 ; 代码膨胀问题
 (if a
     (p x (lambda (val)
@@ -79,13 +70,11 @@
 ; 7. (let ((x (if a (p x) (p y)))) x)
 (if a
     (p x (lambda (val1)
-           ; 代码膨胀问题
            (let ((x val1))
              (cont x)
              )
            ))
     (p y (lambda (val1)
-           ; 代码膨胀问题
            (let ((x val1))
              (cont x)
              )
