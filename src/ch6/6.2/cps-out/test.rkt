@@ -36,6 +36,7 @@
 (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
 (equal-answer? (run "(proc (x, y) -(x,y) 2 3)") -1 "proc-exp")
 
+; exer 3.20
 (equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
 
 (equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letproc-exp")

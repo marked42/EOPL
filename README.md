@@ -1089,26 +1089,29 @@ letcc cont in throw 2 to cont
 ### 6.1 Writing Programs in Continuation-Passing Style
 
 1. cps represented
-  1. data structure
-  1. procedural
-  1. inlined procedural
-  1. 可交换的运算，smarter representation
+   1. data structure
+   1. procedural
+   1. inlined procedural
+1. 可交换的运算，smarter representation
 1. evaluation order by cps
 1. registerized
-  1. 全局参数名称与函数参数名称冲突
-  1. 参数多处使用，读写冲突，需要注意顺序
+   1. 全局参数名称与函数参数名称冲突
+   1. 参数多处使用，读写冲突，需要注意顺序
 1. trampoline
 
 TODO: how to implement a transformer
-tail-form?
 
-普通代码转换到CPS代码，将代码Control Context从栈转移到堆上。
+1. exer 6.7
+1. exer 6.8
 
-普通代码转换到只包含尾递归的CPS代码，将Control Context消除，全局只有一个continuation（Exer 6.15），同样可以进行registerize（Exer 6.16）
-和trampoline（Exer 6.17）的优化操作。
+普通代码转换到 CPS 代码，将代码 Control Context 从栈转移到堆上。
+
+普通代码转换到只包含尾递归的 CPS 代码，将 Control Context 消除，全局只有一个 continuation（Exer 6.15），同样可以进行 registerize（Exer 6.16）
+和 trampoline（Exer 6.17）的优化操作。
 
 > CPS Recipe
 > To convert a program to continuation-passing style
+>
 > 1. Pass each procedure an extra parameter (typically cont or k).
 > 2. Whenever the procedure returns a constant or variable, return that value to the continuation instead, as we did with (cont 7) above.
 > 3. Whenever a procedure call occurs in a tail position, call the procedure with the same continuation cont.
@@ -1135,5 +1138,5 @@ proc (x) body -> proc (x k) (transform body k)
 ))
 ```
 
-设计CPS-OUT语法，将非tail position处的表达式转换为简单表达式，简单表达式计算不需要调用栈（Control Context）。
-这样CPS-OUT语法代表的代码就是尾调用形式（tail-form）形式。
+设计 CPS-OUT 语法，将非 tail position 处的表达式转换为简单表达式，简单表达式计算不需要调用栈（Control Context）。
+这样 CPS-OUT 语法代表的代码就是尾调用形式（tail-form）形式。
