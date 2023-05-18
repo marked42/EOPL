@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "test.rkt")
+(require "../../shared/test-list-sum.rkt")
 
 (define lst 'uninitialized)
 (define sum 'unitiaizlied)

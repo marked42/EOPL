@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "test.rkt")
+(require "../../shared/test-list-sum.rkt")
 
 (define (list-sum lst)
   (list-sum/k lst (end-cont))
