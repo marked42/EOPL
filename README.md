@@ -1126,6 +1126,12 @@ TODO: how to implement a transformer
 > Tail Calls Don't Grow Control Context
 > If the value of exp1 is returned as the value of exp2, then exp1 and exp2 should run in the same continuation.
 
+transformer
+
+1. if 代码膨胀问题 Exercise 6.23
+1. free variable Exercise 6.26
+1. let 多余表达式问题 Exercise 6.27
+
 ```racket
 1 -> 1
 a -> a
@@ -1144,3 +1150,7 @@ proc (x) body -> proc (x k) (transform body k)
 
 设计 CPS-OUT 语法，将非 tail position 处的表达式转换为简单表达式，简单表达式计算不需要调用栈（Control Context）。
 这样 CPS-OUT 语法代表的代码就是尾调用形式（tail-form）形式。
+
+### 6.3 Converting to Continuation-Passing Style
+
+ANF Exercise 6.34
