@@ -1103,6 +1103,10 @@ TODO: how to implement a transformer
 
 1. exer 6.7
 1. exer 6.8
+1. exer 6.13
+1. exer 6.15
+1. exer 6.16
+1. exer 6.17
 
 普通代码转换到 CPS 代码，将代码 Control Context 从栈转移到堆上。
 
