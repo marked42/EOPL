@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "basic.rkt")
+(require "../../../base/basic.rkt")
 
 (provide (all-defined-out))
 
