@@ -1,10 +1,9 @@
 #lang eopl
 
-(require racket)
 (require rackunit)
+(require racket)
+(require "interpreter.rkt")
 (require "value.rkt")
-
-(provide (all-defined-out))
 
 (define equal-answer?
   (lambda (ans correct-ans msg)
@@ -20,71 +19,52 @@
                    "Can't convert sloppy value to expval: ~s"
                    sloppy-val)))))
 
-(define (test-basic run)
-  (equal-answer? (run "1") 1 "const exp")
-
-  (equal-answer? (run "-(1, 2)") -1 "diff exp")
-
-  (equal-answer? (run "zero? (0)") #t "zero? exp")
-  (equal-answer? (run "zero? (1)") #f "zero? exp")
-
-  (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
-  (equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
-
-  (equal-answer? (run "i") 1 "built in var i is 1")
-  (equal-answer? (run "v") 5 "built in var i is 5")
-  (equal-answer? (run "x") 10 "built in var i is 10")
-
-  (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
-  (equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
-
-  ; proc & call
-  (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
-  (equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
-  )
-
-(define (test-const-exp run equal-answer?)
+(define (test-const-exp run)
   (equal-answer? (run "1") 1 "const exp")
   (equal-answer? (run "1") 1 "const exp")
   )
 
-(define (test-diff-exp run equal-answer?)
+(define (test-diff-exp run)
   (equal-answer? (run "-(1, 2)") -1 "diff exp")
   )
 
-(define (test-zero?-exp run equal-answer?)
+(define (test-zero?-exp run)
   (equal-answer? (run "zero? (0)") #t "zero? exp")
   (equal-answer? (run "zero? (1)") #f "zero? exp")
   )
 
-(define (test-var-exp run equal-answer?)
+(define (test-var-exp run)
   (equal-answer? (run "i") 1 "built in var i is 1")
   (equal-answer? (run "v") 5 "built in var i is 5")
   (equal-answer? (run "x") 10 "built in var i is 10")
   )
 
-(define (test-if-exp run equal-answer?)
+(define (test-if-exp run)
   (equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
   (equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
   )
 
-(define (test-let-exp run equal-answer?)
+(define (test-let-exp run)
   (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
   (equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "let-exp with call-exp")
   (equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letexp with call-exp")
   )
 
-(define (test-proc-and-call-exp run equal-answer?)
-  (run "proc (x) x")
-  (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "call-exp with single arguemnt")
+(define (test-proc-and-call-exp run)
   (equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
+  (equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "call-exp with single arguemnt")
   )
 
-(define (test-call-exp-with-multiple-arguments run equal-answer?)
+(define (test-call-exp-with-multiple-arguments)
   (equal-answer? (run "(proc (x, y) -(x,y) 2 3)") -1 "call-exp with multiple arguments")
   )
 
-(define (test-letrec-exp run equal-answer?)
+(define (test-letproc-exp)
+  (equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
+  (equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letproc-exp")
+  )
+
+(define (test-letrec-exp run)
   (equal-answer? (run "
 letrec double(x)
   = if zero?(x) then 0 else -((double -(x,1)), -2)
@@ -92,7 +72,7 @@ letrec double(x)
 ") 12 "letrec-exp")
   )
 
-(define (test-extended-letrec-exp run equal-answer?)
+(define (test-extended-letrec-exp)
   (equal-answer? (run "
 letrec sum1(x, y)
   = if zero?(x) then y else -((sum1 -(x,1) y), -1)
@@ -108,15 +88,18 @@ in (odd 13)
 ") 1 "letrec-exp with multiple procedures")
   )
 
-(define (test-let-lang run equal-answer?)
-  (test-const-exp run equal-answer?)
-  (test-diff-exp run equal-answer?)
-  (test-zero?-exp run equal-answer?)
-  (test-var-exp run equal-answer?)
-  (test-if-exp run equal-answer?)
-  (test-proc-and-call-exp run equal-answer?)
-  (test-call-exp-with-multiple-arguments run equal-answer?)
-  (test-let-exp run equal-answer?)
-  (test-letrec-exp run equal-answer?)
-  (test-extended-letrec-exp run equal-answer?)
+(define (test-let-lang run)
+  (test-const-exp run)
+  (test-diff-exp run)
+  (test-zero?-exp run)
+  (test-var-exp run)
+  (test-if-exp run)
+  (test-proc-and-call-exp run)
+  (test-call-exp-with-multiple-arguments run)
+  (test-let-exp run)
+  (test-letproc-exp run)
+  (test-letrec-exp run)
+  (test-extended-letrec-exp run)
   )
+
+(test-let-lang run)
