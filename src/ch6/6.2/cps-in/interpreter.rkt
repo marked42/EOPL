@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "value.rkt" "parser.rkt" "expression.rkt")
+(require racket/lazy-require "expression.rkt")
 (lazy-require
  ["environment.rkt" (
                      init-env
@@ -8,7 +8,9 @@
                      extend-env
                      extend-env-rec*
                      )]
- ["procedure.rkt" (apply-procedure procedure)])
+ ["parser.rkt" (scan&parse)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["procedure.rkt" (apply-procedure create-procedure)])
 
 (provide (all-defined-out))
 
@@ -64,7 +66,7 @@
                )
              )
     (proc-exp (vars body)
-              (proc-val (procedure vars body env))
+              (proc-val (create-procedure vars body env))
               )
     (call-exp (rator rands)
               (let ((rator-val (value-of-exp rator env)) (rand-vals (value-of-exps rands env)))

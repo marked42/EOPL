@@ -1,9 +1,11 @@
 #lang eopl
 
-(require racket/lazy-require racket/list "basic.rkt" "expression.rkt")
+(require racket/lazy-require racket/list)
 (lazy-require
+ ["../../../base/basic.rkt" (identifier? report-no-binding-found)]
  ["value.rkt" (num-val proc-val expval?)]
- ["procedure.rkt" (procedure)]
+ ["procedure.rkt" (create-procedure)]
+ ["expression.rkt" (expression?)]
  )
 (provide (all-defined-out))
 
@@ -57,7 +59,7 @@
                      (let ((index (index-of p-names search-var)))
                        (if index
                            ; use env as its parent env for recursive definition
-                           (proc-val (procedure (list-ref b-varss index) (list-ref p-bodies index) env))
+                           (proc-val (create-procedure (list-ref b-varss index) (list-ref p-bodies index) env))
                            (apply-env saved-env search-var)
                            )
                        )
