@@ -1,12 +1,9 @@
 #lang eopl
 
-(require racket/lazy-require)
+(require racket/lazy-require "basic.rkt" "environment.rkt")
 (lazy-require
- ["../../../base/basic.rkt" (identifier?)]
  ["expression.rkt" (tfexp?)]
- ["interpreter.rkt" (value-of/k)]
- ["environment.rkt" (extend-env* environment?)]
- )
+ ["interpreter.rkt" (value-of/k)])
 
 (provide (all-defined-out))
 
@@ -21,11 +18,7 @@
 (define (apply-procedure proc1 args cont)
   (cases proc proc1
     (procedure (vars body saved-env)
-               (value-of/k body (extend-env* vars args saved-env) cont)
+               (value-of/k body (extend-mul-env vars args saved-env) cont)
                )
     )
-  )
-
-(define (create-procedure vars args saved-env)
-  (procedure vars args saved-env)
   )
