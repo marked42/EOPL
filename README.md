@@ -1101,8 +1101,8 @@ letcc cont in throw 2 to cont
 
 TODO: how to implement a transformer
 
-1. exer 6.7
-1. exer 6.8
+1. exer 6.7 procedural/inlined interpreter of 5.4/5.5/5.6
+1. exer 6.8 inlined version of of 5.4
 1. exer 6.13
 1. exer 6.15
 1. exer 6.16
