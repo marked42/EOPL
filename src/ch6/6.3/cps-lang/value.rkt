@@ -1,10 +1,9 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt" "expression.rkt")
+(require racket/lazy-require)
 (lazy-require
- ["environment.rkt" (environment?)]
+ [rackunit (check-equal?)]
  ["procedure.rkt" (proc?)]
- ["store.rkt" (reference?)]
  )
 
 (provide (all-defined-out))
@@ -17,7 +16,6 @@
    (bool boolean?)
    )
   (proc-val (proc1 proc?))
-  (ref-val (ref reference?))
   )
 
 (define (expval->num val)
@@ -41,9 +39,20 @@
     )
   )
 
-(define (expval->ref val)
-  (cases expval val
-    (ref-val (ref) ref)
-    (else (eopl:error "expect a ref, get ~s" val))
-    )
+
+(define (equal-answer? ans correct-ans msg)
+  (check-equal? ans (sloppy->expval correct-ans) msg)
+  )
+
+(define (sloppy->expval sloppy-val)
+  (cond
+    ((number? sloppy-val) (num-val sloppy-val))
+    ((boolean? sloppy-val) (bool-val sloppy-val))
+    (else
+     (eopl:error 'sloppy->expval
+                 "Can't convert sloppy value to expval: ~s"
+                 sloppy-val))))
+
+(define (report-expval-extractor-error type val)
+  (eopl:error 'expval-extractors "Looking for a ~s, found ~s" type val)
   )

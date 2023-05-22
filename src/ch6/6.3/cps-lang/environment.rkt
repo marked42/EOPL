@@ -1,11 +1,11 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt")
+(require racket/lazy-require racket/list)
 (lazy-require
- ["value.rkt" (num-val expval? proc-val)]
- ["expression.rkt" (expression?)]
- ["procedure.rkt" (procedure)]
- ["interpreter.rkt" (value-of-exp)]
+ ["../../../base/basic.rkt" (identifier? report-no-binding-found)]
+ ["value.rkt" (num-val proc-val expval?)]
+ ["procedure.rkt" (create-procedure)]
+ ["expression.rkt" (tfexp?)]
  )
 (provide (all-defined-out))
 
@@ -16,40 +16,17 @@
    (val expval?)
    (env environment?)
    )
-  (extend-mul-env
+  (extend-env*
    (vars (list-of identifier?))
    (vals (list-of expval?))
    (env environment?)
    )
-  (extend-env-rec-mul-vec
+  (extend-env-rec*
    (p-names (list-of identifier?))
-   (vec vector?)
+   (b-varss (list-of (list-of identifier?)))
+   (p-bodies (list-of tfexp?))
    (env environment?)
    )
-  )
-
-; use a vec to build circular refs to avoid create same proc-val multiple times
-(define (build-circular-extend-env-rec-mul-vec p-names b-vars-list p-bodies saved-env)
-  ; a direct mutual reference between proc-val and new-env cannot be created
-  ; so we use vec to build a indirect mutual references
-  (let ((vec (make-vector (length p-names))))
-    ; new-env -> vec
-    (let ((new-env (extend-env-rec-mul-vec p-names vec saved-env)))
-      (letrec ((loop (lambda (p-names b-vars-list p-bodies i)
-                       (if (null? p-names)
-                           '()
-                           (let ((first-b-vars (car b-vars-list)) (first-p-body (car p-bodies)))
-                             ; vec -> proc-val -> new-env
-                             (vector-set! vec i (proc-val (procedure first-b-vars first-p-body new-env)))
-                             (loop (cdr p-names) (cdr b-vars-list) (cdr p-bodies) (+ i 1))
-                             )
-                           )
-                       )))
-        (loop p-names b-vars-list p-bodies 0)
-        new-env
-        )
-      )
-    )
   )
 
 (define (init-env)
@@ -70,43 +47,23 @@
                     (apply-env saved-env search-var)
                     )
                 )
-    (extend-mul-env (vars vals saved-env)
-                    (if (= (length vars) (length vals))
-                      (letrec ((loop (lambda (vars vals saved-env)
-                                      (if (null? vars)
-                                          (apply-env saved-env search-var)
-                                          (let ((first-var (car vars)) (first-val (car vals)))
-                                            (if (eqv? first-var search-var)
-                                                first-val
-                                                (loop (cdr vars) (cdr vals) saved-env)
-                                                )
-                                            )
-                                          )
-                                      )))
-                        (loop vars vals saved-env)
-                        )
-                      (eopl:error 'extend-mul-env "vars and vals length not equal, ~s ~s" vars vals)
-                      )
-                    )
-    (extend-env-rec-mul-vec (p-names vec saved-env)
-                            (letrec ((loop (lambda (p-names i)
-                                             (if (null? p-names)
-                                                 (apply-env saved-env search-var)
-                                                 (let ((first-p-name (car p-names)))
-                                                   (if (eqv? first-p-name search-var)
-                                                       (vector-ref vec i)
-                                                       (loop (cdr p-names) (+ i 1))
-                                                       )
-                                                   )
-                                                 )
-                                             )))
-                              (loop p-names 0)
-                              )
-                            )
+    (extend-env* (vars vals saved-env)
+                 (let ((index (index-of vars search-var)))
+                   (if index
+                       (list-ref vals index)
+                       (apply-env saved-env search-var)
+                       )
+                   )
+                 )
+    (extend-env-rec* (p-names b-varss p-bodies saved-env)
+                     (let ((index (index-of p-names search-var)))
+                       (if index
+                           ; use env as its parent env for recursive definition
+                           (proc-val (create-procedure (list-ref b-varss index) (list-ref p-bodies index) env))
+                           (apply-env saved-env search-var)
+                           )
+                       )
+                     )
     (else (report-no-binding-found search-var))
     )
-  )
-
-(define (report-unpack-unequal-vars-list-count exp)
-  (eopl:error 'unpack-exp "Unequal vars and list count ~s" exp)
   )

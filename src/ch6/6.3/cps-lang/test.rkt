@@ -1,61 +1,129 @@
 #lang eopl
 
-(require rackunit)
-(require racket)
-(require "interpreter.rkt")
-(require "value.rkt")
+(require racket/lazy-require)
+(lazy-require
+ ["interpreter.rkt" (run)]
+ ["value.rkt" (equal-answer?)]
+ ["../../../base/test.rkt" (
+                            test-const-exp
+                            test-diff-exp
+                            test-zero?-exp
+                            test-var-exp
+                            test-if-exp
+                            test-call-exp-with-multiple-arguments
+                            )]
+ )
 
-(define equal-answer?
-  (lambda (ans correct-ans msg)
-    (check-equal? ans (sloppy->expval correct-ans) msg)))
+(provide (all-defined-out))
 
-(define sloppy->expval
-  (lambda (sloppy-val)
-    (cond
-      ((number? sloppy-val) (num-val sloppy-val))
-      ((boolean? sloppy-val) (bool-val sloppy-val))
-      (else
-       (eopl:error 'sloppy->expval
-                   "Can't convert sloppy value to expval: ~s"
-                   sloppy-val)))))
+(define (test-sum-exp run equal-answer?)
+  (equal-answer? (run "+(0)") 0 "sum-exp")
+  (equal-answer? (run "+(1, 2, 3)") 6 "sum-exp")
+  )
 
-(equal-answer? (run "1") 1 "const exp")
-(equal-answer? (run "-(1, 2)") -1 "diff exp")
-(equal-answer? (run "zero? (0)") #t "zero? exp")
-(equal-answer? (run "zero? (1)") #f "zero? exp")
-(equal-answer? (run "i") 1 "built in var i is 1")
-(equal-answer? (run "v") 5 "built in var i is 5")
-(equal-answer? (run "x") 10 "built in var i is 10")
+(define (test-proc-and-call-exp run equal-answer?)
+  (run "proc (x) x")
 
-(equal-answer? (run "if zero? (0) then 2 else 3") 2 "if exp")
-(equal-answer? (run "if zero? (1) then 2 else 3") 3 "if exp")
-(equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
+  ; "(proc (f) (f (f 77)) proc (x) -(x,11))"
+  (equal-answer? (run "
+  (proc (f, v, cont)
+    (f v proc (y)
+      (f y proc (z)
+        (cont z)
+      ))
+   proc (x, k1) (k1 -(x,11))
+   77
+   proc (z) z
+  )"
+                      ) 55 "call-exp with single arguemnt")
 
-(equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
-; IIFE
-(equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
-(equal-answer? (run "(proc (x, y) -(x,y) 2 3)") -1 "proc-exp")
+  ; let f = proc (x) -(x,11) in (f (f 77))
+  (equal-answer? (run "
+  let f = proc (x, k1) (k1 -(x, 11))
+    in (f 77 proc (y)
+             (f y proc (z)
+                  z
+             )
+       )
+  ") 55 "proc-exp")
+  )
 
-(equal-answer? (run "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)") 7 "letproc-exp")
+(define (test-let-exp run equal-answer?)
+  (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
 
-(equal-answer? (run "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)") 7 "letproc-exp")
+  ; let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)
+  (equal-answer? (run "
+  let f = proc (x, k1)
+    (k1 proc (y, k2) (k2 -(x, -(0, y))))
+    in (f 3 proc (r1)
+      (r1 4 proc (r2)
+        r2
+      )
+    )
+  ") 7 "let-exp with call-exp")
 
-(equal-answer? (run "
-letrec double(x)
-  = if zero?(x) then 0 else -((double -(x,1)), -2)
-    in (double 6)
+  ; let f = proc(x, y) -(x,-(0,y)) in (f 3 4)
+  (equal-answer? (run "
+  let f = proc (x, y, k1) (k1 -(x, -(0,y)))
+    in (f 3 4 proc (r1) r1)
+  ") 7 "letexp with call-exp")
+  )
+
+(define (test-letrec-exp run equal-answer?)
+  ; letrec double(x)
+  ;   = if zero?(x) then 0 else -((double -(x,1)), -2)
+  ;     in (double 6)
+  (equal-answer? (run "
+  letrec double(x, k1) =
+    if zero?(x)
+      then (k1 0)
+      else (double -(x,1) proc(r1)
+        (k1 -(r1,-2))
+      )
+    in (double 6 proc (z) z)
 ") 12 "letrec-exp")
+  )
 
-(equal-answer? (run "
-letrec sum1(x, y)
-  = if zero?(x) then y else -((sum1 -(x,1) y), -1)
-    in (sum1 3 4)
+(define (test-extended-letrec-exp run equal-answer?)
+  ; letrec sum1(x, y)
+  ;   = if zero?(x) then y else -((sum1 -(x,1) y), -1)
+  ;     in (sum1 3 4)
+  (equal-answer? (run "
+  letrec sum1(x, y, k1) =
+    if zero?(x)
+    then (k1 y)
+    else (sum1 -(x,1) y proc (z)
+      (k1 -(z,-1))
+    )
+  in (sum1 3 4 proc (z) z)
 ") 7 "letrec-exp with multiple arguments")
 
-; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
-(equal-answer? (run "
-letrec
-even(x) = if zero?(x) then 1 else (odd -(x,1))
-odd(x) = if zero?(x) then 0 else (even -(x,1))
-in (odd 13)
+  ; (odd 13) -> (even 12) -> (odd 11) -> ... -> (even 0) -> 1
+  ; letrec
+  ; even(x) = if zero?(x) then 1 else (odd -(x,1))
+  ; odd(x) = if zero?(x) then 0 else (even -(x,1))
+  ; in (odd 13)
+  (equal-answer? (run "
+  letrec
+    even(x, k1) = if zero?(x) then (k1 1) else (odd -(x,1) k1)
+    odd(x, k1) = if zero?(x) then (k1 0) else (even -(x,1) k1)
+    in (odd 13 proc (z) z)
 ") 1 "letrec-exp with multiple procedures")
+  )
+
+
+(define (test-cps-out-lang run equal-answer?)
+  (test-const-exp run equal-answer?)
+  (test-diff-exp run equal-answer?)
+  (test-zero?-exp run equal-answer?)
+  (test-var-exp run equal-answer?)
+  (test-sum-exp run equal-answer?)
+  (test-if-exp run equal-answer?)
+  (test-call-exp-with-multiple-arguments run equal-answer?)
+  (test-proc-and-call-exp run equal-answer?)
+  (test-let-exp run equal-answer?)
+  (test-letrec-exp run equal-answer?)
+  (test-extended-letrec-exp run equal-answer?)
+  )
+
+(test-cps-out-lang run equal-answer?)

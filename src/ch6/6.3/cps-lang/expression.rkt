@@ -1,32 +1,8 @@
 #lang eopl
 
-(require "basic.rkt")
+(require "../../../base/basic.rkt")
 
 (provide (all-defined-out))
-
-(define-datatype expression expression?
-  (const-exp (num number?))
-  (diff-exp (exp1 expression?) (exp2 expression?))
-  (zero?-exp (exp1 expression?))
-  (if-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
-  (var-exp (var identifier?))
-  (let-exp (var identifier?) (exp1 expression?) (body expression?))
-  (letrec-exp
-   (p-names (list-of identifier?))
-   (b-vars (list-of (list-of identifier?)))
-   (p-bodies (list-of expression?))
-   (body expression?)
-   )
-  (proc-exp (vars (list-of identifier?)) (body expression?))
-  (call-exp (rator expression?) (rands (list-of expression?)))
-  (sum-exp (exps (list-of expression?)))
-  )
-
-(define-datatype program program?
-  (a-program
-   (exp1 expression?)
-   )
-  )
 
 (define-datatype cps-program cps-program?
   (cps-a-program
@@ -40,7 +16,7 @@
   (cps-diff-exp (exp1 simple-expression?) (exp2 simple-expression?))
   (cps-zero?-exp (exp1 simple-expression?))
   (cps-proc-exp (vars (list-of identifier?)) (body tfexp?))
-  (cps-sum-exp (exps (simple-expression?)))
+  (cps-sum-exp (exps (list-of simple-expression?)))
   )
 
 (define-datatype tfexp tfexp?
