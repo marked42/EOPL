@@ -18,10 +18,10 @@
    )
   )
 
-(define (apply-procedure proc1 args cont)
+(define (apply-procedure proc1 args)
   (cases proc proc1
     (procedure (vars body saved-env)
-               (value-of/k body (extend-env* vars args saved-env) cont)
+               (value-of/k body (extend-env* vars args saved-env))
                )
     )
   )

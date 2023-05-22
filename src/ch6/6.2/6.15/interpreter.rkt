@@ -8,7 +8,6 @@
                      extend-env
                      extend-env-rec*
                      )]
- ["continuation.rkt" (apply-cont end-cont)]
  ["value.rkt" (num-val bool-val proc-val expval->num expval->bool expval->proc)]
  ["parser.rkt" (scan&parse)]
  ["procedure.rkt" (apply-procedure procedure)])
@@ -22,38 +21,38 @@
 (define (value-of-program cps-prog)
   (cases cps-program cps-prog
     (cps-a-program (exp1)
-                   (value-of/k exp1 (init-env) (end-cont))
+                   (value-of/k exp1 (init-env))
                    )
     )
   )
 
-(define (value-of/k exp env cont)
+(define (value-of/k exp env)
   (cases tfexp exp
     (simple-exp->exp (simple)
-                     (apply-cont cont (value-of-simple-exp simple env))
+                     (value-of-simple-exp simple env)
                      )
     (cps-if-exp (exp1 exp2 exp3)
                 (let ((val1 (value-of-simple-exp exp1 env)))
                   (if (expval->bool val1)
-                      (value-of/k exp2 env cont)
-                      (value-of/k exp3 env cont)
+                      (value-of/k exp2 env)
+                      (value-of/k exp3 env)
                       )
                   )
                 )
     (cps-let-exp (var exp1 body)
                  (let ((val (value-of-simple-exp exp1 env)))
-                   (value-of/k body (extend-env var val env) cont)
+                   (value-of/k body (extend-env var val env))
                    )
                  )
     (cps-letrec-exp (p-names b-varss p-bodies body)
                     (let ((new-env (extend-env-rec* p-names b-varss p-bodies env)))
-                      (value-of/k body new-env cont)
+                      (value-of/k body new-env)
                       )
                     )
     (cps-call-exp (rator rands)
                   (let ((rator-val (value-of-simple-exp rator env)) (rand-vals (value-of-simple-exps rands env)))
                     (let ((proc1 (expval->proc rator-val)))
-                      (apply-procedure proc1 rand-vals cont)
+                      (apply-procedure proc1 rand-vals)
                       )
                     )
                   )
