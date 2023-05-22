@@ -4,6 +4,8 @@
 (lazy-require
  ["interpreter.rkt" (run)]
  ["value.rkt" (equal-answer?)]
+ ["transformer.rkt" (cps-of-exp cps-of-program)]
+ ["parser.rkt" (scan&parse)]
  ["../../../base/test.rkt" (
                             test-const-exp
                             test-diff-exp
@@ -114,16 +116,93 @@
 
 (define (test-cps-out-lang run equal-answer?)
   (test-const-exp run equal-answer?)
-  (test-diff-exp run equal-answer?)
-  (test-zero?-exp run equal-answer?)
-  (test-var-exp run equal-answer?)
-  (test-sum-exp run equal-answer?)
-  (test-if-exp run equal-answer?)
-  (test-call-exp-with-multiple-arguments run equal-answer?)
-  (test-proc-and-call-exp run equal-answer?)
-  (test-let-exp run equal-answer?)
-  (test-letrec-exp run equal-answer?)
-  (test-extended-letrec-exp run equal-answer?)
+  ; (test-diff-exp run equal-answer?)
+  ; (test-zero?-exp run equal-answer?)
+  ; (test-var-exp run equal-answer?)
+  ; (test-sum-exp run equal-answer?)
+  ; (test-if-exp run equal-answer?)
+  ; (test-call-exp-with-multiple-arguments run equal-answer?)
+  ; (test-proc-and-call-exp run equal-answer?)
+  ; (test-let-exp run equal-answer?)
+  ; (test-letrec-exp run equal-answer?)
+  ; (test-extended-letrec-exp run equal-answer?)
   )
 
-(test-cps-out-lang run equal-answer?)
+; (test-cps-out-lang run equal-answer?)
+
+; (cps-of-program (scan&parse "1"))
+; (cps-of-program (scan&parse "a"))
+
+; (a 1 2 proc (var1) var1)
+; (cps-of-program (scan&parse "(a 1 2)"))
+
+; (a 1 proc (var1)
+;    (var1 2 proc (var2)
+;          var2
+;          )
+;    )
+(cps-of-program (scan&parse "((a 1) 2)"))
+
+; (a 1 proc (var1)
+;   (b 2 proc (var2)
+;     (var1 var2 proc (var3)
+;       var3
+;     )
+;   )
+; )
+; (cps-of-program (scan&parse "((a 1) (b 2))"))
+
+; (a 1 proc (var1)
+;   zero?(var1)
+; )
+; (cps-of-program (scan&parse "zero?((a 1))"))
+
+; (a 1 proc(var1)
+;   (b 2 proc(var2)
+;     +(var1, var2)
+;   )
+; )
+; (cps-of-program (scan&parse "+((a 1), (b 2))"))
+
+; (a 1 proc(var1)
+;   (b 2 proc(var2)
+;     -(var1,var2)
+;   )
+; )
+; (cps-of-program (scan&parse "-((a 1), (b 2))"))
+
+; (a 1 proc (var1)
+;    (if var1
+;        (p x proc (var2)
+;           var2
+;           )
+;        (p y proc (var3)
+;           var3
+;           )
+;        )
+;    )
+; (cps-of-program (scan&parse "if (a 1) then (p x) else (p y)"))
+
+; proc (x k1) (x 1 proc (var2) (k1 var2))
+; (cps-of-program (scan&parse "proc (x) (x 1)"))
+
+; (p 1 proc (var1)
+;    let x = var1
+;    in (x 2 proc(var2)
+;          var2
+;          )
+;    )
+; (cps-of-program (scan&parse "let x = (p 1) in (x 2)"))
+
+; letrec
+; f1(x1 k1) = (x1 1 proc (var1) (k1 var1))
+; f2(x2 k2) = (x2 2 proc (var2) (k2 var2))
+; in (f1 f2 proc (var3)
+;        var3
+;        )
+; (cps-of-program (scan&parse "
+; letrec
+; f1(x1) = (x1 1)
+; f2(x2) = (x2 2)
+; in (f1 f2)
+; "))

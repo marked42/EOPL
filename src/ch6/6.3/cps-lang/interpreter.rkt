@@ -11,12 +11,18 @@
  ["continuation.rkt" (apply-cont end-cont)]
  ["value.rkt" (num-val bool-val proc-val expval->num expval->bool expval->proc)]
  ["parser.rkt" (scan&parse)]
+ ["transformer.rkt" (cps-of-program)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program (scan&parse str))
+  (let ((prog (scan&parse str)))
+    (let ((cps-prog (cps-of-program prog)))
+      (eopl:pretty-print cps-prog)
+      (value-of-program cps-prog)
+      )
+    )
   )
 
 (define (value-of-program cps-prog)
