@@ -1101,6 +1101,15 @@ letcc cont in throw 2 to cont
 
 TODO: how to implement a transformer
 
+解释为什么使用 cps 的方式实现 transformer
+
+从CPS-IN expression -> CPS-OUT转换算法
+
+1. cps-of-exp
+1. cps-of-exps
+1. if语句的处理 注意条件，代码膨胀
+1. proc-exp 的处理
+
 1. exer 6.7 procedural/inlined interpreter of 5.4/5.5/5.6
 1. exer 6.8 inlined version of of 5.4
 1. exer 6.13
