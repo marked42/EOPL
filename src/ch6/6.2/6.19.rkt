@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "cps-lang/expression.rkt")
+(require "cps-in/expression.rkt")
 
 (define (tail-form? prog)
   (cases program prog
