@@ -1103,12 +1103,16 @@ TODO: how to implement a transformer
 
 解释为什么使用 cps 的方式实现 transformer
 
-从CPS-IN expression -> CPS-OUT转换算法
+从 CPS-IN expression -> CPS-OUT 转换算法
+
+将位于 operand position 的表达式依次转换为回调形式，使用对应变量 var 代替，得到对应的简单表达式。
+每一个表达式的转换，都生成多一层的嵌套
 
 1. cps-of-exp
 1. cps-of-exps
-1. if语句的处理 注意条件，代码膨胀
+1. if 语句的处理 注意条件，代码膨胀
 1. proc-exp 的处理
+1. let-exp/sum-exp 中 cont 使用在不同的地方，解释不同的效果。增加了外层嵌套`if-exp/let-exp/letrec-exp/call-exp`
 
 1. exer 6.7 procedural/inlined interpreter of 5.4/5.5/5.6
 1. exer 6.8 inlined version of of 5.4

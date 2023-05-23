@@ -20,11 +20,12 @@
   )
 
 (define (make-tfexp-from-simple simple)
+; cps-program 需要一个 tfexp ，在顶层进行包装
   (simple-exp->exp simple)
   )
 
 (define (end-cont)
-  (let ((var (fresh-identifier 'var)))
+  (let ((var 'var))
     (cps-proc-exp (list var) (make-tfexp-from-simple (cps-var-exp var)))
   )
 )
@@ -107,24 +108,22 @@
               )
 )
 
+(define proc-k 'k%00)
+
 (define (cps-of-proc-exp vars body cont)
-  (let ((k (fresh-identifier 'k)))
-    (cont
-      (cps-proc-exp (append vars (list k))
+ ; 可以使用固定的 identifier k%00
+    (cont (cps-proc-exp (append vars (list proc-k))
                     (cps-of-exp body (lambda (simple)
-                                      (cps-call-exp (cps-var-exp k) (list simple))
+                                      (cps-call-exp (cps-var-exp proc-k) (list simple))
                                       ))
                     )
       )
-    )
   ;   (cps-of-exp body (lambda (simple)
-  ;                      (let ((k (fresh-identifier 'k)))
   ;                        (cont
-  ;                         (cps-proc-exp (append vars (list k))
-  ;                                       (cps-call-exp (cps-var-exp k) (list simple))
+  ;                         (cps-proc-exp (append vars (list proc-k))
+  ;                                       (cps-call-exp (cps-var-exp proc-k) (list simple))
   ;                                       )
   ;                         )
-  ;                        )
   ;                      ))
 )
 
@@ -155,21 +154,20 @@
 )
 
 (define (cps-of-letrec-exp p-names b-varss p-bodies body cont)
-  (let ((k-exps (map (lambda (name) (fresh-identifier 'k)) p-names)))
+  ; 使用固定的 k%00
     (cps-letrec-exp
       p-names
-      (map (lambda (b-vars k) (append b-vars (list k))) b-varss k-exps)
-      (map (lambda (p-body k)
+      (map (lambda (b-vars) (append b-vars proc-k)) b-varss)
+      (map (lambda (p-body)
             (cps-of-exp p-body (lambda (simple)
-                                  (cps-call-exp (cps-var-exp k) (list simple))
+                                  (cps-call-exp (cps-var-exp proc-k) (list simple))
                                   )
                         )
-            ) p-bodies k-exps)
+            ) p-bodies)
       (cps-of-exp body (lambda (simple)
                         (cont simple)
                         ))
       )
-    )
 )
 
 (define (cps-of-let-exp var1 exp1 body cont)
