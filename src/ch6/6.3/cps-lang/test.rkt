@@ -141,7 +141,7 @@
 ;          var2
 ;          )
 ;    )
-(cps-of-program (scan&parse "((a 1) 2)"))
+; (cps-of-program (scan&parse "((a 1) 2)"))
 
 ; (a 1 proc (var1)
 ;   (b 2 proc (var2)
