@@ -43,6 +43,7 @@
                 (cps-of-letrec-exp p-names b-varss p-bodies body k-exp)
                 )
     (sum-exp (exps) (cps-of-sum-exp exps k-exp))
+    (list-exp (exps) (cps-of-list-exp exps k-exp))
     (else (eopl:error 'cps-of-exp "unsupported expression ~s " exp))
     )
   )
@@ -56,6 +57,12 @@
 (define (cps-of-sum-exp exps k-exp)
   (cps-of-exps exps (lambda (simples)
                       (make-send-to-cont k-exp (cps-sum-exp simples))
+                      ))
+  )
+
+(define (cps-of-list-exp exps k-exp)
+  (cps-of-exps exps (lambda (simples)
+                      (make-send-to-cont k-exp (cps-list-exp simples))
                       ))
   )
 

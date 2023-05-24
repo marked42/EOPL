@@ -9,7 +9,7 @@
                      extend-env-rec*
                      )]
  ["continuation.rkt" (apply-cont end-cont)]
- ["value.rkt" (num-val bool-val proc-val expval->num expval->bool expval->proc)]
+ ["value.rkt" (num-val bool-val proc-val expval->num expval->bool expval->proc null-val cell-val)]
  ["parser.rkt" (scan&parse)]
  ["procedure.rkt" (apply-procedure procedure)])
 
@@ -103,6 +103,18 @@
                     (let sum-loop ((nums nums))
                       (if (null? nums) 0
                           (+ (car nums) (sum-loop (cdr nums))))))))
+    (cps-list-exp (exps)
+                (let ((vals (map (lambda (exp) (value-of-simple-exp exp env)) exps)))
+                  (let loop ((vals vals))
+                    (if (null? vals)
+                        (null-val)
+                        (let ((first (car vals)) (rest (cdr vals)))
+                          (cell-val first (loop rest))
+                          )
+                        )
+                    )
+                )
+    )
     (else (eopl:error 'value-of-simple-exp "unsupported simple-expression ~s " exp1))
     )
   )
