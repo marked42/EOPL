@@ -98,14 +98,33 @@
                )
   )
 
+(define (unique-if-k-identifier) 'k%01)
+
+(define (is-var-exp exp)
+  (cases simple-expression exp
+    (cps-var-exp (var) #t)
+    (else #f)
+    )
+  )
+
 (define (cps-of-if-exp exp1 exp2 exp3 k-exp)
   (cps-of-exps
    (list exp1)
    (lambda (vals)
-     (cps-if-exp (first vals)
-                 (cps-of-exp exp2 k-exp)
-                 (cps-of-exp exp3 k-exp)
-                 )
+     (if (is-var-exp k-exp)
+         (cps-if-exp (first vals)
+                     (cps-of-exp exp2 k-exp)
+                     (cps-of-exp exp3 k-exp)
+                     )
+         (let ((if-k-exp (unique-if-k-identifier)))
+           (cps-let-exp if-k-exp k-exp
+                        (cps-if-exp (first vals)
+                                    (cps-of-exp exp2 (cps-var-exp if-k-exp))
+                                    (cps-of-exp exp3 (cps-var-exp if-k-exp))
+                                    )
+                        )
+           )
+         )
      )
    )
   )
