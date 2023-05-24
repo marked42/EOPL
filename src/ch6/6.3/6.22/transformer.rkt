@@ -19,7 +19,15 @@
   )
 
 (define (make-send-to-cont k-exp simple-exp)
-  (cps-call-exp k-exp (list simple-exp))
+  (cases simple-expression k-exp
+    (cps-proc-exp (vars body)
+                  (if (= (length vars) 1)
+                      (cps-let-exp (car vars) simple-exp body)
+                      (cps-call-exp k-exp (list simple-exp))
+                      )
+                  )
+    (else (cps-call-exp k-exp (list simple-exp)))
+    )
   )
 
 (define (cps-of-exp exp k-exp)
