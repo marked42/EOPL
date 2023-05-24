@@ -19,7 +19,7 @@
 (define (run str)
   (let ((prog (scan&parse str)))
     (let ((cps-prog (cps-of-program prog)))
-      (eopl:pretty-print cps-prog)
+      ; (eopl:pretty-print cps-prog)
       (value-of-program cps-prog)
       )
     )

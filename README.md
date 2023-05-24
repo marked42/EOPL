@@ -1120,6 +1120,16 @@ TODO: how to implement a transformer
 1. exer 6.15
 1. exer 6.16
 1. exer 6.17
+1. exer 6.22 CPS-OUT语法中位于tail-position的表达式如果是简单表达式，会被make-send-to-cont转换为 `(proc (var1) var1 simple)`的形式，这种代码没有必要，可以简化为 `let var1 = simple in var1`。
+
+```
+let a = 1 in -(a, x)
+
+// 1 被cps-of-exps处理，-(a,x) 被cps-of-exp处理，会调用make-send-to-cont
+let a = 1
+  in (proc (var%1) var%1 -(a,x))
+```
+
 
 普通代码转换到 CPS 代码，将代码 Control Context 从栈转移到堆上。
 
@@ -1163,6 +1173,49 @@ proc (x) body -> proc (x k) (transform body k)
 
 设计 CPS-OUT 语法，将非 tail position 处的表达式转换为简单表达式，简单表达式计算不需要调用栈（Control Context）。
 这样 CPS-OUT 语法代表的代码就是尾调用形式（tail-form）形式。
+
+cps-if
+
+```
+if zero? (0) then 2 else 3
+
+// 书上的实现
+if zero?(0)
+then (proc (var%1) var%1 2)
+else (proc (var%2) var%2 3)
+
+// 自己实现
+if zero?(0)
+then 2
+else 3
+
+if (a 1) then (p x) else (p y)
+
+// 书上实现
+// 为什么内层的var%1变量需要最小，以为作为k-exp参数逐层向内传递，最内层的表达式最先被处理，序号最小
+(a 1 proc (var%2)
+  if var%2
+  then (p x proc (var%1) var%1)
+  else (p y proc (var%1) var%1)
+)
+
+
+// 自己的实现，
+// 两个cps-of-exp var%2/var%3可以重复使用
+// var%1的顺序更合理，从内到外增长，没有k-exp参数，而是需要时再生成，所以从外到内，逐渐增大
+(a 1 proc (var%1)
+  if var%1
+  then (p x proc (var%2) var%2)
+  else (p y proc (var%3) var%3)
+)
+```
+
+call-exp的优化
+
+```
+; proc (x k1) (x 1 proc (var2) (k1 var2))
+; TODO: 可以简化 proc (x k1) (x 1 k)
+```
 
 ### 6.3 Converting to Continuation-Passing Style
 
