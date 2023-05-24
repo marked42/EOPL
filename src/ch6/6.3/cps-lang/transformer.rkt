@@ -1,49 +1,41 @@
 #lang eopl
 
-(require racket/lazy-require racket/list "expression.rkt")
+(require racket/lazy-require racket/list "expression.rkt" "identifier.rkt")
 (provide (all-defined-out))
 
 (define (cps-of-program prog)
-  (eopl:pretty-print prog)
+  ; (eopl:pretty-print prog)
+  (initialize-identifier-index!)
   (cases program prog
     (a-program (exp1)
-               (let ((exp2 (cps-of-exp exp1 (lambda (exp)
-                                              ; exp is gurranteed to be simple
-                                              ;   (make-tfexp-from-simple exp)
-                                              (make-send-to-cont (end-cont) exp)
-                                              ))))
-                 (eopl:pretty-print exp2)
-                 exp2
+               (let ((exp (cps-of-exp exp1 (lambda (exp)
+                                             ; exp is gurranteed to be simple
+                                             (make-tfexp-from-simple exp)
+                                             ))))
+                 (let ((cps-prog (cps-a-program exp)))
+                   ;  (eopl:pretty-print cps-prog)
+                   cps-prog
+                   )
                  )
                )
     )
   )
 
 (define (make-tfexp-from-simple simple)
-; cps-program 需要一个 tfexp ，在顶层进行包装
+  ; cps-program 需要一个 tfexp ，在顶层进行包装
   (simple-exp->exp simple)
   )
 
 (define (end-cont)
   (let ((var 'var))
     (cps-proc-exp (list var) (make-tfexp-from-simple (cps-var-exp var)))
+    )
   )
-)
 
 (define (make-send-to-cont k-exp exp)
   (cps-call-exp k-exp (list exp))
-)
+  )
 
-(define fresh-identifier
-  (let ((sn 0))
-    (lambda (identifier)
-      (set! sn (+ sn 1))
-      (string->symbol
-       (string-append
-        (symbol->string identifier)
-        ; this can't appear in an input identifier
-        "%"
-        (number->string sn))))))
 
 (define (cps-of-exp exp cont)
   (cases expression exp
@@ -79,45 +71,46 @@
 
 (define (cps-of-const-exp num cont)
   (cont (cps-const-exp num))
-)
+  )
 
 (define (cps-of-var-exp var cont)
   (cont (cps-var-exp var))
-)
+  )
 
 (define (cps-of-diff-exp exp1 exp2 cont)
   (cps-of-exp exp1 (lambda (simple1)
-                      (cps-of-exp exp2 (lambda (simple2)
+                     (cps-of-exp exp2 (lambda (simple2)
                                         (cont (cps-diff-exp simple1 simple2))
                                         ))
-                      ))
-)
+                     ))
+  )
 
 (define (cps-of-zero?-exp exp1 cont)
   (cps-of-exp exp1 (lambda (simple1)
-                    (cont (cps-zero?-exp simple1))
-                    ))
-)
+                     (cont (cps-zero?-exp simple1))
+                     ))
+  )
 
 (define (cps-of-if-exp exp1 exp2 exp3 cont)
   (cps-of-exp exp1 (lambda (simple1)
-                      (cps-if-exp simple1
-                                  (cps-of-exp exp2 cont)
-                                  (cps-of-exp exp3 cont)
-                                  ))
+                     (cps-if-exp simple1
+                                 ; 两个cps-of-exp var%1浪费了，可以重复使用
+                                 (cps-of-exp exp2 cont)
+                                 (cps-of-exp exp3 cont)
+                                 ))
               )
-)
+  )
 
 (define proc-k 'k%00)
 
 (define (cps-of-proc-exp vars body cont)
- ; 可以使用固定的 identifier k%00
-    (cont (cps-proc-exp (append vars (list proc-k))
-                    (cps-of-exp body (lambda (simple)
-                                      (cps-call-exp (cps-var-exp proc-k) (list simple))
-                                      ))
-                    )
-      )
+  ; 可以使用固定的 identifier k%00
+  (cont (cps-proc-exp (append vars (list proc-k))
+                      (cps-of-exp body (lambda (simple)
+                                         (cps-call-exp (cps-var-exp proc-k) (list simple))
+                                         ))
+                      )
+        )
   ;   (cps-of-exp body (lambda (simple)
   ;                        (cont
   ;                         (cps-proc-exp (append vars (list proc-k))
@@ -125,60 +118,60 @@
   ;                                       )
   ;                         )
   ;                      ))
-)
+  )
 
 (define (cps-of-call-exp rator rands cont)
   (cps-of-exps
-    (cons rator rands)
-    (lambda (simples)
-      (let ((var (fresh-identifier 'var)))
-        (cps-call-exp
+   (cons rator rands)
+   (lambda (simples)
+     (let ((var (fresh-identifier 'var)))
+       (cps-call-exp
         (car simples)
         (append
-          (cdr simples)
-          (list
+         (cdr simples)
+         (list
           (cps-proc-exp (list var)
                         (cont (cps-var-exp var))
                         )
           )
-          )
+         )
         )
-        ))
-    )
-)
+       ))
+   )
+  )
 
 (define (cps-of-sum-exp exps cont)
   (cps-of-exps exps (lambda (simples)
                       (cont (cps-sum-exp simples))
                       ))
-)
+  )
 
 (define (cps-of-letrec-exp p-names b-varss p-bodies body cont)
   ; 使用固定的 k%00
-    (cps-letrec-exp
-      p-names
-      (map (lambda (b-vars) (append b-vars proc-k)) b-varss)
-      (map (lambda (p-body)
-            (cps-of-exp p-body (lambda (simple)
-                                  (cps-call-exp (cps-var-exp proc-k) (list simple))
-                                  )
-                        )
-            ) p-bodies)
-      (cps-of-exp body (lambda (simple)
-                        (cont simple)
-                        ))
-      )
-)
+  (cps-letrec-exp
+   p-names
+   (map (lambda (b-vars) (append b-vars (list proc-k))) b-varss)
+   (map (lambda (p-body)
+          (cps-of-exp p-body (lambda (simple)
+                               (cps-call-exp (cps-var-exp proc-k) (list simple))
+                               )
+                      )
+          ) p-bodies)
+   (cps-of-exp body (lambda (simple)
+                      (cont simple)
+                      ))
+   )
+  )
 
 (define (cps-of-let-exp var1 exp1 body cont)
   (cps-of-exp exp1 (lambda (simple1)
-                    (cps-let-exp var1 simple1
+                     (cps-let-exp var1 simple1
                                   (cps-of-exp body (lambda (simple)
-                                                    (cont simple)
-                                                    ))
+                                                     (cont simple)
+                                                     ))
                                   )
-                    ))
-)
+                     ))
+  )
 
 (define (cps-of-exps exps cont)
   (if (null? exps)
