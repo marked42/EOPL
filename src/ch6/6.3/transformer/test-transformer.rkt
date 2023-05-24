@@ -2,8 +2,8 @@
 
 (require racket/lazy-require rackunit)
 (lazy-require
- ["formatter.rkt" (format-cps-program)]
- ["parser.rkt" (scan&parse)]
+ ["../cps-lang/formatter.rkt" (format-cps-program)]
+ ["../cps-lang/parser.rkt" (scan&parse)]
  )
 
 (provide (all-defined-out))

@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require racket/list "expression.rkt" "identifier.rkt")
+(require "../cps-lang/expression.rkt" "../cps-lang/identifier.rkt")
 (provide (all-defined-out))
 
 (define (cps-of-program prog)
@@ -25,17 +25,6 @@
   ; cps-program 需要一个 tfexp ，在顶层进行包装
   (simple-exp->exp simple)
   )
-
-(define (end-cont)
-  (let ((var 'var))
-    (cps-proc-exp (list var) (make-tfexp-from-simple (cps-var-exp var)))
-    )
-  )
-
-(define (make-send-to-cont k-exp exp)
-  (cps-call-exp k-exp (list exp))
-  )
-
 
 (define (cps-of-exp exp cont)
   (cases expression exp
