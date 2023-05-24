@@ -1,19 +1,14 @@
 #lang eopl
 
-(require racket/lazy-require racket/list "value.rkt" "parser.rkt" "expression.rkt")
+(require racket/lazy-require racket/list "../cps-lang/expression.rkt")
 (lazy-require
- ["environment.rkt" (
-                     init-env
-                     apply-env
-                     extend-env
-                     build-circular-extend-env-rec-mul-vec
-                     )]
- ["continuation.rkt" (apply-cont end-cont)]
- ["procedure.rkt" (apply-procedure procedure)])
+ ["../cps-lang/identifier.rkt" (fresh-identifier initialize-identifier-index!)]
+ )
 
 (provide (all-defined-out))
 
 (define (cps-of-program prog)
+  (initialize-identifier-index!)
   (cases program prog
     (a-program (exp1)
                (cps-a-program
@@ -23,16 +18,6 @@
     )
   )
 
-(define fresh-identifier
-  (let ((sn 0))
-    (lambda (identifier)
-      (set! sn (+ sn 1))
-      (string->symbol
-       (string-append
-        (symbol->string identifier)
-        "%"             ; this can't appear in an input identifier
-        (number->string sn))))))
-
 (define (make-send-to-cont k-exp simple-exp)
   (cps-call-exp k-exp (list simple-exp))
   )
@@ -41,6 +26,7 @@
   (cases expression exp
     (const-exp (num) (make-send-to-cont k-exp (cps-const-exp num)))
     (var-exp (var) (make-send-to-cont k-exp (cps-var-exp var)))
+    (zero?-exp (exp1) (cps-of-zero?-exp exp1 k-exp))
     (diff-exp (exp1 exp2) (cps-of-diff-exp exp1 exp2 k-exp))
     (call-exp (rator rands) (cps-of-call-exp rator rands k-exp))
     (let-exp (var exp1 body)
@@ -59,6 +45,12 @@
     (sum-exp (exps) (cps-of-sum-exp exps k-exp))
     (else (eopl:error 'cps-of-exp "unsupported expression ~s " exp))
     )
+  )
+
+(define (cps-of-zero?-exp exp1 k-exp)
+  (cps-of-exps (list exp1) (lambda (simples)
+                             (make-send-to-cont k-exp (cps-zero?-exp (car simples)))
+                             ))
   )
 
 (define (cps-of-sum-exp exps k-exp)
@@ -181,49 +173,4 @@
 
 (define (report-invalid-exp-to-cps-of-simple-exp exp)
   (eopl:error 'cps-of-simple-exp "non-simple expression to cps-of-simple-exp: ~s" exp)
-  )
-
-(define (value-of-simple-exp exp1 env)
-  (cases simple-expression exp1
-    (cps-const-exp (num) (num-val num))
-    (cps-var-exp (var) (apply-env env var))
-    (cps-diff-exp (exp1 exp2)
-                  (let ((val1 (value-of-simple-exp exp1 env))
-                        (val2 (value-of-simple-exp exp2 env)))
-                    (let ((num1 (expval->num val1))
-                          (num2 (expval->num val2)))
-                      (num-val (- num1 num2))
-                      )
-                    )
-                  )
-    ; true only if exp1 is number 0
-    (cps-zero?-exp (exp1)
-                   (let ((val (value-of-simple-exp exp1 env)))
-                     (let ((num (expval->num val)))
-                       (if (zero? num)
-                           (bool-val #t)
-                           (bool-val #f)
-                           )
-                       )
-                     )
-                   )
-    (cps-proc-exp (vars body)
-                  (proc-val (procedure vars body env))
-                  )
-    (cps-sum-exp (exps)
-                 (let ((nums (map
-                              (lambda (exp)
-                                (expval->num
-                                 (value-of-simple-exp exp env)))
-                              exps)))
-                   (num-val
-                    (let sum-loop ((nums nums))
-                      (if (null? nums) 0
-                          (+ (car nums) (sum-loop (cdr nums))))))))
-    (else (eopl:error 'value-of-simple-exp "unsupported simple-expression ~s " exp1))
-    )
-  )
-
-(define (value-of-simple-exps exps env)
-  (map (lambda (exp1) (value-of-simple-exp exp1 env)) exps)
   )
