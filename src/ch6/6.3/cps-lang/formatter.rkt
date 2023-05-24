@@ -94,6 +94,13 @@
                   ")"
                   )
                  )
+    (cps-list-exp (exps)
+                 (string-append
+                  "list("
+                  (string-join (map format-simple-exp exps) ", ")
+                  ")"
+                  )
+                 )
     (else (eopl:error 'format-simple-exp "invalid expression ~s " exp))
     )
   )

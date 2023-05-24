@@ -49,4 +49,7 @@
      ("(" simple-expression (arbno simple-expression) ")")
      cps-call-exp)
 
+    (simple-expression
+     ("list" "(" (separated-list simple-expression ",") ")")
+     cps-list-exp)
     ))

@@ -24,6 +24,8 @@
    (b-varss (list-of (list-of identifier?)))
    (p-bodies (list-of expression?))
    (body expression?))
+
+  (list-exp (exps (list-of expression?)))
   )
 
 (define-datatype program program?
@@ -45,6 +47,7 @@
   (cps-zero?-exp (exp1 simple-expression?))
   (cps-proc-exp (vars (list-of identifier?)) (body tfexp?))
   (cps-sum-exp (exps (list-of simple-expression?)))
+  (cps-list-exp (exps (list-of simple-expression?)))
   )
 
 (define-datatype tfexp tfexp?
