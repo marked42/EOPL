@@ -2,10 +2,7 @@
 
 (require racket/lazy-require)
 (lazy-require
- ["interpreter.rkt" (run)]
  ["value.rkt" (equal-answer?)]
- ["transformer.rkt" (cps-of-program)]
- ["test-transformer.rkt" (test-transformer)]
  ["../../../base/test.rkt" (test-let-lang)]
  )
 
@@ -16,10 +13,7 @@
   (equal-answer? (run "+(1, 2, 3)") 6 "sum-exp")
   )
 
-(define (test-cps-lang)
+(define (test-cps-lang run)
   (test-sum-exp run equal-answer?)
   (test-let-lang run equal-answer?)
   )
-
-(test-transformer cps-of-program)
-(test-cps-lang)
