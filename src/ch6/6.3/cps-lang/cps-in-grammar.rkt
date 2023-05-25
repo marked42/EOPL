@@ -19,7 +19,7 @@
 
     (expression ("+" "(" (separated-list expression ",") ")") sum-exp)
 
-    (expression ("let" identifier "=" expression "in" expression) let-exp)
+    (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
     (expression ("letrec" (arbno identifier "(" (separated-list identifier ",") ")" "=" expression) "in" expression) letrec-exp)
 
     (expression ("list" "(" (separated-list expression ",") ")") list-exp)

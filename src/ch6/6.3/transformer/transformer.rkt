@@ -48,8 +48,8 @@
     (sum-exp (exps)
              (cps-of-sum-exp exps cont)
              )
-    (let-exp (var1 exp1 body)
-             (cps-of-let-exp var1 exp1 body cont)
+    (let-exp (vars exps body)
+              (cps-of-let-exp vars exps body cont)
              )
     (letrec-exp (p-names b-varss p-bodies body)
                 (cps-of-letrec-exp p-names b-varss p-bodies body cont)
@@ -152,9 +152,9 @@
    )
   )
 
-(define (cps-of-let-exp var1 exp1 body cont)
-  (cps-of-exp exp1 (lambda (simple1)
-                     (cps-let-exp var1 simple1
+(define (cps-of-let-exp vars exps body cont)
+  (cps-of-exps exps (lambda (simples)
+                     (cps-let-exp vars simples
                                   (cps-of-exp body (lambda (simple)
                                                      (cont simple)
                                                      ))

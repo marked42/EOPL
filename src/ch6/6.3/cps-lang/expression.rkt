@@ -18,7 +18,7 @@
 
   (sum-exp (exps (list-of expression?)))
 
-  (let-exp (var1 identifier?) (exp1 expression?) (body expression?))
+  (let-exp (vars (list-of identifier?)) (exps (list-of expression?)) (body expression?))
   (letrec-exp
    (p-names (list-of identifier?))
    (b-varss (list-of (list-of identifier?)))
@@ -52,7 +52,7 @@
 
 (define-datatype tfexp tfexp?
   (simple-exp->exp (exp1 simple-expression?))
-  (cps-let-exp (var identifier?) (exp1 simple-expression?) (body tfexp?))
+  (cps-let-exp (vars (list-of identifier?)) (exps (list-of simple-expression?)) (body tfexp?))
   (cps-letrec-exp
    (p-names (list-of identifier?))
    (b-varss (list-of (list-of identifier?)))

@@ -5,7 +5,7 @@
  ["environment.rkt" (
                      init-env
                      apply-env
-                     extend-env
+                     extend-env*
                      extend-env-rec*
                      )]
  ["continuation.rkt" (apply-cont end-cont)]
@@ -45,9 +45,9 @@
                       )
                   )
                 )
-    (cps-let-exp (var exp1 body)
-                 (let ((val (value-of-simple-exp exp1 env)))
-                   (value-of/k body (extend-env var val env) cont)
+    (cps-let-exp (vars exps body)
+                 (let ((vals (map (lambda (exp) (value-of-simple-exp exp env)) exps)))
+                   (value-of/k body (extend-env* vars vals env) cont)
                    )
                  )
     (cps-letrec-exp (p-names b-varss p-bodies body)
@@ -104,17 +104,17 @@
                       (if (null? nums) 0
                           (+ (car nums) (sum-loop (cdr nums))))))))
     (cps-list-exp (exps)
-                (let ((vals (map (lambda (exp) (value-of-simple-exp exp env)) exps)))
-                  (let loop ((vals vals))
-                    (if (null? vals)
-                        (null-val)
-                        (let ((first (car vals)) (rest (cdr vals)))
-                          (cell-val first (loop rest))
+                  (let ((vals (map (lambda (exp) (value-of-simple-exp exp env)) exps)))
+                    (let loop ((vals vals))
+                      (if (null? vals)
+                          (null-val)
+                          (let ((first (car vals)) (rest (cdr vals)))
+                            (cell-val first (loop rest))
+                            )
                           )
-                        )
+                      )
                     )
-                )
-    )
+                  )
     (else (eopl:error 'value-of-simple-exp "unsupported simple-expression ~s " exp1))
     )
   )

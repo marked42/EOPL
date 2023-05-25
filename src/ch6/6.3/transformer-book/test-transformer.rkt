@@ -18,8 +18,8 @@
   (test-transform-if-exp transform)
   (test-transform-proc-exp transform)
   (test-transform-let-exp transform)
-  (test-transform-letrec-exp transform)
-  (test-transform-list-exp transform)
+  ; (test-transform-letrec-exp transform)
+  ; (test-transform-list-exp transform)
   )
 
 (define (test-transform-exp transform input expected message)

@@ -30,7 +30,7 @@
      simple-exp->exp)
 
     (tfexp
-     ("let" identifier "=" simple-expression "in" tfexp)
+     ("let" (arbno identifier "=" simple-expression) "in" tfexp)
      cps-let-exp)
 
     (tfexp

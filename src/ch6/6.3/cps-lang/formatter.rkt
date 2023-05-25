@@ -17,12 +17,10 @@
     (simple-exp->exp (exp1)
                      (format-simple-exp exp1)
                      )
-    (cps-let-exp (var exp1 body)
+    (cps-let-exp (vars exps body)
                  (string-append
                   "let "
-                  (symbol->string var)
-                  " = "
-                  (format-simple-exp exp1)
+                  (string-join (map format-cps-let-var vars exps) " ")
                   " in "
                   (format-cps-exp body)
                   )
@@ -54,6 +52,14 @@
                   )
     (else (eopl:error 'format-cps-exp "invalid expression ~s " exp))
     )
+  )
+
+(define (format-cps-let-var var exp)
+  (string-append
+   (symbol->string var)
+   " = "
+   (format-simple-exp exp)
+   )
   )
 
 (define (format-letrec-proc p-name b-vars p-body)
@@ -95,12 +101,12 @@
                   )
                  )
     (cps-list-exp (exps)
-                 (string-append
-                  "list("
-                  (string-join (map format-simple-exp exps) ", ")
-                  ")"
+                  (string-append
+                   "list("
+                   (string-join (map format-simple-exp exps) ", ")
+                   ")"
+                   )
                   )
-                 )
     (else (eopl:error 'format-simple-exp "invalid expression ~s " exp))
     )
   )
