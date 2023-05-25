@@ -12,8 +12,8 @@
 (provide (all-defined-out))
 
 (define (test-list-exp run equal-answer?)
-    (equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
-    (equal-answer? (run "let x = 4 in list(x, -(x, 1), -(x, 3))") (list 4 3 1) "list-exp")
+  (equal-answer? (run "list(1, 2, 3)") (list 1 2 3) "list-exp")
+  (equal-answer? (run "let x = 4 in list(x, -(x, 1), -(x, 3))") (list 4 3 1) "list-exp")
   )
 
 (test-transformer cps-of-program)

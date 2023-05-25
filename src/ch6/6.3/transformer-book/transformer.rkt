@@ -29,8 +29,8 @@
     (zero?-exp (exp1) (cps-of-zero?-exp exp1 k-exp))
     (diff-exp (exp1 exp2) (cps-of-diff-exp exp1 exp2 k-exp))
     (call-exp (rator rands) (cps-of-call-exp rator rands k-exp))
-    (let-exp (var exp1 body)
-             (cps-of-let-exp var exp1 body k-exp)
+    (let-exp (vars exps body)
+             (cps-of-let-exp vars exps body k-exp)
              )
     (proc-exp (vars body)
               (make-send-to-cont k-exp
@@ -75,11 +75,11 @@
    )
   )
 
-(define (cps-of-let-exp var exp1 body k-exp)
+(define (cps-of-let-exp vars exps body k-exp)
   (cps-of-exps
-   (list exp1)
+   exps
    (lambda (simples)
-     (cps-let-exp var (car simples) (cps-of-exp body k-exp))
+     (cps-let-exp vars simples (cps-of-exp body k-exp))
      )
    )
   )
