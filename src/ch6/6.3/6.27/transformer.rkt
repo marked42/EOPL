@@ -77,12 +77,18 @@
     )
 
   (define (cps-of-let-exp vars exps body k-exp)
-    (cps-of-exps
-     exps
-     (lambda (simples)
-       (cps-let-exp vars simples (cps-of-exp body k-exp))
-       )
-     )
+    (if (= (length vars))
+      ; exercise 6.27
+      (let ((var (car vars)) (exp (car exps)))
+        (cps-of-exp exp (cps-proc-exp (list var) (cps-of-exp body k-exp)))
+      )
+      (cps-of-exps
+        exps
+        (lambda (simples)
+          (cps-let-exp vars simples (cps-of-exp body k-exp))
+          )
+        )
+      )
     )
 
   (define (cps-of-diff-exp exp1 exp2 k-exp)

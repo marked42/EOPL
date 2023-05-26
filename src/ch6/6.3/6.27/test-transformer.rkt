@@ -65,11 +65,11 @@
   )
 
 (define (test-transform-let-exp transform)
-  (test-transform-exp transform "let x = (p 1) in (x 2)" "(p 1 proc (var%2) let x = var%2 in (x 2 proc (var%1) var%1))" "let-exp")
-  (test-transform-exp transform "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)" "let f = proc (x, k%00) (k%00 proc (y, k%00) (k%00 -(x, -(0, y)))) in (f 3 proc (var%2) (var%2 4 proc (var%1) var%1))" "let-exp")
-  (test-transform-exp transform "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)" "let f = proc (x, y, k%00) (k%00 -(x, -(0, y))) in (f 3 4 proc (var%1) var%1)" "let-exp")
-  (test-transform-exp transform "let a = 1 in -(a, x)" "let a = 1 in (proc (var%1) var%1 -(a, x))" "let-exp")
-  (test-transform-exp transform "let f = proc (x) -(x,11) in (f (f 77))" "let f = proc (x, k%00) (k%00 -(x, 11)) in (f 77 proc (var%2) (f var%2 proc (var%1) var%1))" "let-exp")
+  (test-transform-exp transform "let x = (p 1) in (x 2)" "(p 1 proc (x) (x 2 proc (var%1) var%1))" "let-exp")
+  (test-transform-exp transform "let f = proc(x) proc(y) -(x,-(0,y)) in ((f 3) 4)" "(proc (f) (f 3 proc (var%2) (var%2 4 proc (var%1) var%1)) proc (x, k%00) (k%00 proc (y, k%00) (k%00 -(x, -(0, y)))))" "let-exp")
+  (test-transform-exp transform "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)" "(proc (f) (f 3 4 proc (var%1) var%1) proc (x, y, k%00) (k%00 -(x, -(0, y))))" "let-exp")
+  (test-transform-exp transform "let a = 1 in -(a, x)" "(proc (a) (proc (var%1) var%1 -(a, x)) 1)" "let-exp")
+  (test-transform-exp transform "let f = proc (x) -(x,11) in (f (f 77))" "(proc (f) (f 77 proc (var%2) (f var%2 proc (var%1) var%1)) proc (x, k%00) (k%00 -(x, 11)))" "let-exp")
   )
 
 (define (test-transform-letrec-exp transform)
