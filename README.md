@@ -1120,7 +1120,9 @@ TODO: how to implement a transformer
 1. exer 6.15
 1. exer 6.16
 1. exer 6.17
-1. exer 6.22 CPS-OUT语法中位于tail-position的表达式如果是简单表达式，会被make-send-to-cont转换为 `(proc (var1) var1 simple)`的形式，这种代码没有必要，可以简化为 `let var1 = simple in var1`。
+1. exer 6.22 CPS-OUT 语法中位于 tail-position 的表达式如果是简单表达式，会被 make-send-to-cont 转换为 `(proc (var1) var1 simple)`的形式，这种代码没有必要，可以简化为 `let var1 = simple in var1`。
+1. exer 6.26 let-exp replace free variable occurrences
+1. exer 6.27 let-exp
 
 ```
 let a = 1 in -(a, x)
@@ -1129,7 +1131,6 @@ let a = 1 in -(a, x)
 let a = 1
   in (proc (var%1) var%1 -(a,x))
 ```
-
 
 普通代码转换到 CPS 代码，将代码 Control Context 从栈转移到堆上。
 
@@ -1210,7 +1211,7 @@ if (a 1) then (p x) else (p y)
 )
 ```
 
-call-exp的优化
+call-exp 的优化
 
 ```
 ; proc (x k1) (x 1 proc (var2) (k1 var2))
