@@ -1123,6 +1123,8 @@ TODO: how to implement a transformer
 1. exer 6.22 CPS-OUT 语法中位于 tail-position 的表达式如果是简单表达式，会被 make-send-to-cont 转换为 `(proc (var1) var1 simple)`的形式，这种代码没有必要，可以简化为 `let var1 = simple in var1`。
 1. exer 6.26 let-exp replace free variable occurrences
 1. exer 6.27 let-exp
+1. exer 6.31/6.32/6.33 Skipped
+1. ANF 《Reasoning about Programs in Continuation-Passing Style》《The essence of compiling with continuations》
 
 ```
 let a = 1 in -(a, x)
