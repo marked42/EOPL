@@ -13,7 +13,12 @@
   (equal-answer? (run "+(1, 2, 3)") 6 "sum-exp")
   )
 
+(define (test-print-exp run equal-answwer?)
+  (equal-answer? (run "print(1)") 38 "print-exp")
+)
+
 (define (test-cps-lang run)
   (test-sum-exp run equal-answer?)
+  (test-print-exp run equal-answer?)
   (test-let-lang run equal-answer?)
   )

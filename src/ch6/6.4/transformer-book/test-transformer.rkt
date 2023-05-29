@@ -18,8 +18,9 @@
   (test-transform-if-exp transform)
   (test-transform-proc-exp transform)
   (test-transform-let-exp transform)
-  ; (test-transform-letrec-exp transform)
-  ; (test-transform-list-exp transform)
+  (test-transform-letrec-exp transform)
+  (test-transform-list-exp transform)
+  (test-transform-print-exp transform)
   )
 
 (define (test-transform-exp transform input expected message)
@@ -82,3 +83,8 @@
 (define (test-transform-list-exp transform)
   (test-transform-exp transform "list((a 1), (b 2))" "(a 1 proc (var%2) (b 2 proc (var%3) (proc (var%1) var%1 list(var%2, var%3))))" "list-exp")
   )
+
+(define (test-transform-print-exp transform)
+  (test-transform-exp transform "print(1)" "print(1); (proc (var%1) var%1 38)" "print-exp")
+  (test-transform-exp transform "print((a 1))" "(a 1 proc (var%2) print(var%2); (proc (var%1) var%1 38))" "print-exp")
+)

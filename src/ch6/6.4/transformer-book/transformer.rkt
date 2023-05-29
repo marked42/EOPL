@@ -45,6 +45,9 @@
                   )
       (sum-exp (exps) (cps-of-sum-exp exps k-exp))
       (list-exp (exps) (cps-of-list-exp exps k-exp))
+      (print-exp (exp1)
+        (cps-of-print-exp exp1 k-exp)
+      )
       (else (eopl:error 'cps-of-exp "unsupported expression ~s " exp))
       )
     )
@@ -117,6 +120,18 @@
        )
      )
     )
+
+  (define (cps-of-print-exp exp1 k-exp)
+    (cps-of-exps
+      (list exp1)
+      (lambda (vals)
+        (cps-printk-exp (first vals)
+        ; print-exp returns 38 on purpose
+          (make-send-to-cont k-exp (cps-const-exp 38))
+        )
+      )
+    )
+  )
 
   (define (cps-of-exps exps builder)
     (let cps-of-rest ((exps exps))

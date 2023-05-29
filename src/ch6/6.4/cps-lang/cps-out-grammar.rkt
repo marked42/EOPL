@@ -52,4 +52,6 @@
     (simple-expression
      ("list" "(" (separated-list simple-expression ",") ")")
      cps-list-exp)
+
+     (tfexp ("printk" "(" simple-expression ")" ";" tfexp) cps-printk-exp)
     ))
