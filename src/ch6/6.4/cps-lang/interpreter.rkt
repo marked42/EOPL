@@ -9,14 +9,16 @@
                      extend-env-rec*
                      )]
  ["continuation.rkt" (apply-cont end-cont)]
- ["value.rkt" (num-val bool-val proc-val expval->num expval->bool expval->proc null-val cell-val)]
+ ["value.rkt" (num-val bool-val proc-val expval->num expval->bool expval->proc null-val cell-val ref-val expval->ref)]
  ["parser.rkt" (scan&parse)]
+ ["store.rkt" (initialize-store! newref deref setref)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
 
 (define (run str cps-of-program)
   (let ((prog (scan&parse str)))
+    (initialize-store!)
     (let ((cps-prog (cps-of-program prog)))
       ; (eopl:pretty-print cps-prog)
       (value-of-program cps-prog)
@@ -67,6 +69,28 @@
                       (eopl:printf "~s~%" (value-of-simple-exp simple env))
                       (value-of/k body env cont)
                     )
+    )
+    (cps-newrefk-exp (simple1 simple2)
+                     (let ((val1 (value-of-simple-exp simple1 env)) (val2 (value-of-simple-exp simple2 env)))
+                      (let ((new-val (ref-val (newref val1))) (proc1 (expval->proc val2)))
+                        (apply-procedure proc1 (list new-val) cont)
+                      )
+                     )
+    )
+    (cps-derefk-exp (simple1 simple2)
+                     (let ((val1 (value-of-simple-exp simple1 env)) (val2 (value-of-simple-exp simple2 env)))
+                      (let ((ref (expval->ref val1)) (proc1 (expval->proc val2)))
+                        (apply-procedure proc1 (list (deref ref)) cont)
+                      )
+                     )
+                    )
+    (cps-setrefk-exp (simple1 simple2 body)
+                     (let ((val1 (value-of-simple-exp simple1 env)) (val2 (value-of-simple-exp simple2 env)))
+                      (let ((ref (expval->ref val1)))
+                        (setref ref val2)
+                        (value-of/k body env cont)
+                      )
+                     )
     )
     (else (eopl:error 'value-of/k "invalid expression ~s" exp))
     )

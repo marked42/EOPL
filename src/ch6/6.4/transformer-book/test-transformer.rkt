@@ -21,6 +21,7 @@
   (test-transform-letrec-exp transform)
   (test-transform-list-exp transform)
   (test-transform-print-exp transform)
+  (test-transform-ref-exp transform)
   )
 
 (define (test-transform-exp transform input expected message)
@@ -87,4 +88,10 @@
 (define (test-transform-print-exp transform)
   (test-transform-exp transform "print(1)" "print(1); (proc (var%1) var%1 38)" "print-exp")
   (test-transform-exp transform "print((a 1))" "(a 1 proc (var%2) print(var%2); (proc (var%1) var%1 38))" "print-exp")
+)
+
+(define (test-transform-ref-exp transform)
+  (test-transform-exp transform "newref(1)" "newref(1, proc (var%1) var%1)" "newref-exp")
+  (test-transform-exp transform "deref(a)" "deref(a, proc (var%1) var%1)" "deref-exp")
+  (test-transform-exp transform "setref(a, 1)" "setref(a, 1); (proc (var%1) var%1 23)" "setref-exp")
 )

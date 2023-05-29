@@ -56,8 +56,37 @@
                     (format-simple-exp rator)
                     "); "
                     (format-cps-exp body)
+                   )
                   )
-    )
+    (cps-newrefk-exp (exp1 exp2)
+                     (string-append
+                      "newref("
+                      (format-simple-exp exp1)
+                      ", "
+                      (format-simple-exp exp2)
+                      ")"
+                     )
+                    )
+    (cps-derefk-exp (exp1 exp2)
+                     (string-append
+                      "deref("
+                      (format-simple-exp exp1)
+                      ", "
+                      (format-simple-exp exp2)
+                      ")"
+                     )
+                    )
+    (cps-setrefk-exp (exp1 exp2 body)
+                    (string-append
+                      "setref("
+                      (format-simple-exp exp1)
+                      ", "
+                      (format-simple-exp exp2)
+                      ")"
+                      "; "
+                      (format-cps-exp body)
+                      )
+                    )
     (else (eopl:error 'format-cps-exp "invalid expression ~s " exp))
     )
   )

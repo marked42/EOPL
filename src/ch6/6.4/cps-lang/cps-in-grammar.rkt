@@ -25,5 +25,10 @@
     (expression ("list" "(" (separated-list expression ",") ")") list-exp)
 
     (expression ("print" "(" expression ")") print-exp)
+
+    ; explicit refs
+    (expression ("newref" "(" expression ")") newref-exp)
+    (expression ("deref" "(" expression ")") deref-exp)
+    (expression ("setref" "(" expression "," expression")") setref-exp)
     )
   )
