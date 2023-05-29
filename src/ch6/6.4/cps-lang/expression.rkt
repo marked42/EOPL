@@ -26,6 +26,8 @@
    (body expression?))
 
   (list-exp (exps (list-of expression?)))
+
+  (print-exp (exp1 expression?))
   )
 
 (define-datatype program program?
@@ -61,4 +63,5 @@
    )
   (cps-if-exp (exp1 simple-expression?) (exp2 tfexp?) (exp3 tfexp?))
   (cps-call-exp (rator simple-expression?) (rands (list-of simple-expression?)))
+  (cps-printk-exp (simple-exp1 simple-expression?) (body tfexp?))
   )

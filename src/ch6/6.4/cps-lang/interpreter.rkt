@@ -62,6 +62,12 @@
                       )
                     )
                   )
+    (cps-printk-exp (simple body)
+                    (begin
+                      (eopl:printf "~s~%" (value-of-simple-exp simple env))
+                      (value-of/k body env cont)
+                    )
+    )
     (else (eopl:error 'value-of/k "invalid expression ~s" exp))
     )
   )

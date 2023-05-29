@@ -50,6 +50,14 @@
                    ")"
                    )
                   )
+    (cps-printk-exp (rator body)
+                  (string-append
+                    "print("
+                    (format-simple-exp rator)
+                    "); "
+                    (format-cps-exp body)
+                  )
+    )
     (else (eopl:error 'format-cps-exp "invalid expression ~s " exp))
     )
   )
