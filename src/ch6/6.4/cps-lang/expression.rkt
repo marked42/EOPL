@@ -28,6 +28,10 @@
   (list-exp (exps (list-of expression?)))
 
   (print-exp (exp1 expression?))
+
+  (newref-exp (exp1 expression?))
+  (deref-exp (exp1 expression?))
+  (setref-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
@@ -64,4 +68,8 @@
   (cps-if-exp (exp1 simple-expression?) (exp2 tfexp?) (exp3 tfexp?))
   (cps-call-exp (rator simple-expression?) (rands (list-of simple-expression?)))
   (cps-printk-exp (simple-exp1 simple-expression?) (body tfexp?))
+
+  (cps-newrefk-exp (simple1 simple-expression?) (simple2 simple-expression?))
+  (cps-derefk-exp (simple1 simple-expression?) (simple2 simple-expression?))
+  (cps-setrefk-exp (simple1 simple-expression?) (simple2 simple-expression?) (body tfexp?))
   )

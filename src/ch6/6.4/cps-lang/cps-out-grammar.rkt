@@ -53,5 +53,9 @@
      ("list" "(" (separated-list simple-expression ",") ")")
      cps-list-exp)
 
-     (tfexp ("printk" "(" simple-expression ")" ";" tfexp) cps-printk-exp)
+    (tfexp ("printk" "(" simple-expression ")" ";" tfexp) cps-printk-exp)
+
+    (tfexp ("newrefk" "(" simple-expression "," simple-expression ")") cps-newrefk-exp)
+    (tfexp ("derefk"  "(" simple-expression "," simple-expression ")") cps-derefk-exp)
+    (tfexp ("setrefk" "(" simple-expression "," simple-expression ")" ";" tfexp) cps-setrefk-exp)
     ))

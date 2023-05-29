@@ -48,6 +48,15 @@
       (print-exp (exp1)
         (cps-of-print-exp exp1 k-exp)
       )
+      (newref-exp (exp1)
+        (cps-of-newref-exp exp1 k-exp)
+      )
+      (deref-exp (exp1)
+        (cps-of-deref-exp exp1 k-exp)
+      )
+      (setref-exp (exp1 exp2)
+        (cps-of-setref-exp exp1 exp2 k-exp)
+      )
       (else (eopl:error 'cps-of-exp "unsupported expression ~s " exp))
       )
     )
@@ -128,6 +137,38 @@
         (cps-printk-exp (first vals)
         ; print-exp returns 38 on purpose
           (make-send-to-cont k-exp (cps-const-exp 38))
+        )
+      )
+    )
+  )
+
+  (define (cps-of-newref-exp exp1 k-exp)
+    (cps-of-exps
+      (list exp1)
+      (lambda (simples)
+        (cps-newrefk-exp (first simples) k-exp)
+      )
+    )
+  )
+
+  (define (cps-of-deref-exp exp1 k-exp)
+    (cps-of-exps
+      (list exp1)
+      (lambda (simples)
+        (cps-derefk-exp (first simples) k-exp)
+      )
+    )
+  )
+
+  (define (cps-of-setref-exp exp1 exp2 k-exp)
+    (cps-of-exps
+      (list exp1 exp2)
+      (lambda (simples)
+        (cps-setrefk-exp
+          (first simples)
+          (second simples)
+          ; returns 23 on purpose
+          (make-send-to-cont k-exp (cps-const-exp 23))
         )
       )
     )
