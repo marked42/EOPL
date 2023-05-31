@@ -30,5 +30,7 @@
     (expression ("newref" "(" expression ")") newref-exp)
     (expression ("deref" "(" expression ")") deref-exp)
     (expression ("setref" "(" expression "," expression")") setref-exp)
+
+    (expression ("begin" (separated-list expression ";") "end") begin-exp)
     )
   )

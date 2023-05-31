@@ -32,6 +32,8 @@
   (newref-exp (exp1 expression?))
   (deref-exp (exp1 expression?))
   (setref-exp (exp1 expression?) (exp2 expression?))
+
+  (begin-exp (exps (list-of expression?)))
   )
 
 (define-datatype program program?
