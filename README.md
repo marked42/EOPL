@@ -1223,3 +1223,9 @@ call-exp 的优化
 ### 6.3 Converting to Continuation-Passing Style
 
 ANF Exercise 6.34
+
+## Chapter 7 Types
+
+type errors & other run time errors (division by zero), non-termination
+
+### 7.1 Value and Their Types
