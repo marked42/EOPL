@@ -19,8 +19,8 @@
   (letrec-exp
    (p-result-type type?)
    (p-name identifier?)
-   (b-var identifier?)
-   (b-var-type type?)
+   (b-vars (list-of identifier?))
+   (b-var-types (list-of type?))
    (p-body expression?)
    (body expression?)
    )
