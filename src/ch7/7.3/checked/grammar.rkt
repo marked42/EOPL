@@ -17,7 +17,7 @@
 
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
-    (expression ("let" identifier "=" expression "in" expression) let-exp)
+    (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
     (expression ("letrec" type identifier "(" (arbno identifier ":" type) ")" "=" expression "in" expression) letrec-exp)
 
     (expression ("proc" "(" (arbno identifier ":" type) ")" expression) proc-exp)

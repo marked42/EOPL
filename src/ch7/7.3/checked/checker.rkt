@@ -99,9 +99,9 @@
               ty2
               )
             )
-    (let-exp (var exp1 body)
-             (let ((exp1-type (type-of exp1 tenv)))
-               (type-of body (extend-tenv (list var) (list exp1-type) tenv))
+    (let-exp (vars exps body)
+             (let ((exp-types (types-of exps tenv)))
+               (type-of body (extend-tenv vars exp-types tenv))
                )
              )
     (proc-exp (vars var-types body)
