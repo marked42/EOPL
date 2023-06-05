@@ -12,8 +12,8 @@
   (zero?-exp (exp1 expression?))
   (if-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
   (let-exp
-   (var identifier?)
-   (exp1 expression?)
+   (vars (list-of identifier?))
+   (exps (list-of expression?))
    (body expression?)
    )
   (letrec-exp
