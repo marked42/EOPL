@@ -5,7 +5,7 @@
 (define-datatype type type?
   (int-type)
   (bool-type)
-  (proc-type (arg-type type?) (result-type type?))
+  (proc-type (arg-types (list-of type?)) (result-type type?))
   )
 
 (define the-grammar
@@ -25,6 +25,6 @@
 
     (type ("int") int-type)
     (type ("bool") bool-type)
-    (type ("(" type "->" type ")") proc-type)
+    (type ("(" (arbno type) "->" type ")") proc-type)
     )
   )
