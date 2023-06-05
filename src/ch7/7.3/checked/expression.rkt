@@ -25,7 +25,7 @@
    (body expression?)
    )
   (proc-exp (vars (list-of identifier?)) (var-types (list-of type?)) (body expression?))
-  (call-exp (rator expression?) (rand expression?))
+  (call-exp (rator expression?) (rands (list-of expression?)))
   )
 
 (define-datatype program program?
