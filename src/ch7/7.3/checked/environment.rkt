@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "basic.rkt")
+(require racket/lazy-require racket/list "basic.rkt")
 (lazy-require
  ["value.rkt" (num-val  expval? proc-val)]
  ["expression.rkt" (expression?)]
@@ -36,18 +36,11 @@
 (define (apply-env env search-var)
   (cases environment env
     (extend-env (vars vals saved-env)
-                (letrec ((loop (lambda (vars vals saved-env)
-                                 (if (null? vars)
-                                     (apply-env saved-env search-var)
-                                     (let ((first-var (car vars)) (first-val (car vals)))
-                                       (if (eqv? first-var search-var)
-                                           first-val
-                                           (loop (cdr vars) (cdr vals) saved-env)
-                                           )
-                                       )
-                                     )
-                                 )))
-                  (loop vars vals saved-env)
+                (let ((index (index-of vars search-var)))
+                  (if index
+                    (list-ref vals index)
+                    (apply-env saved-env search-var)
+                    )
                   )
                 )
     (extend-env-rec (p-name b-vars p-body saved-env)
