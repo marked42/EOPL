@@ -66,7 +66,7 @@
                )
              )
     (letrec-exp (p-result-type p-name b-vars b-var-types p-body body)
-                (let ((new-env (extend-env-rec p-name b-vars p-body env)))
+                (let ((new-env (extend-env-rec (list p-name) (list b-vars) (list p-body) env)))
                   (value-of-exp body new-env)
                   )
                 )
