@@ -20,7 +20,7 @@
     (expression ("let" identifier "=" expression "in" expression) let-exp)
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
-    (expression ("proc" "(" identifier ":" type ")" expression) proc-exp)
+    (expression ("proc" "(" (arbno identifier ":" type) ")" expression) proc-exp)
     (expression ("(" expression expression ")") call-exp)
 
     (type ("int") int-type)
