@@ -1,7 +1,7 @@
 #lang eopl
 
 (require racket/lazy-require "basic.rkt")
-(lazy-require ["value.rkt" (num-val)])
+(lazy-require ["grammar.rkt" (type?)])
 
 (provide (all-defined-out))
 
@@ -17,12 +17,14 @@
    (body expression?)
    )
   (letrec-exp
+   (p-result-type type?)
    (p-name identifier?)
    (b-var identifier?)
+   (b-var-type type?)
    (p-body expression?)
    (body expression?)
    )
-  (proc-exp (var identifier?) (body expression?))
+  (proc-exp (var identifier?) (var-type type?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
   )
 

@@ -2,6 +2,12 @@
 
 (provide (all-defined-out))
 
+(define-datatype type type?
+  (int-type)
+  (bool-type)
+  (proc-type (arg-type type?) (result-type type?))
+  )
+
 (define the-grammar
   '((program (expression) a-program)
     (expression (number) const-exp)
@@ -12,9 +18,13 @@
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
-    (expression ("letrec" identifier "(" identifier ")" "=" expression "in" expression) letrec-exp)
+    (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
-    (expression ("proc" "(" identifier ")" expression) proc-exp)
+    (expression ("proc" "(" identifier ":" type ")" expression) proc-exp)
     (expression ("(" expression expression ")") call-exp)
+
+    (type ("int") int-type)
+    (type ("bool") bool-type)
+    (type ("(" type "->" type ")") proc-type)
     )
   )

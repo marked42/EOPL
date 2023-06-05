@@ -30,12 +30,11 @@
 (equal-answer? (run "x") 10 "built in var i is 10")
 (equal-answer? (run "let a = 1 in -(a, x)") -9 "let exp")
 
-(equal-answer? (run "let f = proc (x) -(x,11) in (f (f 77))") 55 "proc-exp")
-; IIFE
-(equal-answer? (run "(proc (f) (f (f 77)) proc (x) -(x,11))") 55 "proc-exp")
+(equal-answer? (run "let f = proc (x : int) -(x,11) in (f (f 77))") 55 "proc-exp")
+(equal-answer? (run "(proc (f : (int -> int)) (f (f 77)) proc (x : int) -(x,11))") 55 "proc-exp")
 
 (equal-answer? (run "
-letrec double(x)
+letrec int double(x: int)
   = if zero?(x) then 0 else -((double -(x,1)), -2)
     in (double 6)
 ") 12 "letrec-exp")
