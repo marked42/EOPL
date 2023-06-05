@@ -9,16 +9,16 @@
 
 (define-datatype proc proc?
   (procedure
-   (var identifier?)
+   (vars (list-of identifier?))
    (body expression?)
    (saved-env environment?)
    )
   )
 
-(define (apply-procedure proc1 arg)
+(define (apply-procedure proc1 args)
   (cases proc proc1
-    (procedure (var body saved-env)
-               (value-of-exp body (extend-env (list var) (list arg) saved-env))
+    (procedure (vars body saved-env)
+               (value-of-exp body (extend-env vars args saved-env))
                )
     )
   )
