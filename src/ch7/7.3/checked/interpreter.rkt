@@ -8,6 +8,7 @@
                      extend-env
                      extend-env-rec
                      )]
+ ["checker.rkt" (type-of-program)]
  ["procedure.rkt" (apply-procedure procedure)])
 
 (provide (all-defined-out))
@@ -17,6 +18,7 @@
   )
 
 (define (value-of-program prog)
+  (type-of-program prog)
   (cases program prog
     (a-program (exp1) (value-of-exp exp1 (init-env)))
     )
@@ -63,12 +65,12 @@
                (value-of-exp body (extend-env var val env))
                )
              )
-    (letrec-exp (p-name b-var p-body body)
+    (letrec-exp (p-result-type p-name b-var b-var-type p-body body)
                 (let ((new-env (extend-env-rec p-name b-var p-body env)))
                   (value-of-exp body new-env)
                   )
                 )
-    (proc-exp (var body)
+    (proc-exp (var var-type body)
               (proc-val (procedure var body env))
               )
     (call-exp (rator rand)

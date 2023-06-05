@@ -1229,3 +1229,33 @@ ANF Exercise 6.34
 type errors & other run time errors (division by zero), non-termination
 
 ### 7.1 Value and Their Types
+
+### 7.3 CHECKED: A Type-Checked Language
+
+为函数表达式和`letrec`表达式添加类型支持。
+
+```
+proc (Identifier : Type) Expression
+
+letrec Type Identifier (Identifier : Type) = Expression
+  in Expression
+```
+
+支持的类型定义
+
+```
+(define-datatype type type?
+  (int-type)
+  (bool-type)
+  (proc-type (arg-type type?) (result-type type?))
+  )
+```
+
+更新语法定义
+
+更新解释器中函数表达式和`letrec`表达式。
+
+增加`type-of-program`在解释器开始运行时进行类型检查。
+
+1. 7.5
+1. 数据类型 pair (7.8) / list (7.9) / ref (7.10) / mutable-pair (7.11)
