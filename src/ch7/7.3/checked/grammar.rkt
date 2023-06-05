@@ -21,7 +21,7 @@
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
     (expression ("proc" "(" (arbno identifier ":" type) ")" expression) proc-exp)
-    (expression ("(" expression expression ")") call-exp)
+    (expression ("(" expression (arbno expression) ")") call-exp)
 
     (type ("int") int-type)
     (type ("bool") bool-type)

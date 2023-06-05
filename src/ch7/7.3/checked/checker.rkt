@@ -109,13 +109,13 @@
                 (proc-type var-types result-type)
                 )
               )
-    (call-exp (rator rand)
+    (call-exp (rator rands)
               (let ((rator-type (type-of rator tenv))
-                    (rand-type (type-of rand tenv)))
+                    (rand-types (types-of rands tenv)))
                 (cases type rator-type
                   (proc-type (arg-types result-type)
                              (begin
-                               (check-equal-type! arg-types (list rand-type) rand)
+                               (check-equal-type! arg-types rand-types rands)
                                result-type
                                )
                              )
@@ -131,8 +131,13 @@
                     )
                   )
                 )
+    (else (eopl:error 'type-of "unsupported expression type ~s" exp))
     )
   )
+
+(define (types-of exps env)
+  (map (lambda (exp) (type-of exp env)) exps)
+)
 
 (define (check-equal-type! ty1 ty2 exp)
   (if (not (equal? ty1 ty2))
