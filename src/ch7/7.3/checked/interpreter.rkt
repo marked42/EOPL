@@ -62,7 +62,7 @@
              )
     (let-exp (var exp1 body)
              (let ((val (value-of-exp exp1 env)))
-               (value-of-exp body (extend-env var val env))
+               (value-of-exp body (extend-env (list var) (list val) env))
                )
              )
     (letrec-exp (p-result-type p-name b-var b-var-type p-body body)
