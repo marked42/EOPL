@@ -7,7 +7,7 @@
                      apply-env
                      extend-env
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool)]
+ ["value.rkt" (num-val expval->num)]
  )
 
 (provide (all-defined-out))
@@ -39,18 +39,22 @@
                (let ([val (value-of-exp exp1 env)])
                  (let ([num (expval->num val)])
                    (if (zero? num)
-                       (bool-val #t)
-                       (bool-val #f)
+                       ; treat 0 as false, other values as true
+                       (num-val 1)
+                       (num-val 0)
                        )
                    )
                  )
                )
     (if-exp (exp1 exp2 exp3)
             (let ([val1 (value-of-exp exp1 env)])
-              (if (expval->bool val1)
-                  (value-of-exp exp2 env)
-                  (value-of-exp exp3 env)
-                  )
+              (let ([num (expval->num val1)])
+                ; treat 0 as false, other values as true
+                (if (not (= num 0))
+                    (value-of-exp exp2 env)
+                    (value-of-exp exp3 env)
+                    )
+                )
               )
             )
     (let-exp (var exp1 body)
