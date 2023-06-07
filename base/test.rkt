@@ -95,3 +95,9 @@ letrec double(x)
    test-cases-letrec-exp
    )
   )
+
+(define test-cases-minus-exp
+  (list
+   (list "minus(-(minus(5), 9))" 14 "minus-exp")
+   )
+  )
