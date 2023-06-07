@@ -10,7 +10,6 @@
 
 (define-datatype expval expval?
   (num-val (num number?))
-  (bool-val (bool boolean?))
   )
 
 (define (expval->num val)
@@ -20,18 +19,10 @@
     )
   )
 
-(define (expval->bool val)
-  (cases expval val
-    (bool-val (bool) bool)
-    (else (report-expval-extractor-error 'bool val))
-    )
-  )
-
 (define sloppy->expval
   (lambda (sloppy-val)
     (cond
       ((number? sloppy-val) (num-val sloppy-val))
-      ((boolean? sloppy-val) (bool-val sloppy-val))
       (else
        (eopl:error 'sloppy->expval
                    "Can't convert sloppy value to expval: ~s"
