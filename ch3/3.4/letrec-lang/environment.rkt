@@ -1,8 +1,9 @@
 #lang eopl
 
-(require racket/lazy-require)
+(require racket/lazy-require "expression.rkt")
 (lazy-require
- ["value.rkt" (num-val expval?)]
+ ["value.rkt" (num-val expval? proc-val)]
+ ["procedure.rkt" (procedure)]
  )
 (provide (all-defined-out))
 
@@ -11,6 +12,12 @@
   (extend-env
    (var symbol?)
    (val expval?)
+   (saved-env environment?)
+   )
+  (extend-env-rec
+   (p-name symbol?)
+   (b-var symbol?)
+   (p-body expression?)
    (saved-env environment?)
    )
   )
@@ -33,6 +40,15 @@
                     (apply-env saved-env search-var)
                     )
                 )
+    (extend-env-rec (p-name b-var p-body saved-env)
+                    (if (eqv? search-var p-name)
+                        ; procedure env is extend-env-rec itself which contains procedure
+                        ; when procedure is called, procedure body is evaluated in this extend-env-rec
+                        ; where procedure is visible, which enables recursive call
+                        (proc-val (procedure b-var p-body env))
+                        (apply-env saved-env search-var)
+                        )
+                    )
     (else (report-no-binding-found search-var))
     )
   )
