@@ -24,6 +24,13 @@
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
+
+    ; new stuff
+    (expression ("cons" "(" expression "," expression ")") cons-exp)
+    (expression ("car" "(" expression ")") car-exp)
+    (expression ("cdr" "(" expression ")") cdr-exp)
+    (expression ("emptylist") emptylist-exp)
+    (expression ("null?" "(" expression ")") null?-exp)
     )
   )
 

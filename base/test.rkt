@@ -122,3 +122,19 @@ letrec double(x)
    (list "less?(3, 4)" #t "less?-exp")
    )
   )
+
+(define test-cases-list-v1-exp
+  (list
+   (list "emptylist" '() "emptylist-exp")
+   (list "cons(1, 2)" (cons 1 2) "cons-exp")
+
+   (list "null?(emptylist)" #t "null?-exp")
+   (list "null?(cons(1, 2))" #f "null?-exp")
+
+   (list "car(cons(1, 2))" 1 "car-exp")
+   (list "car(emptylist)" '() "car-exp")
+
+   (list "cdr(cons(1, 2))" 2 "cdr-exp")
+   (list "cdr(emptylist)" '() "cdr-exp")
+   )
+  )
