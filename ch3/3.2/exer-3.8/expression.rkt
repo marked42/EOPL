@@ -13,6 +13,11 @@
    (exp1 expression?)
    (body expression?)
    )
+
+  ; new stuff
+  (equal?-exp (exp1 expression?) (exp2 expression?))
+  (greater?-exp (exp1 expression?) (exp2 expression?))
+  (less?-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
