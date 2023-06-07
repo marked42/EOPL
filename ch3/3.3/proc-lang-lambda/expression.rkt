@@ -13,6 +13,8 @@
    (exp1 expression?)
    (body expression?)
    )
+  (proc-exp (var symbol?) (body expression?))
+  (call-exp (rator expression?) (rand expression?))
   )
 
 (define-datatype program program?

@@ -7,7 +7,8 @@
                      apply-env
                      extend-env
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["procedure.rkt" (procedure apply-procedure)]
  )
 
 (provide (all-defined-out))
@@ -58,6 +59,16 @@
                (value-of-exp body (extend-env var val env))
                )
              )
+    (proc-exp (var body)
+              (proc-val (procedure var body env))
+              )
+    (call-exp (rator rand)
+              (let ((rator-val (value-of-exp rator env)) (rand-val (value-of-exp rand env)))
+                (let ((proc1 (expval->proc rator-val)))
+                  (apply-procedure proc1 rand-val)
+                  )
+                )
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
