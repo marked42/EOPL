@@ -148,3 +148,10 @@ letrec double(x)
     )
    )
   )
+
+(define test-cases-cond-exp
+  (list
+   (list "cond zero?(1) ==> 1 zero?(0) ==> 0 end" 0 "cond-exp")
+   (list "cond zero?(0) ==> 0 zero?(1) ==> 1 end" 0 "cond-exp")
+   )
+  )
