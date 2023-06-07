@@ -54,13 +54,6 @@
    )
   )
 
-(define test-cases-proc-exp
-  (list
-   (list "let f = proc (x) -(x,11) in (f (f 77))" 55 "proc-exp")
-   (list "(proc (f) (f (f 77)) proc (x) -(x,11))" 55 "proc-exp")
-   )
-  )
-
 (define test-cases-let-lang
   (append
    test-cases-const-exp
@@ -72,9 +65,33 @@
    )
   )
 
+(define test-cases-proc-exp
+  (list
+   (list "let f = proc (x) -(x,11) in (f (f 77))" 55 "proc-exp")
+   (list "(proc (f) (f (f 77)) proc (x) -(x,11))" 55 "proc-exp")
+   )
+  )
+
 (define test-cases-proc-lang
   (append
    test-cases-let-lang
    test-cases-proc-exp
+   )
+  )
+
+(define test-cases-letrec-exp
+  (list
+   (list "
+letrec double(x)
+  = if zero?(x) then 0 else -((double -(x,1)), -2)
+    in (double 6)
+" 12 "letrec-exp")
+   )
+  )
+
+(define test-cases-letrec-lang
+  (append
+   test-cases-proc-lang
+   test-cases-letrec-exp
    )
   )
