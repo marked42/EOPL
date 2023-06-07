@@ -13,6 +13,7 @@
    (exp1 expression?)
    (body expression?)
    )
+  (minus-exp (exp1 expression?))
   )
 
 (define-datatype program program?

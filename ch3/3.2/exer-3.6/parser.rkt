@@ -24,6 +24,8 @@
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
+
+    (expression ("minus" "(" expression  ")") minus-exp)
     )
   )
 
