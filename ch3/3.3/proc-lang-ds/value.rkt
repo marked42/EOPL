@@ -1,6 +1,9 @@
 #lang eopl
 
-(require "expression.rkt")
+(require racket/lazy-require "expression.rkt")
+(lazy-require
+ ["procedure.rkt" (proc?)]
+ )
 
 (provide (all-defined-out))
 
@@ -11,6 +14,7 @@
 (define-datatype expval expval?
   (num-val (num number?))
   (bool-val (bool boolean?))
+  (proc-val (proc1 proc?))
   )
 
 (define (expval->num val)
@@ -26,6 +30,14 @@
     (else (report-expval-extractor-error 'bool val))
     )
   )
+
+(define (expval->proc val)
+  (cases expval val
+    (proc-val (proc1) proc1)
+    (else (report-expval-extractor-error 'proc val))
+    )
+  )
+
 
 (define sloppy->expval
   (lambda (sloppy-val)
