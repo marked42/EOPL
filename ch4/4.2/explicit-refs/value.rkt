@@ -3,6 +3,7 @@
 (require racket/lazy-require "expression.rkt")
 (lazy-require
  ["procedure.rkt" (proc?)]
+ ["store.rkt" (reference?)]
  )
 
 (provide (all-defined-out))
@@ -15,6 +16,7 @@
   (num-val (num number?))
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
+  (ref-val (ref reference?))
   )
 
 (define (expval->num val)
@@ -38,6 +40,12 @@
     )
   )
 
+(define (expval->ref val)
+  (cases expval val
+    (ref-val (ref) ref)
+    (else (eopl:error "expect a ref, get ~s" val))
+    )
+  )
 
 (define sloppy->expval
   (lambda (sloppy-val)
