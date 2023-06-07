@@ -24,6 +24,11 @@
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
+
+    ; new stuff
+    (expression ("+" "(" expression "," expression ")") sum-exp)
+    (expression ("*" "(" expression "," expression ")") mul-exp)
+    (expression ("/" "(" expression "," expression ")") div-exp)
     )
   )
 
