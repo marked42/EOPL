@@ -13,6 +13,12 @@
    (exp1 expression?)
    (body expression?)
    )
+
+  ; new stuff
+  (cond-exp
+   (conds (list-of expression?))
+   (acts (list-of expression?))
+   )
   )
 
 (define-datatype program program?

@@ -24,6 +24,9 @@
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
+
+    ; new stuff
+    (expression ("cond" (arbno expression "==>" expression) "end") cond-exp)
     )
   )
 
