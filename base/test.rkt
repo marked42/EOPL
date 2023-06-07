@@ -101,3 +101,11 @@ letrec double(x)
    (list "minus(-(minus(5), 9))" 14 "minus-exp")
    )
   )
+
+(define test-cases-arithmetic
+  (list
+   (list "+(1, 2)" 3 "sum exp")
+   (list "*(2, 3)" 6 "mul-exp")
+   (list "/(4, 2)" 2 "div-exp")
+   )
+  )

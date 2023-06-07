@@ -13,6 +13,11 @@
    (exp1 expression?)
    (body expression?)
    )
+
+  ; new stuff
+  (sum-exp (exp1 expression?) (exp2 expression?))
+  (mul-exp (exp1 expression?) (exp2 expression?))
+  (div-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
