@@ -6,37 +6,28 @@
  )
 (provide (all-defined-out))
 
-(define-datatype environment environment?
-  (empty-env)
-  (extend-env
-   (var symbol?)
-   (val expval?)
-   (saved-env environment?)
-   )
-  )
+(define (empty-nameless-env) '())
 
-(define (init-env)
-  (extend-env 'i (num-val 1)
-              (extend-env 'v (num-val 5)
-                          (extend-env 'x (num-val 10)
-                                      (empty-env)
+(define (extend-namless-env val saved-env)
+  (cons val saved-env)
+)
+
+(define (nameless-environment? env) ((list-of expval?) env))
+
+(define (init-nameless-env)
+  (extend-namless-env (num-val 1)
+              (extend-namless-env (num-val 5)
+                          (extend-namless-env (num-val 10)
+                                      (empty-nameless-env)
                                       )
                           )
               )
   )
 
-(define (apply-env env search-var)
-  (cases environment env
-    (extend-env (var val saved-env)
-                (if (eqv? search-var var)
-                    val
-                    (apply-env saved-env search-var)
-                    )
-                )
-    (else (report-no-binding-found search-var))
-    )
+(define (apply-nameless-env env offset)
+  (list-ref env offset)
   )
 
 (define (report-no-binding-found var)
-  (eopl:error 'apply-env "No binding for ~s" var)
+  (eopl:error 'apply-nameless-env "No binding for ~s" var)
   )
