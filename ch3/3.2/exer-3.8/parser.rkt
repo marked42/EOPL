@@ -24,6 +24,11 @@
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
+
+    ; new stuff
+    (expression ("equal?" "(" expression "," expression ")") equal?-exp)
+    (expression ("greater?" "(" expression "," expression ")") greater?-exp)
+    (expression ("less?" "(" expression "," expression ")") less?-exp)
     )
   )
 

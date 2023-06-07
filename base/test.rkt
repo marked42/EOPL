@@ -109,3 +109,16 @@ letrec double(x)
    (list "/(4, 2)" 2 "div-exp")
    )
   )
+
+(define test-cases-comparison
+  (list
+   (list "equal?(4, 2)" #f "equal?-exp")
+   (list "equal?(2, 2)" #t "equal?-exp")
+   (list "greater?(3, 2)" #t "greater?-exp")
+   (list "greater?(3, 3)" #f "greater?-exp")
+   (list "greater?(3, 4)" #f "greater?-exp")
+   (list "less?(3, 2)" #f "less?-exp")
+   (list "less?(3, 3)" #f "less?-exp")
+   (list "less?(3, 4)" #t "less?-exp")
+   )
+  )
