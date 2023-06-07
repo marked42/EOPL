@@ -171,4 +171,32 @@ letrec double(x) = if zero?(x) then 0 else -((double -(x,1)), -2)
    test-cases-letrec-lang
    test-cases-letrec-exp-with-multiple-declarartions
    )
-)
+  )
+
+(define test-cases-ref-exp
+  (list
+   (list "
+    let a = newref(43)
+      in let b = newref(42)
+        in -(deref(a), deref(b))
+    " 1 "deref retrieves value of a ref")
+
+   (list "
+    let a = newref(42)
+      in let b = setref(a, 43)
+        in deref(a)
+    " 43 "setref! updates value of a ref")
+
+   (list "
+    let a = newref(42)
+      in setref(a, 43)
+    " 23 "setref returns an arbitrary number 2")
+   )
+  )
+
+(define test-cases-explicit-refs
+  (append
+   test-cases-letrec-lang
+   test-cases-ref-exp
+   )
+  )

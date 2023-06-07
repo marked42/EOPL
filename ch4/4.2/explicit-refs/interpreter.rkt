@@ -8,8 +8,9 @@
                      extend-env
                      extend-env-rec
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc ref-val expval->ref)]
  ["procedure.rkt" (procedure apply-procedure)]
+ ["store.rkt" (initialize-store! newref deref setref!)]
  )
 
 (provide (all-defined-out))
@@ -19,6 +20,7 @@
   )
 
 (define (value-of-program prog)
+  (initialize-store!)
   (cases program prog
     (a-program (exp1) (value-of-exp exp1 (init-env)))
     )
@@ -73,6 +75,25 @@
     (letrec-exp (p-name b-var p-body body)
                 (let ((new-env (extend-env-rec p-name b-var p-body env)))
                   (value-of-exp body new-env)
+                  )
+                )
+
+    ; new stuff
+    (newref-exp (exp1)
+                (ref-val (newref (value-of-exp exp1 env)))
+                )
+    (deref-exp (exp1)
+               (let ([ref (expval->ref (value-of-exp exp1 env))])
+                 (deref ref)
+                 )
+               )
+    (setref-exp (exp1 exp2)
+                (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                  (let ([ref1 (expval->ref val1)])
+                    (setref! ref1 val2)
+                    ; return an arbitrary val since we don't care the return value of setref!
+                    (num-val 23)
+                    )
                   )
                 )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))

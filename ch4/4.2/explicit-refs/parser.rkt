@@ -29,6 +29,11 @@
     (expression ("("expression expression")" ) call-exp)
 
     (expression ("letrec" identifier "(" identifier ")" "=" expression "in" expression) letrec-exp)
+
+    ; new stuff
+    (expression ("newref" "(" expression ")") newref-exp)
+    (expression ("deref" "(" expression ")") deref-exp)
+    (expression ("setref" "(" expression "," expression")") setref-exp)
     )
   )
 
