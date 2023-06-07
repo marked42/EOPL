@@ -3,30 +3,32 @@
 (require racket/lazy-require "parser.rkt" "expression.rkt")
 (lazy-require
  ["environment.rkt" (
-                     init-env
-                     apply-env
-                     extend-env
+                     init-nameless-env
+                     apply-nameless-env
+                     extend-namless-env
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
+ ["translator.rkt" (translation-of-program)]
  )
 
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program (scan&parse str))
+  (let ([translated-prog (translation-of-program (scan&parse str))])
+    (value-of-program translated-prog)
+  )
   )
 
 (define (value-of-program prog)
   (cases program prog
-    (a-program (exp1) (value-of-exp exp1 (init-env)))
+    (a-program (exp1) (value-of-exp exp1 (init-nameless-env)))
     )
   )
 
 (define (value-of-exp exp env)
   (cases expression exp
     (const-exp (num) (num-val num))
-    (var-exp (var) (apply-env env var))
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -54,20 +56,23 @@
                   )
               )
             )
-    (let-exp (var exp1 body)
-             (let ([val (value-of-exp exp1 env)])
-               (value-of-exp body (extend-env var val env))
-               )
-             )
-    (proc-exp (var body)
-              (proc-val (procedure var body env))
-              )
     (call-exp (rator rand)
               (let ((rator-val (value-of-exp rator env)) (rand-val (value-of-exp rand env)))
                 (let ((proc1 (expval->proc rator-val)))
                   (apply-procedure proc1 rand-val)
                   )
                 )
+              )
+
+    ; new stuff
+    (nameless-var-exp (num) (apply-nameless-env env num))
+    (nameless-let-exp (exp1 body)
+             (let ([val (value-of-exp exp1 env)])
+               (value-of-exp body (extend-namless-env val env))
+               )
+             )
+    (nameless-proc-exp (body)
+              (proc-val (procedure body env))
               )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )

@@ -27,6 +27,11 @@
 
     (expression ("proc" "(" identifier ")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
+
+    ; new stuff
+    (expression ("%lexref" number) nameless-var-exp)
+    (expression ("%let" expression "in" expression) nameless-let-exp)
+    (expression ("%lexproc" expression) nameless-proc-exp)
     )
   )
 
