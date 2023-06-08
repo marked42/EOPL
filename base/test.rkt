@@ -311,3 +311,22 @@ letrec infinite-loop (x) = (infinite-loop -(x,-1))
     test-cases-call-by-name
   )
 )
+
+(define test-cases-checked
+  (list
+    (list "let f = proc (x : int) -(x,11) in (f (f 77))" 55 "proc-exp")
+    (list "(proc (f : (int -> int)) (f (f 77)) proc (x : int) -(x,11))" 55 "proc-exp")
+    (list "
+letrec int double(x: int)
+  = if zero?(x) then 0 else -((double -(x,1)), -2)
+    in (double 6)
+" 12 "letrec-exp")
+  )
+)
+
+(define test-cases-checked-lang
+  (append
+    test-cases-let-lang
+    test-cases-checked
+  )
+)
