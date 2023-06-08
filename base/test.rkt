@@ -155,3 +155,20 @@ letrec double(x)
    (list "cond zero?(0) ==> 0 zero?(1) ==> 1 end" 0 "cond-exp")
    )
   )
+
+(define test-cases-letrec-exp-with-multiple-declarartions
+  (list
+   (list "
+letrec double(x) = if zero?(x) then 0 else -((double -(x,1)), -2)
+       triple(x) = if zero?(x) then 0 else -((triple -(x,1)), -3)
+    in (triple (double 6))
+" 36 "letrec-exp with multiple declarations")
+   )
+  )
+
+(define test-cases-letrec-lang-with-multiple-declarations
+  (append
+   test-cases-letrec-lang
+   test-cases-letrec-exp-with-multiple-declarartions
+   )
+)
