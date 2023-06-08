@@ -33,10 +33,13 @@
     (const-exp (num) (num-val num))
     ; new stuff
     (var-exp (var)
-      (let ([val (deref (apply-env env var))])
+      (let* ([ref (apply-env env var)] [val (deref val)])
         (if (expval? val)
           val
-          (value-of-thunk val)
+          (let ([thunk-val (value-of-thunk val)])
+            (setref! ref thunk-val)
+            thunk-val
+          )
         )
       )
     )
