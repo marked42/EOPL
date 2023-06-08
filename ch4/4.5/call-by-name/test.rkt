@@ -4,4 +4,4 @@
 (require "value.rkt")
 (require "../../../base/test.rkt")
 
-(test-lang run sloppy->expval test-cases-call-by-reference-lang)
+(test-lang run sloppy->expval test-cases-call-by-name-lang)
