@@ -200,3 +200,16 @@ letrec double(x) = if zero?(x) then 0 else -((double -(x,1)), -2)
    test-cases-ref-exp
    )
   )
+
+(define test-cases-begin-exp
+  (list
+   (list "begin 1; 2; 3 end" 3 "begin-exp")
+   )
+  )
+
+(define test-cases-implicit-refs-lang
+  (append
+   test-cases-letrec-lang-with-multiple-declarations
+   test-cases-begin-exp
+   )
+  )
