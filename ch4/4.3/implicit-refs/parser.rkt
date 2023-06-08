@@ -31,6 +31,9 @@
     (expression ("letrec" (arbno identifier "(" identifier ")" "=" expression) "in" expression) letrec-exp)
 
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
+
+    ; new stuff
+    (expression ("set" identifier "=" expression) assign-exp)
     )
   )
 

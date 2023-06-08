@@ -4,4 +4,4 @@
 (require "value.rkt")
 (require "../../../base/test.rkt")
 
-(test-lang run sloppy->expval test-cases-letrec-lang-with-multiple-declarations)
+(test-lang run sloppy->expval test-cases-implicit-refs-lang)
