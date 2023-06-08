@@ -3,6 +3,7 @@
 (require racket/lazy-require "expression.rkt")
 (lazy-require
  ["procedure.rkt" (proc?)]
+ ["pair.rkt" (mutpair?)]
  )
 
 (provide (all-defined-out))
@@ -15,6 +16,7 @@
   (num-val (num number?))
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
+  (pair-val (p mutpair?))
   )
 
 (define (expval->num val)
@@ -38,6 +40,12 @@
     )
   )
 
+(define (expval->pair val)
+  (cases expval val
+    (pair-val (p) p)
+    (else (report-expval-extractor-error 'pair val))
+    )
+  )
 
 (define sloppy->expval
   (lambda (sloppy-val)

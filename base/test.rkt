@@ -237,3 +237,23 @@ let x = 0
    test-cases-implicit-refs
    )
   )
+
+(define test-cases-mutable-pair-exp
+  (list
+   (list "
+let glo = pair(11,22)
+  in let f = proc (loc)
+              let d1 = setright(loc, left(loc))
+                 in let d2 = setleft(glo, 99)
+                    in -(left(loc),right(loc))
+      in (f glo)
+      " 88 "mutable-pair")
+   )
+  )
+
+(define test-cases-mutable-pair-lang
+  (append
+   test-cases-implicit-refs-lang
+   test-cases-mutable-pair-exp
+   )
+  )
