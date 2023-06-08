@@ -19,8 +19,14 @@
 
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
 
-  ; new stuff
   (assign-exp (var symbol?) (exp1 expression?))
+
+  ; new stuff
+  (newpair-exp (exp1 expression?) (exp2 expression?))
+  (left-exp (exp1 expression?))
+  (right-exp (exp1 expression?))
+  (setleft-exp (exp1 expression?) (exp2 expression?))
+  (setright-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
