@@ -18,6 +18,9 @@
   (letrec-exp (p-names (list-of symbol?)) (b-vars (list-of symbol?)) (p-bodies (list-of expression?)) (body expression?))
 
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
+
+  ; new stuff
+  (assign-exp (var symbol?) (exp1 expression?))
   )
 
 (define-datatype program program?

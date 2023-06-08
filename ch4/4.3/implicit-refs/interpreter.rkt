@@ -10,6 +10,7 @@
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
+ ["store.rkt" (initialize-store! newref deref setref!)]
  )
 
 (provide (all-defined-out))
@@ -19,6 +20,8 @@
   )
 
 (define (value-of-program prog)
+  ; new stuff
+  (initialize-store!)
   (cases program prog
     (a-program (exp1) (value-of-exp exp1 (init-env)))
     )
@@ -27,7 +30,8 @@
 (define (value-of-exp exp env)
   (cases expression exp
     (const-exp (num) (num-val num))
-    (var-exp (var) (apply-env env var))
+    ; new stuff
+    (var-exp (var) (deref (apply-env env var)))
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -57,7 +61,8 @@
             )
     (let-exp (var exp1 body)
              (let ([val (value-of-exp exp1 env)])
-               (value-of-exp body (extend-env var val env))
+               ; new stuff
+               (value-of-exp body (extend-env var (newref val) env))
                )
              )
     (proc-exp (var body)
@@ -75,8 +80,6 @@
                   (value-of-exp body new-env)
                   )
                 )
-
-    ; new stuff
     (begin-exp (exp1 exps)
                (let value-of-begin-exps ([exps (cons exp1 exps)])
                  (if (null? exps)
@@ -93,6 +96,12 @@
                      )
                  )
                )
+    ; new stuff
+    (assign-exp (var exp1)
+                (let ([val1 (value-of-exp exp1 env)])
+                  (setref! (apply-env env var) val1)
+                  )
+                )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
