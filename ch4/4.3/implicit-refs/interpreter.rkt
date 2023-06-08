@@ -75,6 +75,24 @@
                   (value-of-exp body new-env)
                   )
                 )
+
+    ; new stuff
+    (begin-exp (exp1 exps)
+               (let value-of-begin-exps ([exps (cons exp1 exps)])
+                 (if (null? exps)
+                     (eopl:error 'value-of-exp "begin expression should have at lease one expression")
+                     (let ((first-exp (car exps)) (rest-exps (cdr exps)))
+                       ; always calculate first exp cause it may has side effects
+                       (let ((first-val (value-of-exp first-exp env)))
+                         (if (null? rest-exps)
+                             first-val
+                             (value-of-begin-exps rest-exps)
+                             )
+                         )
+                       )
+                     )
+                 )
+               )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
