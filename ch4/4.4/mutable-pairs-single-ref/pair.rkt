@@ -8,33 +8,36 @@
 (provide (all-defined-out))
 
 (define-datatype mutpair mutpair?
-  (a-pair (left-loc reference?) (right-loc reference?))
+  (a-pair (ref reference?))
   )
 
 (define (make-pair val1 val2)
-  (a-pair (newref val1) (newref val2))
+  (let ([ref (newref val1)])
+    (newref val2)
+    (a-pair ref)
+    )
   )
 
 (define (left pair)
   (cases mutpair pair
-    (a-pair (left-loc right-loc) (deref left-loc))
+    (a-pair (ref) (deref ref))
     )
   )
 
 (define (right pair)
   (cases mutpair pair
-    (a-pair (left-loc right-loc) (deref right-loc))
+    (a-pair (ref) (deref (+ 1 ref)))
     )
   )
 
 (define (set-left! pair val)
   (cases mutpair pair
-    (a-pair (left-loc right-loc) (setref! left-loc val))
+    (a-pair (ref) (setref! ref val))
     )
   )
 
 (define (set-right! pair val)
   (cases mutpair pair
-    (a-pair (left-loc right-loc) (setref! right-loc val))
+    (a-pair (ref) (setref! (+ 1 ref) val))
     )
   )
