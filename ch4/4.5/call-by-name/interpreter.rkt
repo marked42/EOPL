@@ -8,9 +8,10 @@
                      extend-env
                      extend-env-rec*
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc expval?)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref!)]
+ ["thunk.rkt" (a-thunk value-of-thunk)]
  )
 
 (provide (all-defined-out))
@@ -31,7 +32,14 @@
   (cases expression exp
     (const-exp (num) (num-val num))
     ; new stuff
-    (var-exp (var) (deref (apply-env env var)))
+    (var-exp (var)
+      (let ([val (deref (apply-env env var))])
+        (if (expval? val)
+          val
+          (value-of-thunk val)
+        )
+      )
+    )
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -109,6 +117,7 @@
 (define (value-of-operand rand env)
   (cases expression rand
     (var-exp (var) (apply-env env var))
-    (else (newref (value-of-exp rand env)))
+    ; new stuff
+    (else (newref (a-thunk rand env)))
     )
   )

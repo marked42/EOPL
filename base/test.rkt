@@ -293,3 +293,21 @@ let swap = proc (x) proc (y) let temp = x
    test-cases-call-by-reference
    )
   )
+
+(define test-cases-call-by-name
+  (list
+    (list "
+letrec infinite-loop (x) = (infinite-loop -(x,-1))
+  in let f = proc (z) 11
+    in (f (infinite-loop 0))
+" 11 "call-by-name allows infinite loop by lazy evaluation"
+    )
+  )
+)
+
+(define test-cases-call-by-name-lang
+  (append
+    test-cases-call-by-reference-lang
+    test-cases-call-by-name
+  )
+)
