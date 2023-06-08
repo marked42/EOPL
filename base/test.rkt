@@ -257,3 +257,39 @@ let glo = pair(11,22)
    test-cases-mutable-pair-exp
    )
   )
+
+(define test-cases-call-by-reference
+  (list
+   (list "
+let p = proc (x) set x = 4
+      in let a = 3
+         in begin (p a); a end
+    " 4 "call-by-reference")
+   (list "
+  let f = proc (x) set x = 44 in let g = proc (y) (f y)
+        in let z = 55
+          in begin (g z); z end
+   " 44 "call-by-reference")
+
+   (list "
+let swap = proc (x) proc (y) let temp = x
+                  in begin
+                      set x = y;
+                      set y = temp
+                     end
+      in let a = 33
+         in let b = 44
+            in begin
+                ((swap a) b);
+                -(a,b)
+            end
+  " 11 "swap two values under call by reference")
+   )
+  )
+
+(define test-cases-call-by-reference-lang
+  (append
+   test-cases-implicit-refs-lang
+   test-cases-call-by-reference
+   )
+  )

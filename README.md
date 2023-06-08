@@ -212,6 +212,16 @@ let swap = proc (x, y)
 -(arrayref(a, 0), arrayref(a, 1))
 ```
 
+### call-by-reference
+
+> If an operand is simply a vari- able reference, a reference to the variable’s location is passed. The formal parameter of the procedure is then bound to this location. If the operand is some other kind of expression, then the formal parameter is bound to a new location containing the value of the operand, just as in call-by-value.
+
+```
+let p = proc (x) set x = 4
+      in let a = 3
+         in begin (p a); a end
+```
+
 ### call-by-value-result
 
 这是`call-by-reference`的一个变种，实现的效果也是函数的执行会对传入的数据产生副作用。
