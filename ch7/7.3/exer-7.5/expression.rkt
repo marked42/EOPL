@@ -10,8 +10,8 @@
   (zero?-exp (exp1 expression?))
   (if-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
   (let-exp
-   (var symbol?)
-   (exp1 expression?)
+   (vars (list-of symbol?))
+   (exps (list-of expression?))
    (body expression?)
    )
   (proc-exp (var symbol?) (var-type type?) (body expression?))
