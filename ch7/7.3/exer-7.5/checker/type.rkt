@@ -7,20 +7,23 @@
 (define-datatype type type?
   (int-type)
   (bool-type)
-  (proc-type (arg-type type?) (result-type type?))
+  (proc-type (arg-type (list-of type?)) (result-type type?))
   )
 
 (define (type-to-external-form ty)
-  (cases type ty
-    (int-type () 'int)
-    (bool-type () 'bool)
-    (proc-type (arg-type result-type)
-               (list (type-to-external-form arg-type)
-                     '->
-                     (type-to-external-form result-type)
-                     )
-               )
-    )
+  (if (list? ty)
+      (map type-to-external-form ty)
+      (cases type ty
+        (int-type () 'int)
+        (bool-type () 'bool)
+        (proc-type (arg-types result-type)
+                   (list (type-to-external-form arg-types)
+                         '->
+                         (type-to-external-form result-type)
+                         )
+                   )
+        )
+      )
   )
 
 (define (report-unequal-types ty1 ty2 exp)

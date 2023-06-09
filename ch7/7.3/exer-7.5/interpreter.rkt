@@ -11,6 +11,7 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
+ ["typed-var.rkt" (typed-vars->vars)]
  )
 
 (provide (all-defined-out))
@@ -62,13 +63,13 @@
                (value-of-exp body (extend-env* vars vals env))
                )
              )
-    (proc-exp (var var-type body)
-              (proc-val (procedure (list var) body env))
+    (proc-exp (typed-vars body)
+              (proc-val (procedure (typed-vars->vars typed-vars) body env))
               )
-    (call-exp (rator rand)
-              (let ([rator-val (value-of-exp rator env)] [rand-val (value-of-exp rand env)])
+    (call-exp (rator rands)
+              (let ([rator-val (value-of-exp rator env)] [rand-vals (value-of-exps rands env)])
                 (let ([proc1 (expval->proc rator-val)])
-                  (apply-procedure proc1 rand-val)
+                  (apply-procedure proc1 rand-vals)
                   )
                 )
               )

@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "../expression.rkt" "type-environment.rkt")
+(require "type.rkt" "../expression.rkt" "type-environment.rkt" "../typed-var.rkt")
 
 (provide (all-defined-out))
 
@@ -42,18 +42,20 @@
                (type-of body (extend-tenv* vars var-types tenv))
                )
              )
-    (proc-exp (var var-type body)
-              (let ([result-type (type-of body (extend-tenv* (list var) (list var-type) tenv))])
-                (proc-type var-type result-type)
+    (proc-exp (typed-vars body)
+              (let ([vars (typed-vars->vars typed-vars)] [var-types (typed-vars->types typed-vars)])
+                (let ([result-type (type-of body (extend-tenv* vars var-types tenv))])
+                  (proc-type var-types result-type)
+                  )
                 )
               )
-    (call-exp (rator rand)
+    (call-exp (rator rands)
               (let ([rator-type (type-of rator tenv)]
-                    [rand-type (type-of rand tenv)])
+                    [rand-types (type-of-exps rands tenv)])
                 (cases type rator-type
                   (proc-type (arg-type result-type)
                              (begin
-                               (check-equal-type! arg-type rand-type rand)
+                               (check-equal-type! arg-type rand-types rands)
                                result-type
                                )
                              )
@@ -62,7 +64,7 @@
                 )
               )
     (letrec-exp (p-result-type p-name b-var b-var-type p-body letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type b-var-type p-result-type)) tenv)])
+                (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type (list b-var-type) p-result-type)) tenv)])
                   (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body))])
                     (check-equal-type! p-body-type p-result-type p-body)
                     (type-of letrec-body tenv-for-letrec-body)
