@@ -30,7 +30,7 @@
     (expression ("proc" "("(separated-list typed-var ",") ")" expression) proc-exp)
     (expression ("("expression (arbno expression)")" ) call-exp)
 
-    (expression ("letrec" type identifier "(" typed-var ")" "=" expression "in" expression) letrec-exp)
+    (expression ("letrec" type identifier "("(separated-list typed-var ",")")" "=" expression "in" expression) letrec-exp)
 
     (typed-var (identifier ":" type) a-typed-var)
 
