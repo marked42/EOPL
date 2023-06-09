@@ -18,7 +18,9 @@
   (call-exp (rator expression?) (rand expression?))
   (letrec-exp (p-result-type type?) (p-name symbol?) (b-var symbol?) (b-var-type type?) (p-body expression?) (body expression?))
 
+  ; new stuff
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
+  (assign-exp (var symbol?) (exp1 expression?))
   )
 
 (define-datatype program program?
