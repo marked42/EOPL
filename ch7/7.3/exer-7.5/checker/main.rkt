@@ -63,12 +63,10 @@
                   )
                 )
               )
-    (letrec-exp (p-result-type p-name b-typed-vars p-body letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type (typed-vars->types b-typed-vars) p-result-type)) tenv)])
-                  (let ([p-body-type (type-of p-body (extend-tenv* (typed-vars->vars b-typed-vars) (typed-vars->types b-typed-vars) tenv-for-letrec-body))])
-                    (check-equal-type! p-body-type p-result-type p-body)
-                    (type-of letrec-body tenv-for-letrec-body)
-                    )
+    (letrec-exp (p-result-types p-names b-typed-vars-list p-bodies letrec-body)
+                (let ([tenv-for-letrec-body (extend-tenv* p-names (get-proc-types b-typed-vars-list p-result-types) tenv)])
+                  (check-p-body-types p-result-types b-typed-vars-list p-bodies tenv-for-letrec-body)
+                  (type-of letrec-body tenv-for-letrec-body)
                   )
                 )
     )
@@ -80,4 +78,21 @@
 
 (define (type-of-exps exps tenv)
   (map (lambda (exp) (type-of exp tenv)) exps)
+  )
+
+(define (get-proc-types b-typed-vars-list p-result-types)
+  (map (lambda (b-typed-vars p-result-type) (proc-type (typed-vars->types b-typed-vars) p-result-type)) b-typed-vars-list p-result-types)
+  )
+
+(define (check-p-body-types p-result-types b-typed-vars-list p-bodies tenv-for-letrec-body)
+  (map
+   (lambda (p-result-type b-typed-vars p-body)
+     (let ([p-body-type (type-of p-body (extend-tenv* (typed-vars->vars b-typed-vars) (typed-vars->types b-typed-vars) tenv-for-letrec-body))])
+       (check-equal-type! p-body-type p-result-type p-body)
+       )
+     )
+   p-result-types
+   b-typed-vars-list
+   p-bodies
+   )
   )
