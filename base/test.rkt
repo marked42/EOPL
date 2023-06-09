@@ -348,9 +348,20 @@ letrec infinite-loop (x) = (infinite-loop -(x,-1))
    )
   )
 
+(define tests-cases-checked-letrec-with-multiple-arguments
+  (list
+   (list "
+    letrec int double(x: int, y: int)
+      = if zero?(x) then 0 else -((double -(x,1) -(y,1)), -4)
+        in (double 6 6)
+    " 24 "letrec-exp")
+   )
+  )
+
 (define test-cases-exer-7.5
   (append
-   test-cases-let-lang-with-multiple-declarations
    test-cases-checked
+   test-cases-let-lang-with-multiple-declarations
+   tests-cases-checked-letrec-with-multiple-arguments
    )
   )
