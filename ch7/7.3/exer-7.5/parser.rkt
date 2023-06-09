@@ -2,6 +2,7 @@
 
 (require "expression.rkt")
 (require "checker/type.rkt")
+(require "typed-var.rkt")
 (provide (all-defined-out))
 
 (define the-lexical-spec
@@ -26,14 +27,16 @@
 
     (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
 
-    (expression ("proc" "(" identifier ":" type")" expression) proc-exp)
-    (expression ("("expression expression")" ) call-exp)
+    (expression ("proc" "("(separated-list typed-var ",") ")" expression) proc-exp)
+    (expression ("("expression (arbno expression)")" ) call-exp)
 
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
+    (typed-var (identifier ":" type) a-typed-var)
+
     (type ("int") int-type)
     (type ("bool") bool-type)
-    (type ("(" type "->" type")") proc-type)
+    (type ("(" (separated-list type "*")"->" type")") proc-type)
     )
   )
 

@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "checker/type.rkt")
+(require "checker/type.rkt" "typed-var.rkt")
 (provide (all-defined-out))
 
 (define-datatype expression expression?
@@ -14,8 +14,8 @@
    (exps (list-of expression?))
    (body expression?)
    )
-  (proc-exp (var symbol?) (var-type type?) (body expression?))
-  (call-exp (rator expression?) (rand expression?))
+  (proc-exp (typed-vars (list-of typed-var?)) (body expression?))
+  (call-exp (rator expression?) (rand (list-of expression?)))
   (letrec-exp (p-result-type type?) (p-name symbol?) (b-var symbol?) (b-var-type type?) (p-body expression?) (body expression?))
   )
 
