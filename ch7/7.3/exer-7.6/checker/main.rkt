@@ -69,6 +69,22 @@
                     )
                   )
                 )
+    (begin-exp (exp1 exps)
+               (let type-of-begin-exps ([exps (cons exp1 exps)])
+                 (if (null? exps)
+                     (eopl:error 'type-of "begin expression should have at lease one expression")
+                     (let ((first-exp (car exps)) (rest-exps (cdr exps)))
+                       ; always calculate first exp cause it may has side effects
+                       (let ((last-type (type-of first-exp tenv)))
+                         (if (null? rest-exps)
+                             last-type
+                             (type-of-begin-exps rest-exps)
+                             )
+                         )
+                       )
+                     )
+                 )
+               )
     )
   )
 
