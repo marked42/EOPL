@@ -376,3 +376,10 @@ letrec int double(x: int) = if zero?(x) then 0 else -((double -(x,1)), -2)
    tests-cases-checked-letrec-with-multiple-declarations
    )
   )
+
+(define test-cases-exer-7.6
+  (append
+   test-cases-checked
+   test-cases-begin-exp
+   )
+  )
