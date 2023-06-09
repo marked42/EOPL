@@ -73,8 +73,11 @@
                   )
                 )
               )
-    (letrec-exp (p-result-type p-name b-typed-vars p-body body)
-                (let ([new-env (extend-env-rec* (list p-name) (list (typed-vars->vars b-typed-vars)) (list p-body) env)])
+    (letrec-exp (p-result-types p-names b-typed-vars-list p-bodies body)
+                (let ([new-env (extend-env-rec*
+                                p-names
+                                (map (lambda (b-typed-vars) (typed-vars->vars b-typed-vars)) b-typed-vars-list)
+                                p-bodies env)])
                   (value-of-exp body new-env)
                   )
                 )

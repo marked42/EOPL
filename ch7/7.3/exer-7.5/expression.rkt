@@ -16,7 +16,7 @@
    )
   (proc-exp (typed-vars (list-of typed-var?)) (body expression?))
   (call-exp (rator expression?) (rand (list-of expression?)))
-  (letrec-exp (p-result-type type?) (p-name symbol?) (b-typed-vars (list-of typed-var?)) (p-body expression?) (body expression?))
+  (letrec-exp (p-result-types (list-of type?)) (p-names (list-of symbol?)) (b-typed-vars-list (list-of (list-of typed-var?))) (p-bodies (list-of expression?)) (body expression?))
   )
 
 (define-datatype program program?
