@@ -31,7 +31,9 @@
 
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
+    ; new stuff
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
+    (expression ("set" identifier "=" expression) assign-exp)
 
     (type ("int") int-type)
     (type ("bool") bool-type)

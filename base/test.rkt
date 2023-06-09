@@ -377,9 +377,19 @@ letrec int double(x: int) = if zero?(x) then 0 else -((double -(x,1)), -2)
    )
   )
 
+(define test-cases-checked-assignment
+  (list
+   (list "
+let x = 0
+  in begin set x = 1; x end
+" 1 "assignment")
+   )
+  )
+
 (define test-cases-exer-7.6
   (append
-   test-cases-checked
+   test-cases-checked-lang
    test-cases-begin-exp
+   test-cases-checked-assignment
    )
   )

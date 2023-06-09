@@ -69,6 +69,7 @@
                     )
                   )
                 )
+    ; new stuff
     (begin-exp (exp1 exps)
                (let type-of-begin-exps ([exps (cons exp1 exps)])
                  (if (null? exps)
@@ -85,6 +86,10 @@
                      )
                  )
                )
+    (assign-exp (var exp1)
+                (check-equal-type! (apply-tenv tenv var) (type-of exp1 tenv) exp1)
+                )
+    (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
 
