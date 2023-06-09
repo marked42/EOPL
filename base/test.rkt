@@ -54,6 +54,12 @@
    )
   )
 
+(define test-cases-let-exp-with-multiple-declarations
+  (list
+   (list "let a = 1 b = 2 in -(a, b)" -1 "let exp with multiple declarations")
+   )
+  )
+
 (define test-cases-let-lang
   (append
    test-cases-const-exp
@@ -62,6 +68,17 @@
    test-cases-var-exp
    test-cases-if-exp
    test-cases-let-exp
+   )
+  )
+
+(define test-cases-let-lang-with-multiple-declarations
+  (append
+   test-cases-const-exp
+   test-cases-diff-exp
+   test-cases-zero?-exp
+   test-cases-var-exp
+   test-cases-if-exp
+   test-cases-let-exp-with-multiple-declarations
    )
   )
 
@@ -327,6 +344,13 @@ letrec int double(x: int)
 (define test-cases-checked-lang
   (append
    test-cases-let-lang
+   test-cases-checked
+   )
+  )
+
+(define test-cases-exer-7.5
+  (append
+   test-cases-let-lang-with-multiple-declarations
    test-cases-checked
    )
   )
