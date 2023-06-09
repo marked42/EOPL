@@ -11,7 +11,7 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
- ["typed-var.rkt" (typed-vars->vars)]
+ ["typed-var.rkt" (typed-vars->vars typed-var->var)]
  )
 
 (provide (all-defined-out))
@@ -73,8 +73,8 @@
                   )
                 )
               )
-    (letrec-exp (p-result-type p-name b-var b-var-type p-body body)
-                (let ([new-env (extend-env-rec p-name b-var p-body env)])
+    (letrec-exp (p-result-type p-name b-typed-var p-body body)
+                (let ([new-env (extend-env-rec p-name (typed-var->var b-typed-var) p-body env)])
                   (value-of-exp body new-env)
                   )
                 )
