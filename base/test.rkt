@@ -57,6 +57,12 @@
 (define test-cases-let-exp-with-multiple-declarations
   (list
    (list "let a = 1 b = 2 in -(a, b)" -1 "let exp with multiple declarations")
+   (list "
+let x = 30
+      in let x = -(x,1)
+             y = -(x,2)
+         in -(x,y)
+   " 1 "let exp with multiple declarations")
    )
   )
 
