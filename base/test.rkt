@@ -95,6 +95,23 @@ let x = 30
    )
   )
 
+(define test-cases-let*-exp
+  (list
+    (list "
+let x = 30
+  in let* x = -(x,1) y = -(x,2)
+    in -(x,y)
+    " 2 "let*-exp")
+  )
+)
+
+(define test-cases-let*-lang
+  (append
+    test-cases-let-lang
+    test-cases-let*-exp
+  )
+)
+
 (define test-cases-proc-exp
   (list
    (list "let f = proc (x) -(x,11) in (f (f 77))" 55 "proc-exp")
