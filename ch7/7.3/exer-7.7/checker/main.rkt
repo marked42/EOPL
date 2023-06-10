@@ -32,8 +32,12 @@
                   [ty2 (type-of exp2 tenv)]
                   [ty3 (type-of exp3 tenv)]
                   )
-              (check-equal-type! ty1 (bool-type) exp1)
-              (check-equal-type! ty2 ty3 exp)
+              ; chect ty2/ty3 equality when ty1 is bool, otherwise ty2/ty3 can be differerent
+              (if (equal? (bool-type) ty1)
+                (check-equal-type! ty2 ty3 exp)
+                #f
+              )
+              ; TODO: should return a union type of ty2/ty3 more accurately
               ty2
               )
             )
