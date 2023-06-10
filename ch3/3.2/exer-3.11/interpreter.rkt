@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "parser.rkt" "expression.rkt")
+(require racket/lazy-require racket/list "parser.rkt" "expression.rkt" "operator.rkt")
 (lazy-require
  ["environment.rkt" (
                      init-env
@@ -26,25 +26,6 @@
   (cases expression exp
     (const-exp (num) (num-val num))
     (var-exp (var) (apply-env env var))
-    (diff-exp (exp1 exp2)
-              (let ([val1 (value-of-exp exp1 env)]
-                    [val2 (value-of-exp exp2 env)])
-                (let ((num1 (expval->num val1))
-                      (num2 (expval->num val2)))
-                  (num-val (- num1 num2))
-                  )
-                )
-              )
-    (zero?-exp (exp1)
-               (let ([val (value-of-exp exp1 env)])
-                 (let ([num (expval->num val)])
-                   (if (zero? num)
-                       (bool-val #t)
-                       (bool-val #f)
-                       )
-                   )
-                 )
-               )
     (if-exp (exp1 exp2 exp3)
             (let ([val1 (value-of-exp exp1 env)])
               (if (expval->bool val1)
@@ -58,6 +39,25 @@
                (value-of-exp body (extend-env var val env))
                )
              )
+    (numeric-exp (op exps)
+              (let ([vals (value-of-exps exps env)])
+                (let ([nums (map expval->num vals)])
+                  (value-of-numeric-exp op nums)
+                  )
+                )
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
+
+(define (value-of-numeric-exp op nums)
+  (cases operator op
+    [binary-diff () (num-val (- (first nums) (second nums)))]
+    [unary-zero? () (bool-val (= 0 (first nums)))]
+    [else (eopl:error "Unsupported numeric operator ~s" op)]
+  )
+)
+
+(define (value-of-exps exps env)
+  (map (lambda (exp) (value-of-exp exp env)) exps)
+)

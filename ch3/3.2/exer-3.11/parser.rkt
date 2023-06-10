@@ -1,6 +1,7 @@
 #lang eopl
 
 (require "expression.rkt")
+(require "operator.rkt")
 (provide (all-defined-out))
 
 (define the-lexical-spec
@@ -18,8 +19,9 @@
     (expression (number) const-exp)
     (expression (identifier) var-exp)
 
-    (expression ("-" "(" expression "," expression ")") diff-exp)
-    (expression ("zero?" "(" expression ")") zero?-exp)
+    (expression (operator "(" (separated-list expression ",")")") numeric-exp)
+    (operator ("-") binary-diff)
+    (operator ("zero?") unary-zero?)
 
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
