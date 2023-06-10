@@ -58,6 +58,16 @@
                (value-of-exp body (extend-env var val env))
                )
              )
+    ; new stuff
+    ; print-exp has side effect of printing which cannot be describe by
+    ; current specification
+    (print-exp (exp1)
+               (let ([val (value-of-exp exp1 env)])
+                (eopl:pretty-print val)
+                ; return arbitrary number 1 as require by exer
+                (num-val 1)
+                )
+               )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
