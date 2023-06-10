@@ -8,7 +8,7 @@
                      extend-env
                      extend-env-rec
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc is-truthy)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
  )
@@ -51,7 +51,7 @@
                )
     (if-exp (exp1 exp2 exp3)
             (let ([val1 (value-of-exp exp1 env)])
-              (if (expval->bool val1)
+              (if (is-truthy val1)
                   (value-of-exp exp2 env)
                   (value-of-exp exp3 env)
                   )

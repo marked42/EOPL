@@ -393,3 +393,12 @@ let x = 0
    test-cases-checked-assignment
    )
   )
+
+(define test-cases-exer-7.7
+  (append
+   test-cases-checked-lang
+   (list
+    (list "if 1 then 11 else 12" 11 "not checking condition of if-exp as bool")
+   )
+  )
+)

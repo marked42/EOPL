@@ -31,6 +31,14 @@
     )
   )
 
+(define (is-truthy val)
+  (cases expval val
+    (num-val (num) (not (= num 0)))
+    (bool-val (bool) bool)
+    (proc-val (proc1) #t)
+  )
+)
+
 (define (expval->proc val)
   (cases expval val
     (proc-val (proc1) proc1)
