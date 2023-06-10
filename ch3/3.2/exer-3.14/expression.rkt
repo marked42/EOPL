@@ -26,4 +26,7 @@
 ; new stuff
 (define-datatype bool-exp bool-exp?
   (zero?-exp (exp1 expression?))
+  (equal?-exp (exp1 expression?) (exp2 expression?))
+  (greater?-exp (exp1 expression?) (exp2 expression?))
+  (less?-exp (exp1 expression?) (exp2 expression?))
 )
