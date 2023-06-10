@@ -24,6 +24,9 @@
     (operator ("+") binary-sum)
     (operator ("*") binary-mul)
     (operator ("/") binary-div)
+    (operator ("equal?") binary-equal?)
+    (operator ("greater?") binary-greater?)
+    (operator ("less?") binary-less?)
     (operator ("zero?") unary-zero?)
     (operator ("minus") unary-minus)
 
