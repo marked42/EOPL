@@ -25,12 +25,14 @@
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
 
-    ; new stuff
     (expression ("cons" "(" expression "," expression ")") cons-exp)
     (expression ("car" "(" expression ")") car-exp)
     (expression ("cdr" "(" expression ")") cdr-exp)
     (expression ("emptylist") emptylist-exp)
     (expression ("null?" "(" expression ")") null?-exp)
+
+    ; new stuff
+    (expression ("unpack" (arbno identifier) "=" expression "in" expression) unpack-exp)
     )
   )
 

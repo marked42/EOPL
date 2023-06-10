@@ -105,6 +105,16 @@ let x = 30
   )
 )
 
+(define test-cases-unpack-exp
+  (list
+    (list "
+let u = 7 in
+  unpack x y = cons(u,cons(3,emptylist))
+    in -(x,y)
+    " 4 "unpack-exp")
+  )
+)
+
 (define test-cases-let*-lang
   (append
     test-cases-let-lang
