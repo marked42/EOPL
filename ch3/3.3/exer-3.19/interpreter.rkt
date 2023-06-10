@@ -59,8 +59,9 @@
                (value-of-exp body (extend-env var val env))
                )
              )
-    (proc-exp (var body)
-              (proc-val (procedure var body env))
+    ; new stuff
+    (letproc-exp (p-name b-var p-body body)
+              (value-of-exp body (extend-env p-name (proc-val (procedure b-var p-body env)) env))
               )
     (call-exp (rator rand)
               (let ([rator-val (value-of-exp rator env)] [rand-val (value-of-exp rand env)])
