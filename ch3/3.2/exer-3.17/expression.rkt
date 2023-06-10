@@ -13,6 +13,13 @@
    (exp1 expression?)
    (body expression?)
    )
+
+  ; new stuff
+  (let*-exp
+   (vars (list-of symbol?))
+   (exps (list-of expression?))
+   (body expression?)
+   )
   )
 
 (define-datatype program program?

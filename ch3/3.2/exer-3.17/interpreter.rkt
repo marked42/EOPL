@@ -58,6 +58,20 @@
                (value-of-exp body (extend-env var val env))
                )
              )
+    (let*-exp (vars exps body)
+              (value-of-exp body (extend-env-let* vars exps env))
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+(define (extend-env-let* vars exps env)
+  (if (null? vars)
+      env
+      (let ((first-var (car vars)) (first-exp (car exps)))
+        (let ((new-env (extend-env first-var (value-of-exp first-exp env) env)))
+          ; let* evalutates with previous defined variable visible to following initialization expression
+          (extend-env-let* (cdr vars) (cdr exps) new-env))
+        )
+      )
   )
