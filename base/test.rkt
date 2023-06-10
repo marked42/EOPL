@@ -129,6 +129,12 @@ let u = 7 in
    )
   )
 
+(define test-cases-letproc-exp
+  (list
+   (list "letproc f (x) -(x,11) in (f (f 77))" 55 "proc-exp")
+   )
+  )
+
 (define test-cases-proc-lang
   (append
    test-cases-let-lang
