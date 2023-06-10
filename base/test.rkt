@@ -129,6 +129,12 @@ let u = 7 in
    )
   )
 
+(define test-cases-curried-sum
+  (list
+   (list "let f = proc (x) proc (y) -(x, -(0, y)) in ((f 3) 4)" 7 "curried-sum")
+   )
+  )
+
 (define test-cases-letproc-exp
   (list
    (list "letproc f (x) -(x,11) in (f (f 77))" 55 "proc-exp")
