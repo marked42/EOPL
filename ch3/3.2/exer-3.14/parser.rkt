@@ -19,11 +19,15 @@
     (expression (identifier) var-exp)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)
-    (expression ("zero?" "(" expression ")") zero?-exp)
 
-    (expression ("if" expression "then" expression "else" expression) if-exp)
+    (expression ("if" bool-exp "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
+
+    ; new stuff
+    (expression (bool-exp) top-level-bool-exp)
+
+    (bool-exp ("zero?" "(" expression ")") zero?-exp)
     )
   )
 

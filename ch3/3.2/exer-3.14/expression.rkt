@@ -6,13 +6,15 @@
   (const-exp (num number?))
   (var-exp (var symbol?))
   (diff-exp (exp1 expression?) (exp2 expression?))
-  (zero?-exp (exp1 expression?))
-  (if-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
+  (if-exp (exp1 bool-exp?) (exp2 expression?) (exp3 expression?))
   (let-exp
    (var symbol?)
    (exp1 expression?)
    (body expression?)
    )
+
+  ; new stuff
+  (top-level-bool-exp (exp1 bool-exp?))
   )
 
 (define-datatype program program?
@@ -20,3 +22,8 @@
    (exp1 expression?)
    )
   )
+
+; new stuff
+(define-datatype bool-exp bool-exp?
+  (zero?-exp (exp1 expression?))
+)
