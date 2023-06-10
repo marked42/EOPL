@@ -137,7 +137,7 @@ let u = 7 in
 
 (define test-cases-letproc-exp
   (list
-   (list "letproc f (x) -(x,11) in (f (f 77))" 55 "proc-exp")
+   (list "letproc f (x) -(x,11) in (f (f 77))" 55 "letproc-exp")
    )
   )
 
@@ -145,6 +145,20 @@ let u = 7 in
   (append
    test-cases-let-lang
    test-cases-proc-exp
+   )
+  )
+
+(define test-cases-proc-exp-with-multiple-arguments
+  (list
+   (list "let f = proc(x, y) -(x,-(0,y)) in (f 3 4)" 7 "proc-exp with multiple arguments")
+   )
+  )
+
+(define test-cases-proc-lang-with-multiple-arguments
+  (append
+   test-cases-let-lang
+   test-cases-proc-exp
+   test-cases-proc-exp-with-multiple-arguments
    )
   )
 
