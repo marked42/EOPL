@@ -28,6 +28,9 @@
     (expression (bool-exp) top-level-bool-exp)
 
     (bool-exp ("zero?" "(" expression ")") zero?-exp)
+    (bool-exp ("equal?" "(" expression "," expression ")") equal?-exp)
+    (bool-exp ("greater?" "(" expression "," expression ")") greater?-exp)
+    (bool-exp ("less?" "(" expression "," expression ")") less?-exp)
     )
   )
 
