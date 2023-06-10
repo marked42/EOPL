@@ -71,6 +71,13 @@
    )
   )
 
+(define test-cases-print-exp
+  (list
+    (list "print(0)" 1 "print-exp")
+    (list "print(zero?(0))" 1 "print-exp")
+  )
+)
+
 (define test-cases-let-lang-with-multiple-declarations
   (append
    test-cases-const-exp

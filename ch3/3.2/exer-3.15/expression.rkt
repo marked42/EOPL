@@ -13,6 +13,9 @@
    (exp1 expression?)
    (body expression?)
    )
+
+  ; new stuff
+  (print-exp (exp1 expression?))
   )
 
 (define-datatype program program?
