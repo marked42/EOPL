@@ -22,6 +22,7 @@
     (expression (operator "(" (separated-list expression ",")")") numeric-exp)
     (operator ("-") binary-diff)
     (operator ("zero?") unary-zero?)
+    (operator ("minus") unary-minus)
 
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
