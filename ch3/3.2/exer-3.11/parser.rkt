@@ -21,6 +21,9 @@
 
     (expression (operator "(" (separated-list expression ",")")") numeric-exp)
     (operator ("-") binary-diff)
+    (operator ("+") binary-sum)
+    (operator ("*") binary-mul)
+    (operator ("/") binary-div)
     (operator ("zero?") unary-zero?)
     (operator ("minus") unary-minus)
 

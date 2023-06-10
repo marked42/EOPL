@@ -8,5 +8,6 @@
            (append
             test-cases-let-lang
             test-cases-minus-exp
+            test-cases-arithmetic
             )
            )
