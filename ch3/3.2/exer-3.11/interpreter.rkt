@@ -53,6 +53,9 @@
 (define (value-of-numeric-exp op nums)
   (cases operator op
     [binary-diff () (num-val (- (first nums) (second nums)))]
+    [binary-sum () (num-val (+ (first nums) (second nums)))]
+    [binary-mul () (num-val (* (first nums) (second nums)))]
+    [binary-div () (num-val (/ (first nums) (second nums)))]
     [unary-zero? () (bool-val (= 0 (first nums)))]
     [unary-minus () (num-val (- 0 (first nums)))]
     [else (eopl:error "Unsupported numeric operator ~s" op)]
