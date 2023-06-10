@@ -5,4 +5,5 @@
 (define-datatype operator operator?
   (binary-diff)
   (unary-zero?)
+  (unary-minus)
 )

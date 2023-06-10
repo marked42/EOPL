@@ -54,6 +54,7 @@
   (cases operator op
     [binary-diff () (num-val (- (first nums) (second nums)))]
     [unary-zero? () (bool-val (= 0 (first nums)))]
+    [unary-minus () (num-val (- 0 (first nums)))]
     [else (eopl:error "Unsupported numeric operator ~s" op)]
   )
 )
