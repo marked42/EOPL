@@ -15,8 +15,8 @@ EOPL 中使用 Scheme 的函数`identifier?`判断一个值是不是标识符，
 ## TODO:
 
 - proc-lang free-variables optimization
-  - [ ] at branch feat/free-variables
-  - [ ] Exercise 3.42 with lexical addressing
+  - [ ] exer 3.26 free-variables
+  - [ ] fixed point exer 3.23/3.24/3.25
 - chapter 5.1
   - [ ] Exercise 5.16 在 Exercise 4.22 的基础上，实现 CPS 解释器。
 
