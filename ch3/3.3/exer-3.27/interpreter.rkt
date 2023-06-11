@@ -8,7 +8,7 @@
                      extend-env
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
- ["procedure.rkt" (procedure apply-procedure)]
+ ["procedure.rkt" (procedure trace-procedure apply-procedure)]
  )
 
 (provide (all-defined-out))
@@ -61,6 +61,9 @@
              )
     (proc-exp (var body)
               (proc-val (procedure var body env))
+              )
+    (traceproc-exp (var body)
+              (proc-val (trace-procedure var body env))
               )
     (call-exp (rator rand)
               (let ([rator-val (value-of-exp rator env)] [rand-val (value-of-exp rand env)])

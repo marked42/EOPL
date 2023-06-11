@@ -15,6 +15,9 @@
    )
   (proc-exp (var symbol?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
+
+  ; new stuff
+  (traceproc-exp (var symbol?) (body expression?))
   )
 
 (define-datatype program program?
