@@ -27,6 +27,10 @@
 
     (expression ("proc" "(" identifier ")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
+
+    ; new stuff
+    (expression ("add1" "(" expression ")") add1-exp)
+    (expression ("*" "(" expression "," expression")") mul-exp)
     )
   )
 
