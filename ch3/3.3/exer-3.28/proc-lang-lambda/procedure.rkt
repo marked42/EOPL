@@ -8,12 +8,12 @@
 
 (define (proc? val) (procedure? val))
 
-(define (procedure var body env)
-  (lambda (val)
+(define (procedure var body)
+  (lambda (val env)
     (value-of-exp body (extend-env* (list var) (list val) env))
     )
   )
 
-(define (apply-procedure proc arg)
-  (proc arg)
+(define (apply-procedure proc arg env)
+  (proc arg env)
   )
