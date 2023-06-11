@@ -5,7 +5,7 @@
  ["environment.rkt" (
                      init-env
                      apply-env
-                     extend-env
+                     extend-env*
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
@@ -56,7 +56,7 @@
             )
     (let-exp (var exp1 body)
              (let ([val (value-of-exp exp1 env)])
-               (value-of-exp body (extend-env var val env))
+               (value-of-exp body (extend-env* (list var) (list val) env))
                )
              )
     (proc-exp (var body)
