@@ -28,7 +28,7 @@
     (expression ("proc" "(" identifier ")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
 
-    (expression ("letrec" identifier "(" identifier ")" "=" expression "in" expression) letrec-exp)
+    (expression ("letrec" (arbno identifier "(" identifier ")" "=" expression) "in" expression) letrec-exp)
     )
   )
 

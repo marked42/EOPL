@@ -24,11 +24,17 @@
   )
 )
 
-(define (extend-env-rec p-name b-var p-body saved-env)
-  (let ([vec (make-vector 1)])
-    (let ([new-env (extend-env p-name vec saved-env)])
-      (vector-set! vec 0 (proc-val (procedure b-var p-body new-env)))
-      new-env
+; new stuff
+(define (extend-env-rec p-names b-vars p-bodies saved-env)
+  (let loop ([p-names p-names] [b-vars b-vars] [p-bodies p-bodies] [saved-env saved-env])
+    (if (null? p-names)
+      saved-env
+      (let ([vec (make-vector 1)])
+        (let ([new-env (extend-env (car p-names) vec saved-env)])
+          (vector-set! vec 0 (proc-val (procedure (car b-vars) (car p-bodies) new-env)))
+          (loop (cdr p-names) (cdr b-vars) (cdr p-bodies) new-env)
+        )
+      )
     )
   )
 )
