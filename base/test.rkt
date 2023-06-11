@@ -162,6 +162,18 @@ let u = 7 in
    )
   )
 
+(define test-cases-dynamic-scoping
+  (list
+    (list "
+let a = 3
+  in let p = proc (x) -(x,a)
+         a = 5
+    in -(a,(p 2))
+" 8 "dynamic scoping"
+    )
+  )
+)
+
 (define test-cases-letrec-exp
   (list
    (list "
