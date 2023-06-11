@@ -25,13 +25,11 @@
 )
 
 (define (extend-env-rec p-name b-var p-body saved-env)
-  (letrec ([new-env (lambda (search-var)
-          (if (eqv? search-var p-name)
-              ; use letrec to use new-env inside new-new
-              (proc-val (procedure b-var p-body new-env))
-              (apply-env saved-env search-var)
-              ))])
+  (let ([vec (make-vector 1)])
+    (let ([new-env (extend-env p-name vec saved-env)])
+      (vector-set! vec 0 (proc-val (procedure b-var p-body new-env)))
       new-env
+    )
   )
 )
 
@@ -46,7 +44,13 @@
   )
 
 (define (apply-env env search-var)
-  (env search-var)
+  (let ([val (env search-var)])
+    (if (vector? val)
+      ; if val is vector, it contains a proc-val
+      (vector-ref val 0)
+      val
+      )
+    )
   )
 
 (define (report-no-binding-found var)
