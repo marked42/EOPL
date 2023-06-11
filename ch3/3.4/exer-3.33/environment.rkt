@@ -1,0 +1,58 @@
+#lang eopl
+
+(require racket/lazy-require racket/list "expression.rkt")
+(lazy-require
+ ["value.rkt" (num-val proc-val expval?)]
+ ["procedure.rkt" (procedure)]
+ )
+(provide (all-defined-out))
+
+(define-datatype environment environment?
+  (empty-env)
+  (extend-env*
+   (vars (list-of symbol?))
+   (vals (list-of expval?))
+   (saved-env environment?)
+   )
+  (extend-env-rec
+   (p-name symbol?)
+   (b-vars (list-of symbol?))
+   (p-body expression?)
+   (saved-env environment?)
+   )
+  )
+
+(define (init-env)
+  (extend-env*
+    (list 'i 'v 'x)
+    (list (num-val 1) (num-val 5) (num-val 10))
+    (empty-env)
+    )
+  )
+
+(define (apply-env env search-var)
+  (cases environment env
+    (extend-env* (vars vals saved-env)
+                 (let ([index (index-of vars search-var)])
+                   (if index
+                       (list-ref vals index)
+                       (apply-env saved-env search-var)
+                       )
+                   )
+                 )
+    (extend-env-rec (p-name b-vars p-body saved-env)
+                    (if (eqv? search-var p-name)
+                        ; procedure env is extend-env-rec itself which contains procedure
+                        ; when procedure is called, procedure body is evaluated in this extend-env-rec
+                        ; where procedure is visible, which enables recursive call
+                        (proc-val (procedure b-vars p-body env))
+                        (apply-env saved-env search-var)
+                        )
+                    )
+    (else (report-no-binding-found search-var))
+    )
+  )
+
+(define (report-no-binding-found var)
+  (eopl:error 'apply-env "No binding for ~s" var)
+  )
