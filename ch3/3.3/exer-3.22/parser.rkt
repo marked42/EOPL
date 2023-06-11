@@ -18,15 +18,18 @@
     (expression (number) const-exp)
     (expression (identifier) var-exp)
 
-    (expression ("-" "(" expression "," expression ")") diff-exp)
-    (expression ("zero?" "(" expression ")") zero?-exp)
+    (expression ("(" top-level-call-exp ")") top-level-call-exp)
 
-    (expression ("if" expression "then" expression "else" expression) if-exp)
+    (top-level-call-exp ("-" expression expression) diff-exp)
 
-    (expression ("let" identifier "=" expression "in" expression) let-exp)
+    (top-level-call-exp ("zero?" expression) zero?-exp)
 
-    (expression ("proc" "(" identifier ")" expression) proc-exp)
-    (expression ("("expression expression")" ) call-exp)
+    (top-level-call-exp ("if" expression expression expression) if-exp)
+
+    (top-level-call-exp ("let" identifier expression expression) let-exp)
+
+    (top-level-call-exp ("proc" identifier expression) proc-exp)
+    (top-level-call-exp (expression expression) custom-call-exp)
     )
   )
 
