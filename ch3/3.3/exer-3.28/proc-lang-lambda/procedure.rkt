@@ -10,7 +10,7 @@
 
 (define (procedure var body env)
   (lambda (val)
-    (value-of-exp body (extend-env var val env))
+    (value-of-exp body (extend-env* (list var) (list val) env))
     )
   )
 
