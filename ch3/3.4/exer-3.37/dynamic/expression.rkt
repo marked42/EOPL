@@ -15,6 +15,10 @@
    )
   (proc-exp (var symbol?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
+
+  ; new sutff
+  (add1-exp (exp1 expression?))
+  (mul-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
