@@ -27,6 +27,9 @@
 
     (expression ("proc" "(" identifier ")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
+
+    ; new stuff
+    (expression ("traceproc" "(" identifier ")" expression) traceproc-exp)
     )
   )
 
