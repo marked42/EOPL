@@ -99,6 +99,10 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
    1. let-exp -> nameless-let-exp
    1. proc-exp -> nameless-proc-exp
 
+### dynamic scoping
+
+exer 3.28/exer 3.29
+
 ## Chapter 4 State
 
 ### explicit refs lang

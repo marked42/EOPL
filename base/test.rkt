@@ -171,6 +171,22 @@ let a = 3
     in -(a,(p 2))
 " 8 "dynamic scoping"
     )
+    (list "
+let a = 3
+    in let p = proc (z) a
+        in let f = proc (x) (p 0)
+          in let a = 5
+            in (f 2)
+" 5 "exer 3.29 dynamic scoping is hard to understand"
+    )
+    (list "
+let a = 3
+    in let p = proc (z) a
+        in let f = proc (a) (p 0)
+          in let a = 5
+            in (f 2)
+" 2 "exer 3.29 dynamic scoping is hard to understand"
+    )
   )
 )
 
