@@ -172,6 +172,16 @@ letrec double(x)
    )
   )
 
+(define test-cases-letrec-exp-with-multiple-arguments
+  (list
+   (list "
+letrec mul(x, y)
+  = if zero?(x) then 0 else -((mul -(x,1) y), -(0, y))
+    in (mul 6 2)
+" 12 "letrec-exp")
+   )
+  )
+
 (define test-cases-letrec-lang
   (append
    test-cases-proc-lang

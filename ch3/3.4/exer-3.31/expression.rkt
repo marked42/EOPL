@@ -15,6 +15,9 @@
    )
   (proc-exp (vars (list-of symbol?)) (body expression?))
   (call-exp (rator expression?) (rands (list-of expression?)))
+
+  ; new stuff
+  (letrec-exp (p-name symbol?) (b-vars (list-of symbol?)) (p-body expression?) (body expression?))
   )
 
 (define-datatype program program?
