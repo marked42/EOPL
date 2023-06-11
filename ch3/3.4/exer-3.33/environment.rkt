@@ -14,10 +14,10 @@
    (vals (list-of expval?))
    (saved-env environment?)
    )
-  (extend-env-rec
-   (p-name symbol?)
-   (b-vars (list-of symbol?))
-   (p-body expression?)
+  (extend-env-rec*
+   (p-names (list-of symbol?))
+   (b-vars-list (list-of (list-of symbol?)))
+   (p-bodies (list-of expression?))
    (saved-env environment?)
    )
   )
@@ -40,15 +40,14 @@
                        )
                    )
                  )
-    (extend-env-rec (p-name b-vars p-body saved-env)
-                    (if (eqv? search-var p-name)
-                        ; procedure env is extend-env-rec itself which contains procedure
-                        ; when procedure is called, procedure body is evaluated in this extend-env-rec
-                        ; where procedure is visible, which enables recursive call
-                        (proc-val (procedure b-vars p-body env))
-                        (apply-env saved-env search-var)
-                        )
-                    )
+    (extend-env-rec* (p-names b-vars-list p-bodies saved-env)
+                     (let ([index (index-of p-names search-var)])
+                       (if index
+                           (proc-val (procedure (list-ref b-vars-list index) (list-ref p-bodies index) env))
+                           (apply-env saved-env search-var)
+                           )
+                       )
+                     )
     (else (report-no-binding-found search-var))
     )
   )
