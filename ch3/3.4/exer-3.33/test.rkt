@@ -9,5 +9,6 @@
         test-cases-proc-lang-with-multiple-arguments
         test-cases-letrec-lang
         test-cases-letrec-exp-with-multiple-arguments
+        test-cases-letrec-exp-with-multiple-declarartions
     )
 )
