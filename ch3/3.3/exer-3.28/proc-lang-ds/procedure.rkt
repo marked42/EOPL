@@ -1,8 +1,9 @@
 #lang eopl
 
-(require racket/lazy-require "environment.rkt")
+(require racket/lazy-require)
 (lazy-require
  ["expression.rkt" (expression?)]
+ ["environment.rkt" (extend-env*)]
  ["interpreter.rkt" (value-of-exp)])
 
 (provide (all-defined-out))
@@ -11,14 +12,13 @@
   (procedure
    (var symbol?)
    (body expression?)
-   (saved-env environment?)
    )
   )
 
-(define (apply-procedure proc1 arg)
+(define (apply-procedure proc1 arg env)
   (cases proc proc1
-    (procedure (var body saved-env)
-               (value-of-exp body (extend-env* (list var) (list arg) saved-env))
+    (procedure (var body)
+               (value-of-exp body (extend-env* (list var) (list arg) env))
                )
     )
   )
