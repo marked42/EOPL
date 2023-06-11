@@ -27,6 +27,15 @@
   (cases expression exp
     (const-exp (num) (num-val num))
     (var-exp (var) (apply-env env var))
+    (top-level-call-exp (exp1)
+      (value-of-call-exp exp1 env)
+    )
+    (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
+    )
+  )
+
+(define (value-of-call-exp exp1 env)
+  (cases call-exp exp1
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -62,13 +71,13 @@
     (proc-exp (var body)
               (proc-val (procedure var body env))
               )
-    (call-exp (rator rand)
+    (custom-call-exp (rator rand)
               (let ([rator-val (value-of-exp rator env)] [rand-val (value-of-exp rand env)])
                 (let ((proc1 (expval->proc rator-val)))
                   (apply-procedure proc1 rand-val)
                   )
                 )
               )
-    (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
-    )
+    (else (eopl:error 'value-of-call-exp "unsupported expression type ~s" exp))
   )
+)
