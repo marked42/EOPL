@@ -32,6 +32,9 @@
     (expression ("%lexref" number) nameless-var-exp)
     (expression ("%let" expression "in" expression) nameless-let-exp)
     (expression ("%lexproc" expression) nameless-proc-exp)
+
+    ; new stuff
+    (expression ("cond" (arbno expression "==>" expression) "end") cond-exp)
     )
   )
 

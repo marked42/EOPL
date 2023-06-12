@@ -56,6 +56,13 @@
                (translation-of-exp rand senv)
                )
               )
+    (cond-exp (conditions actions)
+              (cond-exp (translation-of-exps conditions senv) (translation-of-exps actions senv))
+              )
     (else (eopl:error 'translation-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+(define (translation-of-exps exps senv)
+  (map (lambda (exp) (translation-of-exp exp senv)) exps)
   )
