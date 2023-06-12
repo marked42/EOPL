@@ -32,6 +32,12 @@
     (expression ("%lexref" number) nameless-var-exp)
     (expression ("%let" expression "in" expression) nameless-let-exp)
     (expression ("%lexproc" expression) nameless-proc-exp)
+
+    (expression ("cons" "(" expression "," expression ")") cons-exp)
+    (expression ("car" "(" expression ")") car-exp)
+    (expression ("cdr" "(" expression ")") cdr-exp)
+    (expression ("emptylist") emptylist-exp)
+    (expression ("null?" "(" expression ")") null?-exp)
     )
   )
 
