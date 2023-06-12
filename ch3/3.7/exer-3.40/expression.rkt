@@ -16,10 +16,14 @@
   (proc-exp (var symbol?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
 
-  ; new stuff
   (nameless-var-exp (num integer?))
   (nameless-let-exp (exp1 expression?) (body expression?))
   (nameless-proc-exp (body expression?))
+
+  ; new stuff
+  (letrec-exp (p-name symbol?) (b-var symbol?) (p-body expression?) (body expression?))
+  (nameless-letrec-exp (p-body expression?) (body expression?))
+  (nameless-letrec-var-exp (num integer?))
   )
 
 (define-datatype program program?
