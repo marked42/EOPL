@@ -5,7 +5,7 @@
  ["environment.rkt" (
                      init-nameless-env
                      apply-nameless-env
-                     extend-namless-env
+                     extend-nameless-env
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
@@ -68,7 +68,7 @@
     (nameless-var-exp (num) (apply-nameless-env env num))
     (nameless-let-exp (exp1 body)
                       (let ([val (value-of-exp exp1 env)])
-                        (value-of-exp body (extend-namless-env val env))
+                        (value-of-exp body (extend-nameless-env val env))
                         )
                       )
     (nameless-proc-exp (body)
