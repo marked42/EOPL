@@ -8,16 +8,16 @@
 
 (define (empty-nameless-env) '())
 
-(define (extend-namless-env val saved-env)
+(define (extend-nameless-env val saved-env)
   (cons val saved-env)
   )
 
 (define (nameless-environment? env) ((list-of expval?) env))
 
 (define (init-nameless-env)
-  (extend-namless-env (num-val 1)
-                      (extend-namless-env (num-val 5)
-                                          (extend-namless-env (num-val 10)
+  (extend-nameless-env (num-val 1)
+                      (extend-nameless-env (num-val 5)
+                                          (extend-nameless-env (num-val 10)
                                                               (empty-nameless-env)
                                                               )
                                           )

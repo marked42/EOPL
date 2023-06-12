@@ -5,7 +5,7 @@
  ["environment.rkt" (
                      init-nameless-env
                      apply-nameless-env
-                     extend-namless-env
+                     extend-nameless-env
                      )]
  ["value.rkt" (num-val
                expval->num
@@ -104,7 +104,7 @@
     (nameless-var-exp (num) (apply-nameless-env env num))
     (nameless-let-exp (exp1 body)
                       (let ([val (value-of-exp exp1 env)])
-                        (value-of-exp body (extend-namless-env val env))
+                        (value-of-exp body (extend-nameless-env val env))
                         )
                       )
     (nameless-proc-exp (body)
@@ -127,7 +127,7 @@
     ((cell-val? val)
      (let ((first-val (cell-val->first val)))
        ; define vars from left to right
-       (let ((new-env (extend-namless-env first-val env)))
+       (let ((new-env (extend-nameless-env first-val env)))
          (extend-env-unpack (cell-val->second val) new-env)
          )
        )
