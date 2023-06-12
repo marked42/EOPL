@@ -20,6 +20,12 @@
   (nameless-var-exp (num integer?))
   (nameless-let-exp (exp1 expression?) (body expression?))
   (nameless-proc-exp (body expression?))
+
+  (cons-exp (exp1 expression?) (exp2 expression?))
+  (car-exp (exp1 expression?))
+  (cdr-exp (exp1 expression?))
+  (emptylist-exp)
+  (null?-exp (exp1 expression?))
   )
 
 (define-datatype program program?

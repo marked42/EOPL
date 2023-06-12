@@ -7,7 +7,20 @@
                      apply-nameless-env
                      extend-namless-env
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val
+               expval->num
+               bool-val
+               expval->bool
+               proc-val
+               expval->proc
+               ; new stuff
+               null-val
+               cell-val
+               cell-val?
+               cell-val->first
+               cell-val->second
+               null-val?
+               )]
  ["procedure.rkt" (procedure apply-procedure)]
  ["translator.rkt" (translation-of-program)]
  )
@@ -63,6 +76,29 @@
                   )
                 )
               )
+
+    ; new suff
+    (cons-exp (exp1 exp2)
+              (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                (cell-val val1 val2)
+                )
+              )
+    (car-exp (exp1)
+             (let ([val1 (value-of-exp exp1 env)])
+               (cell-val->first val1)
+               )
+             )
+    (cdr-exp (exp1)
+             (let ([val1 (value-of-exp exp1 env)])
+               (cell-val->second val1)
+               )
+             )
+    (emptylist-exp () (null-val))
+    (null?-exp (exp1)
+               (let ([val1 (value-of-exp exp1 env)])
+                 (bool-val (null-val? val1))
+                 )
+               )
 
     ; new stuff
     (nameless-var-exp (num) (apply-nameless-env env num))
