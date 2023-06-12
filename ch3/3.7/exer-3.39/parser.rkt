@@ -38,6 +38,10 @@
     (expression ("cdr" "(" expression ")") cdr-exp)
     (expression ("emptylist") emptylist-exp)
     (expression ("null?" "(" expression ")") null?-exp)
+
+    ; new stuff
+    (expression ("%unpack" expression "in" expression) nameless-unpack-exp)
+    (expression ("unpack" (arbno identifier) "=" expression "in" expression) unpack-exp)
     )
   )
 

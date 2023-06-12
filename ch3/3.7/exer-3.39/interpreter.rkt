@@ -110,6 +110,27 @@
     (nameless-proc-exp (body)
                        (proc-val (procedure body env))
                        )
+    ; new stuff
+    (nameless-unpack-exp (exp1 body)
+                         (let ([val1 (value-of-exp exp1 env)])
+                           (value-of-exp body (extend-env-unpack val1 env))
+                           )
+                         )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
+    )
+  )
+
+; new stuff
+(define (extend-env-unpack val env)
+  (cond
+    ((null-val? val) env)
+    ((cell-val? val)
+     (let ((first-val (cell-val->first val)))
+       ; define vars from left to right
+       (let ((new-env (extend-namless-env first-val env)))
+         (extend-env-unpack (cell-val->second val) new-env)
+         )
+       )
+     )
     )
   )

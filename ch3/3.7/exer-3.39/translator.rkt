@@ -71,6 +71,21 @@
     (null?-exp (exp1)
                (null?-exp (translation-of-exp exp1 senv))
                )
+    ; new stuff
+    (unpack-exp (vars exp1 body)
+                (nameless-unpack-exp
+                 (translation-of-exp exp1 senv)
+                 (translation-of-exp body (extend-senv-unpack vars senv))
+                 )
+                )
     (else (eopl:error 'translation-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+; new stuff
+(define (extend-senv-unpack vars senv)
+  (if (null? vars)
+      senv
+      (extend-senv-unpack (cdr vars) (extend-senv (car vars) senv))
+      )
   )

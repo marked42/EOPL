@@ -8,6 +8,6 @@
            (append
             test-cases-proc-lang
             test-cases-list-v1-exp
-            ; test-cases-unpack-exp
+            test-cases-unpack-exp
             )
            )
