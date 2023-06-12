@@ -5,7 +5,7 @@
  ["static-environment.rkt" (
                             init-senv
                             apply-senv
-                            extend-senv
+                            extend-senv-normal
                             )]
  )
 
@@ -42,12 +42,12 @@
     (let-exp (var exp1 body)
              (nameless-let-exp
               (translation-of-exp exp1 senv)
-              (translation-of-exp body (extend-senv var senv))
+              (translation-of-exp body (extend-senv-normal var senv))
               )
              )
     (proc-exp (var body)
               (nameless-proc-exp
-               (translation-of-exp body (extend-senv var senv))
+               (translation-of-exp body (extend-senv-normal var senv))
                )
               )
     (call-exp (rator rand)
