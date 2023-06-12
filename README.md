@@ -99,6 +99,105 @@ letrec-lang 中环境使用 list 实现，参考标签: letrec-lang-env-list-env
    1. let-exp -> nameless-let-exp
    1. proc-exp -> nameless-proc-exp
 
+#### letrec
+
+exer 3.40 关于 letrec-exp 的处理
+
+```
+letrec p-name (b-var)
+  = p-body
+    in body
+```
+
+假设`p-name`函数之前的环境变量是`env`，那么 `p-body` 和 `body` 对应的环境变量分别如下。
+
+```
+body -> (p-name env)
+p-body -> (b-var p-name env)
+```
+
+首先修改`environment`定义记录变量类型，这样能区分普通变量和`letrec-exp`定义的变量。
+
+```scheme
+(define (extend-senv type var senv)
+  (cons (list type var) senv)
+  )
+
+(define (extend-senv-normal var senv)
+  (extend-senv 'normal var senv)
+)
+
+(define (extend-senv-letrec var senv)
+  (extend-senv 'letrec var senv)
+)
+```
+
+然后可以根据变量类型将其转换为`nameless-var-exp`或者`nameless-letrec-var-exp`。
+
+```scheme
+(var-exp (var)
+         ; new stuf
+         (let* ([index (apply-senv senv var)] [type (car (list-ref senv index))])
+          (cond
+            [(eqv? type 'normal) (nameless-var-exp index)]
+            [(eqv? type 'letrec) (nameless-letrec-var-exp index)]
+            [else (eopl:error 'value-of-exp "unsupported var ~s of type ~s, only allow 'normal/letrec" var type)]
+            )
+          )
+         )
+```
+
+将`letrec-exp`转换为`nameless-letrec-exp`，注意其中`body`所在的环境变量包含了`p-name`；`p-body`所在的环境同时包含了`p-name`和`b-var`。
+
+```
+(let ([proc-env (extend-senv-letrec p-name senv)])
+  (nameless-letrec-exp
+    ; both p-body and body remembers current senv in their env
+    ; handle recursive variable behavior in interpreter logic
+    (translation-of-exp p-body (extend-senv-normal b-var proc-env))
+    (translation-of-exp body proc-env)
+  )
+)
+```
+
+然后在解释器部分处理关于递归变量`p-name`的访问，其中`nameless-letrec-exp`对应的新环境变量`new-env`需要在`env`的基础上新增一个
+对应`p-name`的函数值`the-proc`，其中`(procedure p-body env)`中使用环境变量由于`letrec`表达式的递归语意，应该就是`new-env`本身，
+但是这样形成了循环引用，在`letrec-lang`中我们使用了`extend-env-rec`来打破循环引用。同样的处理方式，在`procedure`中先使用`env`，
+然后在变量访问逻辑中来处理`letrec`的递归语意。
+
+```scheme
+; new stuff
+(nameless-letrec-exp (p-body body)
+                      (let ([the-proc (proc-val (procedure p-body env))])
+                      (value-of-exp body (extend-nameless-env the-proc env))
+                      )
+                     )
+```
+
+访问`nameless-letrec-var-exp`代表的递归变量`p-name`时，同样应该返回一个`procedure`，它的`body`保存在`p-name`对应的值中。
+`letrec`的递归语意要求这个`procedure`对应的环境变量应该包含`p-name`，从当前的环境量`env`中找到以`p-name`开头的尾部环境变量，
+就是需要的部分。
+
+```scheme
+(nameless-letrec-var-exp (num)
+                          ; list-tail find tail part of list starting from target element
+                          (let ([new-nameless-env (list-tail env num)])
+                          ; so car of new-nameless-env is the-proc corresponding to letrec-var
+                          (let ([the-proc (expval->proc (car new-nameless-env))])
+                            ; cases requires to "procedure.rkt" to load eagerly
+                            (cases proc the-proc
+                              (procedure (body saved-env)
+                                ; environment of procedure body is new-nameless-env with first var being
+                                ; the-proc itself
+                                (proc-val (procedure body new-nameless-env))
+                                )
+                              (else (eopl:error 'value-of-exp "expect a procedure, got ~s" the-proc))
+                              )
+                            )
+                          )
+                         )
+```
+
 ### dynamic scoping
 
 exer 3.28/exer 3.29
