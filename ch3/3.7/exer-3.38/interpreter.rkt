@@ -1,13 +1,12 @@
 #lang eopl
 
-(require racket/lazy-require "parser.rkt" "expression.rkt")
+(require racket/lazy-require "parser.rkt" "expression.rkt" "value.rkt")
 (lazy-require
  ["environment.rkt" (
                      init-nameless-env
                      apply-nameless-env
                      extend-namless-env
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["translator.rkt" (translation-of-program)]
  )
@@ -74,6 +73,26 @@
     (nameless-proc-exp (body)
                        (proc-val (procedure body env))
                        )
+    ; new stuff
+    (cond-exp (cond-exps act-exps)
+              (let return-first-true-cond ([conditions cond-exps] [actions act-exps])
+                (if (null? conditions)
+                    (eopl:error 'cond-exp "No true cond for exp ~s" exp)
+                    (let ([first-condition (car conditions)])
+                      ; must require value.rkt synchronously for cases to work
+                      (cases expval (value-of-exp first-condition env)
+                        (bool-val (bool)
+                                  (if bool
+                                      (value-of-exp (car actions) env)
+                                      (return-first-true-cond (cdr conditions) (cdr actions))
+                                      )
+                                  )
+                        (else (eopl:error 'cond-exp "invalid predicate " exp))
+                        )
+                      )
+                    )
+                )
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
