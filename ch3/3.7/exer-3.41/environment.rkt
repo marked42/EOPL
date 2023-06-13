@@ -8,24 +8,24 @@
 
 (define (empty-nameless-env) '())
 
-(define (extend-nameless-env val saved-env)
-  (cons val saved-env)
+(define (extend-nameless-env vals saved-env)
+  (cons vals saved-env)
   )
 
-(define (nameless-environment? env) ((list-of expval?) env))
+(define (nameless-environment? env) ((list-of (list-of expval?)) env))
 
 (define (init-nameless-env)
-  (extend-nameless-env (num-val 1)
-                       (extend-nameless-env (num-val 5)
-                                            (extend-nameless-env (num-val 10)
+  (extend-nameless-env (list (num-val 1))
+                       (extend-nameless-env (list (num-val 5))
+                                            (extend-nameless-env (list (num-val 10))
                                                                  (empty-nameless-env)
                                                                  )
                                             )
                        )
   )
 
-(define (apply-nameless-env env offset)
-  (list-ref env offset)
+(define (apply-nameless-env env depth position)
+  (list-ref (list-ref env depth) position)
   )
 
 (define (report-no-binding-found var)
