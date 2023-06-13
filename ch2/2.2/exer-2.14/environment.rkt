@@ -1,10 +1,12 @@
 #lang eopl
 
+(require racket/list)
+
 (provide (all-defined-out))
 
 (define (empty-env)
   (list
-   (cons
+   (list
     (lambda (var)
       (report-no-binding-found var)
       )
@@ -15,7 +17,7 @@
 
 (define (extend-env var val env)
   (cons
-   (cons
+   (list
     (lambda (search-var)
       (if (eqv? var search-var)
           val
@@ -29,14 +31,11 @@
   )
 
 (define (apply-env env search-var)
-  ((caar env) search-var)
+  ((first (car env)) search-var)
   )
 
 (define (empty-env? env)
-  ; get cdr of first pair, it's a pair not a list, using cadar is wrong
-  ; (cadr ((apply-env . empty-env?) ...))
-  ; (cadar ((apply-env empty-env? ...) ...))
-  ((cdar env))
+  ((second (car env)))
   )
 
 (define (report-no-binding-found search-var)
