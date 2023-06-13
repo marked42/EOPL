@@ -6,6 +6,7 @@
                             init-senv
                             apply-senv
                             extend-senv
+                            extend-senv-normal
                             )]
  )
 
@@ -38,16 +39,19 @@
              (translation-of-exp exp3 senv)
              )
             )
-    (var-exp (var) (nameless-var-exp (apply-senv senv var)))
+    (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (car pair)])
+                    (nameless-var-exp depth)
+                    )
+                   )
     (let-exp (var exp1 body)
              (nameless-let-exp
               (translation-of-exp exp1 senv)
-              (translation-of-exp body (extend-senv var senv))
+              (translation-of-exp body (extend-senv-normal var senv))
               )
              )
     (proc-exp (var body)
               (nameless-proc-exp
-               (translation-of-exp body (extend-senv var senv))
+               (translation-of-exp body (extend-senv-normal var senv))
                )
               )
     (call-exp (rator rand)

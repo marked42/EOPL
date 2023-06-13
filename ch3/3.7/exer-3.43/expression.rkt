@@ -27,3 +27,10 @@
    (exp1 expression?)
    )
   )
+
+(define (is-proc-exp? exp)
+  (cases expression exp
+    (proc-exp (var body) #t)
+    (else #f)
+  )
+)
