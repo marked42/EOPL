@@ -23,14 +23,14 @@
 
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
-    (expression ("let" identifier "=" expression "in" expression) let-exp)
+    (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
 
     (expression ("proc" "(" identifier ")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
 
     ; new stuff
     (expression ("%lexref" number number) nameless-var-exp)
-    (expression ("%let" expression "in" expression) nameless-let-exp)
+    (expression ("%let" (arbno expression) "in" expression) nameless-let-exp)
     (expression ("%lexproc" expression) nameless-proc-exp)
     )
   )

@@ -9,8 +9,8 @@
   (zero?-exp (exp1 expression?))
   (if-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
   (let-exp
-   (var symbol?)
-   (exp1 expression?)
+   (vars (list-of symbol?))
+   (exps (list-of expression?))
    (body expression?)
    )
   (proc-exp (var symbol?) (body expression?))
@@ -18,7 +18,7 @@
 
   ; new stuff
   (nameless-var-exp (depth integer?) (position integer?))
-  (nameless-let-exp (exp1 expression?) (body expression?))
+  (nameless-let-exp (exps (list-of expression?)) (body expression?))
   (nameless-proc-exp (body expression?))
   )
 
