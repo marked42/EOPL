@@ -66,9 +66,9 @@
 
     ; new stuff
     (nameless-var-exp (depth position) (apply-nameless-env env depth position))
-    (nameless-let-exp (exp1 body)
-                      (let ([val (value-of-exp exp1 env)])
-                        (value-of-exp body (extend-nameless-env (list val) env))
+    (nameless-let-exp (exps body)
+                      (let ([vals (value-of-exps exps env)])
+                        (value-of-exp body (extend-nameless-env vals env))
                         )
                       )
     (nameless-proc-exp (body)
@@ -76,4 +76,8 @@
                        )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+(define (value-of-exps exps env)
+  (map (lambda (exp) (value-of-exp exp env)) exps)
   )

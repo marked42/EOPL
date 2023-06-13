@@ -42,10 +42,10 @@
                      (nameless-var-exp depth position)
                      )
              )
-    (let-exp (var exp1 body)
+    (let-exp (vars exps body)
              (nameless-let-exp
-              (translation-of-exp exp1 senv)
-              (translation-of-exp body (extend-senv (list var) senv))
+              (translation-of-exps exps senv)
+              (translation-of-exp body (extend-senv vars senv))
               )
              )
     (proc-exp (var body)
@@ -61,4 +61,8 @@
               )
     (else (eopl:error 'translation-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+(define (translation-of-exps exps senv)
+  (map (lambda (exp) (translation-of-exp exp senv)) exps)
   )
