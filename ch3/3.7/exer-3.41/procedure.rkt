@@ -14,10 +14,10 @@
    )
   )
 
-(define (apply-procedure proc1 arg)
+(define (apply-procedure proc1 args)
   (cases proc proc1
     (procedure (body saved-env)
-               (value-of-exp body (extend-nameless-env (list arg) saved-env))
+               (value-of-exp body (extend-nameless-env args saved-env))
                )
     )
   )
