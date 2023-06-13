@@ -5,22 +5,32 @@
 (define (empty-env) '())
 
 (define (init-senv)
-  (extend-senv 'i
-               (extend-senv 'v
-                            (extend-senv 'x (empty-env))
+  (extend-senv-normal 'i
+               (extend-senv-normal 'v
+                            (extend-senv-normal 'x (empty-env))
                             )
                )
   )
 
-(define (extend-senv var senv)
-  (cons var senv)
+(define (extend-senv var val senv)
+  (cons (cons var val) senv)
   )
 
+(define (extend-senv-normal var senv)
+  (extend-senv var #f senv)
+)
+
 (define (apply-senv senv var)
-  (cond
-    [(null? senv) (report-unbound-var var)]
-    [(eqv? (car senv) var) 0]
-    [else (+ 1 (apply-senv (cdr senv) var))]
+  (let loop ([senv senv] [depth 0])
+    (if (null? senv)
+      (report-unbound-var var)
+      (let ([saved-var (caar senv)] [saved-val (cdar senv)])
+        (if (eqv? saved-var var)
+          (cons depth saved-val)
+          (loop (cdr senv) (+ depth 1))
+          )
+        )
+      )
     )
   )
 
