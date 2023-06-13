@@ -6,25 +6,23 @@
 (define (empty-env) '())
 
 (define (extend-env var val env)
-  (cons (cons var val) env)
+  (cons (cons (list var) (list val)) env)
   )
 
-; new stuff, a naive implementation
 (define (extend-env* vars vals env)
-  (if (null? vars)
-      env
-      (extend-env* (cdr vars) (cdr vals) (extend-env (car vars) (car vals) env))
-      )
+  (cons (cons vars vals) env)
   )
 
 (define (apply-env env search-var)
   (if (null? env)
       (report-no-binding-found search-var)
-      (let* ([top (first env)] [saved-var (car top)] [saved-val (cdr top)])
-        (if (eqv? search-var saved-var)
-            saved-val
-            (apply-env (cdr env) search-var)
-            )
+      (let* ([top-rib (first env)] [saved-vars (car top-rib)] [saved-vals (cdr top-rib)])
+        (let ([index (index-of saved-vars search-var)])
+          (if index
+              (list-ref saved-vals index)
+              (apply-env (cdr env) search-var)
+              )
+          )
         )
       )
   )
