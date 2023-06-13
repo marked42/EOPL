@@ -65,10 +65,10 @@
               )
 
     ; new stuff
-    (nameless-var-exp (num) (apply-nameless-env env num))
+    (nameless-var-exp (num) (apply-nameless-env env num 0))
     (nameless-let-exp (exp1 body)
                       (let ([val (value-of-exp exp1 env)])
-                        (value-of-exp body (extend-nameless-env val env))
+                        (value-of-exp body (extend-nameless-env (list val) env))
                         )
                       )
     (nameless-proc-exp (body)
