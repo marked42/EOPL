@@ -11,6 +11,7 @@
       (report-no-binding-found var)
       )
     (lambda () #t)
+    (lambda (var) #f)
     )
    )
   )
@@ -25,6 +26,12 @@
           )
       )
     (lambda () #f)
+    (lambda (search-var)
+      (if (eqv? var search-var)
+          #t
+          (has-binding? env search-var)
+          )
+      )
     )
    env
    )
@@ -36,6 +43,10 @@
 
 (define (empty-env? env)
   ((second (car env)))
+  )
+
+(define (has-binding? env search-var)
+  ((third (car env)) search-var)
   )
 
 (define (report-no-binding-found search-var)
