@@ -65,7 +65,7 @@
               )
 
     ; new stuff
-    (nameless-var-exp (num) (apply-nameless-env env num 0))
+    (nameless-var-exp (depth position) (apply-nameless-env env depth position))
     (nameless-let-exp (exp1 body)
                       (let ([val (value-of-exp exp1 env)])
                         (value-of-exp body (extend-nameless-env (list val) env))
