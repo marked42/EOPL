@@ -48,8 +48,8 @@
                      (if val
                          ; adjust it's internal intermediary-nameless-var-exp index, should add the offset
                          ; of current var def and the location of the proc it refrences
-                         (intermediary-nameless-var-exp->nameless-var-exp val total-count)
-                         (nameless-var-exp (- total-count 1))
+                         (intermediary-nameless-var-exp->nameless-var-exp val non-proc-count)
+                         (nameless-var-exp (- non-proc-count 1))
                          )
                      )
              )
@@ -59,14 +59,10 @@
               ; when exp1 is a proc, transform its internal vars which referenes external definitions
               ; to intermediay-nameless-var-exp, remember this new-proc-exp in environment for later use.
               (if (is-proc-exp? exp1)
-                (nameless-let-exp
-                  ; translate proc as always, not used anymore when interpreted
-                  (translation-of-exp exp1 senv)
-                  (let* ([proc-exp-with-intermediary-var (var-exp->intermediary-nameless-var-exp exp1 senv 0)]
-                        [new-proc-exp (translation-of-exp proc-exp-with-intermediary-var senv)]
-                        )
-                    (translation-of-exp body (extend-senv var new-proc-exp senv))
-                    )
+                (let* ([proc-exp-with-intermediary-var (var-exp->intermediary-nameless-var-exp exp1 senv 0)]
+                      [new-proc-exp (translation-of-exp proc-exp-with-intermediary-var senv)]
+                      )
+                  (translation-of-exp body (extend-senv var new-proc-exp senv))
                   )
                 (nameless-let-exp
                   ; translate proc as always, not used anymore when interpreted
@@ -119,7 +115,7 @@
                           [depth (- (+ non-proc-count proc-count) 1)]
                           )
                      (if (>= depth limit)
-                         (intermediary-nameless-var-exp depth)
+                         (intermediary-nameless-var-exp (- non-proc-count 1))
                          exp
                          )
                      )
