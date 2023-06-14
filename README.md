@@ -202,6 +202,26 @@ p-body -> (b-var p-name env)
 
 exer 3.28/exer 3.29
 
+#### Exer 3.43 / Exer 3.44
+
+explain the process of inline known procedures
+
+```scheme
+let x = 3
+  in let f = proc (y) -(y,x)
+    in (f 13)
+```
+
+to
+
+```
+let x = 3
+  in let f = proc (y) -(y,x)
+    in (proc (y) -(y, x) 13)
+```
+
+notice the handling of variable x
+
 ## Chapter 4 State
 
 ### explicit refs lang
