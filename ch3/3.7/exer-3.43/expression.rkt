@@ -20,6 +20,8 @@
   (nameless-var-exp (num integer?))
   (nameless-let-exp (exp1 expression?) (body expression?))
   (nameless-proc-exp (body expression?))
+
+  (intermediary-nameless-var-exp (num integer?))
   )
 
 (define-datatype program program?
@@ -32,5 +34,5 @@
   (cases expression exp
     (proc-exp (var body) #t)
     (else #f)
+    )
   )
-)
