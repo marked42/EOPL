@@ -35,20 +35,6 @@
     )
   )
 
-(define (apply-senv-non-proc senv var)
-  (let loop ([senv senv] [depth 0])
-    (if (null? senv)
-        (report-unbound-var var)
-        (let ([saved-var (caar senv)] [saved-val (cdar senv)])
-          (if (eqv? saved-var var)
-              depth
-              (loop (cdr senv) (+ depth (if (is-proc-exp? saved-val) 0 1)))
-              )
-          )
-        )
-    )
-  )
-
 (define (report-unbound-var var)
   (eopl:error 'apply-senv "No binding for ~s" var)
   )
