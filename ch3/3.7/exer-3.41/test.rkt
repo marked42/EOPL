@@ -8,6 +8,6 @@
            (append
             test-cases-proc-lang
             test-cases-let-exp-with-multiple-declarations
-            ; test-cases-proc-exp-with-multiple-arguments
+            test-cases-proc-exp-with-multiple-arguments
             )
            )
