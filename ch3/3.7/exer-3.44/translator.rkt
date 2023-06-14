@@ -39,13 +39,17 @@
              (translation-of-exp exp3 senv)
              )
             )
-    (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (first pair)] [val (second pair)] [gap-env-count (+ 1 depth)])
+    (var-exp (var) (let* ([record (apply-senv senv var)]
+                          [non-proc-count (first record)]
+                          [proc-count (second record)]
+                          [total-count (+ non-proc-count proc-count)]
+                          [val (third record)])
                      ; when a var is references, if is a proc
                      (if val
                          ; adjust it's internal intermediary-nameless-var-exp index, should add the offset
                          ; of current var def and the location of the proc it refrences
-                         (intermediary-nameless-var-exp->nameless-var-exp val gap-env-count)
-                         (nameless-var-exp depth)
+                         (intermediary-nameless-var-exp->nameless-var-exp val total-count)
+                         (nameless-var-exp (- total-count 1))
                          )
                      )
              )
@@ -109,7 +113,11 @@
              (var-exp->intermediary-nameless-var-exp exp3 senv limit)
              )
             )
-    (var-exp (var) (let* ([record (apply-senv senv var)] [depth (first record)])
+    (var-exp (var) (let* ([record (apply-senv senv var)]
+                          [non-proc-count (first record)]
+                          [proc-count (second record)]
+                          [depth (- (+ non-proc-count proc-count) 1)]
+                          )
                      (if (>= depth limit)
                          (intermediary-nameless-var-exp depth)
                          exp
