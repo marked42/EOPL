@@ -39,10 +39,6 @@
              (translation-of-exp exp3 senv)
              )
             )
-    ; (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (car pair)])
-    ;                  (nameless-var-exp depth)
-    ;                  )
-    ;          )
     (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (car pair)] [val (cdr pair)] [gap-env-count (+ 1 depth)])
                      ; when a var is references, if is a proc
                      (if val
