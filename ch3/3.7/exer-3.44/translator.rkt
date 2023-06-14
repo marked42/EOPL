@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "expression.rkt")
+(require racket/lazy-require racket/list "expression.rkt")
 (lazy-require
  ["static-environment.rkt" (
                             init-senv
@@ -39,7 +39,7 @@
              (translation-of-exp exp3 senv)
              )
             )
-    (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (car pair)] [val (cdr pair)] [gap-env-count (+ 1 depth)])
+    (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (first pair)] [val (second pair)] [gap-env-count (+ 1 depth)])
                      ; when a var is references, if is a proc
                      (if val
                          ; adjust it's internal intermediary-nameless-var-exp index, should add the offset
@@ -109,7 +109,7 @@
              (var-exp->intermediary-nameless-var-exp exp3 senv limit)
              )
             )
-    (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (car pair)])
+    (var-exp (var) (let* ([record (apply-senv senv var)] [depth (first record)])
                      (if (>= depth limit)
                          (intermediary-nameless-var-exp depth)
                          exp
