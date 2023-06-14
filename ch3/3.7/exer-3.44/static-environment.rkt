@@ -22,13 +22,24 @@
   )
 
 (define (apply-senv senv var)
-  (let loop ([senv senv] [depth 0])
+  (let loop ([senv senv] [non-proc-count 0] [proc-count 0])
     (if (null? senv)
         (report-unbound-var var)
-        (let ([saved-var (caar senv)] [saved-val (cdar senv)])
+        (let* ([saved-var (caar senv)]
+               [saved-val (cdar senv)]
+               [non-proc-count (+ non-proc-count (if saved-val 0 1))]
+               [proc-count (+ proc-count (if saved-val 1 0))])
           (if (eqv? saved-var var)
-              (list depth saved-val)
-              (loop (cdr senv) (+ depth 1))
+              (list
+                non-proc-count
+                proc-count
+                saved-val
+              )
+              (loop
+                (cdr senv)
+                non-proc-count
+                proc-count
+                )
               )
           )
         )
