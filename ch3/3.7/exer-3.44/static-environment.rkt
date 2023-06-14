@@ -27,7 +27,7 @@
         (report-unbound-var var)
         (let ([saved-var (caar senv)] [saved-val (cdar senv)])
           (if (eqv? saved-var var)
-              (cons depth saved-val)
+              (list depth saved-val)
               (loop (cdr senv) (+ depth 1))
               )
           )
