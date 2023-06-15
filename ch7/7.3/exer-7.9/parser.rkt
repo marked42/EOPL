@@ -35,6 +35,7 @@
     (expression ("emptylist_" type) emptylist-exp)
     (expression ("null?" "(" expression ")") null?-exp)
     (expression ("cons" "(" expression "," expression ")") cons-exp)
+    (expression ("list" "(" expression (arbno "," expression) ")") list-exp)
 
     (type ("int") int-type)
     (type ("bool") bool-type)

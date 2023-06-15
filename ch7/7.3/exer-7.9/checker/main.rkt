@@ -87,6 +87,13 @@
                 type2
                 )
               )
+    (list-exp (exp1 exps)
+              (let ([type1 (type-of exp1 tenv)])
+                ; requires every element type to be same
+                (map (lambda (exp) (check-equal-type! (type-of exp tenv) type1 exp)) exps)
+                (list-type type1)
+                )
+              )
     )
   )
 
