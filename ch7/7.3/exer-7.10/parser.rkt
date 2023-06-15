@@ -31,6 +31,10 @@
 
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
+    (expression ("newref" "(" expression ")") newref-exp)
+    (expression ("deref" "(" expression ")") deref-exp)
+    (expression ("setref" "(" expression "," expression ")") setref-exp)
+
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
