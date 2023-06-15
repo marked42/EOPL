@@ -35,7 +35,7 @@
   (cases expval val
     (cell-val (first second) first)
     (null-val () (null-val))
-    (else "error")
+    (else (eopl:error 'cell-val->first "val must be a cell, get ~s" val))
     )
   )
 
@@ -43,7 +43,7 @@
   (cases expval val
     (cell-val (first second) second)
     (null-val () (null-val))
-    (else "error")
+    (else (eopl:error 'cell-val->second "val must be a cell, get ~s" val))
     )
   )
 

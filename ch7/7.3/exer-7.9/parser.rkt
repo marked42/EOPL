@@ -34,6 +34,7 @@
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
+    (type ("listof" type) list-type)
     )
   )
 
