@@ -69,6 +69,21 @@
                     )
                   )
                 )
+
+    ; new stuff
+    (newpair-exp (exp1 exp2)
+                 (pair-type (type-of exp1 tenv) (type-of exp2 tenv))
+                 )
+    (unpair-exp (var1 var2 exp1 body)
+                (let ([exp1-type (type-of exp1 tenv)])
+                  (cases type exp1-type
+                    (pair-type (type1 type2)
+                               (type-of body (extend-tenv var1 type1 (extend-tenv var2 type2 tenv)))
+                               )
+                    (else (eopl:error 'unpair-exp "unpair expression must be pair-exp, get ~s in ~s" exp1 exp))
+                    )
+                  )
+                )
     )
   )
 

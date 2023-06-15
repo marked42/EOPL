@@ -5,10 +5,12 @@
 (provide (all-defined-out))
 
 (define-datatype type type?
-    (int-type)
-    (bool-type)
-    (proc-type (arg-type type?) (result-type type?))
-)
+  (int-type)
+  (bool-type)
+  (proc-type (arg-type type?) (result-type type?))
+  ; new stuff
+  (pair-type (type1 type?) (type2 type?))
+  )
 
 (define (type-to-external-form ty)
   (cases type ty
@@ -20,6 +22,8 @@
                      (type-to-external-form result-type)
                      )
                )
+    ; new stuff
+    (pair-type (type1 type2) (list 'pairof type1 type2))
     )
   )
 

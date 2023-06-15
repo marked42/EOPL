@@ -79,10 +79,10 @@ let x = 30
 
 (define test-cases-print-exp
   (list
-    (list "print(0)" 1 "print-exp")
-    (list "print(zero?(0))" 1 "print-exp")
+   (list "print(0)" 1 "print-exp")
+   (list "print(zero?(0))" 1 "print-exp")
+   )
   )
-)
 
 (define test-cases-let-lang-with-multiple-declarations
   (append
@@ -97,30 +97,30 @@ let x = 30
 
 (define test-cases-let*-exp
   (list
-    (list "
+   (list "
 let x = 30
   in let* x = -(x,1) y = -(x,2)
     in -(x,y)
     " 2 "let*-exp")
+   )
   )
-)
 
 (define test-cases-unpack-exp
   (list
-    (list "
+   (list "
 let u = 7 in
   unpack x y = cons(u,cons(3,emptylist))
     in -(x,y)
     " 4 "unpack-exp")
+   )
   )
-)
 
 (define test-cases-let*-lang
   (append
-    test-cases-let-lang
-    test-cases-let*-exp
+   test-cases-let-lang
+   test-cases-let*-exp
+   )
   )
-)
 
 (define test-cases-proc-exp
   (list
@@ -164,31 +164,31 @@ let u = 7 in
 
 (define test-cases-dynamic-scoping
   (list
-    (list "
+   (list "
 let a = 3
   in let p = proc (x) -(x,a)
          a = 5
     in -(a,(p 2))
 " 8 "dynamic scoping"
-    )
-    (list "
+  )
+   (list "
 let a = 3
     in let p = proc (z) a
         in let f = proc (x) (p 0)
           in let a = 5
             in (f 2)
 " 5 "exer 3.29 dynamic scoping is hard to understand"
-    )
-    (list "
+  )
+   (list "
 let a = 3
     in let p = proc (z) a
         in let f = proc (a) (p 0)
           in let a = 5
             in (f 2)
 " 2 "exer 3.29 dynamic scoping is hard to understand"
-    )
   )
-)
+   )
+  )
 
 (define test-cases-letrec-exp
   (list
@@ -503,6 +503,15 @@ let x = 0
    test-cases-checked-lang
    (list
     (list "if 1 then 11 else 12" 11 "not checking condition of if-exp as bool")
+    )
    )
   )
-)
+
+(define test-cases-exer-7.8
+  (append
+   test-cases-checked-lang
+   (list
+    (list "let a = newpair(1, 2) in unpair b c = a in -(b, c)" -1 "pair exp")
+    )
+   )
+  )
