@@ -69,6 +69,17 @@
                     )
                   )
                 )
+    (emptylist-exp (element-type)
+                   (list-type element-type)
+                   )
+    (null?-exp (exp1)
+               (let ([exp1-type (type-of exp1 tenv)])
+                 (cases type exp1-type
+                   (list-type (element-type) (bool-type))
+                   (else (eopl:error 'type-of "null? requires exp1 to be list type, get ~s" exp1-type))
+                   )
+                 )
+               )
     )
   )
 

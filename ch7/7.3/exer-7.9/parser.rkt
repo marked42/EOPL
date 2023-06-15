@@ -31,6 +31,10 @@
 
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
+    ; new stuff
+    (expression ("emptylist_" type) emptylist-exp)
+    (expression ("null?" "(" expression ")") null?-exp)
+
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
