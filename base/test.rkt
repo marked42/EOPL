@@ -537,3 +537,16 @@ let x = 0
     )
    )
   )
+
+(define test-cases-checked-mutable-pair-exp
+  (list
+   (list "
+let glo = pair(11,22)
+  in let f = proc (loc: pairof int * int)
+              let d1 = setright(loc, left(loc))
+                 in let d2 = setleft(glo, 99)
+                    in -(left(loc),right(loc))
+      in (f glo)
+      " 88 "mutable-pair")
+   )
+  )

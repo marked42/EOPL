@@ -34,6 +34,14 @@
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
+    (type ("pairof" type "*" type) pair-type)
+
+    ; new stuff
+    (expression ("pair" "(" expression "," expression ")") newpair-exp)
+    (expression ("left" "(" expression ")") left-exp)
+    (expression ("right" "(" expression ")") right-exp)
+    (expression ("setleft" "(" expression "," expression ")") setleft-exp)
+    (expression ("setright" "(" expression "," expression ")") setright-exp)
     )
   )
 

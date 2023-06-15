@@ -8,10 +8,11 @@
                      extend-env
                      extend-env-rec
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc pair-val expval->pair)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
  ["store.rkt" (initialize-store! newref deref setref!)]
+ ["pair.rkt" (make-pair left right set-left! set-right!)]
  )
 
 (provide (all-defined-out))
@@ -79,6 +80,41 @@
                   (value-of-exp body new-env)
                   )
                 )
+
+    ; new stuff
+    (newpair-exp (exp1 exp2)
+                 (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                   (pair-val (make-pair val1 val2))
+                   )
+                 )
+    (left-exp (exp1)
+              (let ([val1 (value-of-exp exp1 env)])
+                (let ([p (expval->pair val1)])
+                  (left p)
+                  )
+                )
+              )
+    (right-exp (exp1)
+               (let ([val1 (value-of-exp exp1 env)])
+                 (let ([p (expval->pair val1)])
+                   (right p);
+                   )
+                 )
+               )
+    (setleft-exp (exp1 exp2)
+                 (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                   (let ((p (expval->pair val1)))
+                     (set-left! p val2);
+                     )
+                   )
+                 )
+    (setright-exp (exp1 exp2)
+                  (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                    (let ((p (expval->pair val1)))
+                      (set-right! p val2);
+                      )
+                    )
+                  )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

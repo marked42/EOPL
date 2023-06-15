@@ -38,7 +38,7 @@
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
-    (type ("pair-of" type "*" type")") pair-type)
+    (type ("pair-of" type "*" type) pair-type)
     )
   )
 

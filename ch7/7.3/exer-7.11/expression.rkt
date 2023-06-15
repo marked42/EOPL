@@ -17,6 +17,13 @@
   (proc-exp (var symbol?) (var-type type?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
   (letrec-exp (p-result-type type?) (p-name symbol?) (b-var symbol?) (b-var-type type?) (p-body expression?) (body expression?))
+
+  ; new stuff
+  (newpair-exp (exp1 expression?) (exp2 expression?))
+  (left-exp (exp1 expression?))
+  (right-exp (exp1 expression?))
+  (setleft-exp (exp1 expression?) (exp2 expression?))
+  (setright-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
