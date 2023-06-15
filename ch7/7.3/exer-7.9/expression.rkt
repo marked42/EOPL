@@ -20,6 +20,7 @@
 
   (emptylist-exp (element-type type?))
   (null?-exp (exp1 expression?))
+  (cons-exp (exp1 expression?) (exp2 expression?))
   )
 
 (define-datatype program program?
