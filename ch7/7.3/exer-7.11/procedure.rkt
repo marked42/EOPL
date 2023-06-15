@@ -3,6 +3,7 @@
 (require racket/lazy-require "environment.rkt")
 (lazy-require
  ["expression.rkt" (expression?)]
+ ["store.rkt" (newref)]
  ["interpreter.rkt" (value-of-exp)])
 
 (provide (all-defined-out))
@@ -18,7 +19,7 @@
 (define (apply-procedure proc1 arg)
   (cases proc proc1
     (procedure (var body saved-env)
-               (value-of-exp body (extend-env var arg saved-env))
+               (value-of-exp body (extend-env var (newref arg) saved-env))
                )
     )
   )
