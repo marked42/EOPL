@@ -4,6 +4,7 @@
 (lazy-require
  ["value.rkt" (num-val expval? proc-val)]
  ["procedure.rkt" (procedure)]
+ ["store.rkt" (reference? newref)]
  )
 (provide (all-defined-out))
 
@@ -11,7 +12,7 @@
   (empty-env)
   (extend-env
    (var symbol?)
-   (val expval?)
+   (val reference?)
    (saved-env environment?)
    )
   (extend-env-rec
@@ -23,9 +24,9 @@
   )
 
 (define (init-env)
-  (extend-env 'i (num-val 1)
-              (extend-env 'v (num-val 5)
-                          (extend-env 'x (num-val 10)
+  (extend-env 'i (newref (num-val 1))
+              (extend-env 'v (newref (num-val 5))
+                          (extend-env 'x (newref (num-val 10))
                                       (empty-env)
                                       )
                           )
@@ -45,7 +46,7 @@
                         ; procedure env is extend-env-rec itself which contains procedure
                         ; when procedure is called, procedure body is evaluated in this extend-env-rec
                         ; where procedure is visible, which enables recursive call
-                        (proc-val (procedure b-var p-body env))
+                        (newref (proc-val (procedure b-var p-body env)))
                         (apply-env saved-env search-var)
                         )
                     )
