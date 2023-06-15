@@ -15,6 +15,7 @@
   (num-val (num number?))
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
+  (ref-val (index number?))
   )
 
 (define (expval->num val)
@@ -38,6 +39,12 @@
     )
   )
 
+(define (expval->ref val)
+  (cases expval val
+    (ref-val (val) val)
+    (else (report-expval-extractor-error 'ref val))
+    )
+  )
 
 (define sloppy->expval
   (lambda (sloppy-val)
