@@ -5,10 +5,11 @@
 (provide (all-defined-out))
 
 (define-datatype type type?
-    (int-type)
-    (bool-type)
-    (proc-type (arg-type type?) (result-type type?))
-)
+  (int-type)
+  (bool-type)
+  (proc-type (arg-type type?) (result-type type?))
+  (list-type (element-type type?))
+  )
 
 (define (type-to-external-form ty)
   (cases type ty
@@ -20,6 +21,7 @@
                      (type-to-external-form result-type)
                      )
                )
+    (list-type (element-type) (list 'listof element-type))
     )
   )
 
