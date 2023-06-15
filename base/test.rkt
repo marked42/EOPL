@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/list rackunit)
+(require racket racket/list rackunit)
 
 (provide (all-defined-out))
 
@@ -8,7 +8,10 @@
   (let ([equal-answer? (lambda (ans correct-ans msg) (check-equal? ans (sloppy->expval correct-ans) msg))])
     (map (lambda (test-case)
            (let ([source (first test-case)] [expected (second test-case)] [msg (third test-case)])
-             (equal-answer? (run source) expected msg)
+             (if (equal? expected 'error)
+                 (check-exn exn:fail? (lambda () (run source)))
+                 (equal-answer? (run source) expected msg)
+                 )
              )
            ) test-cases)
     )
