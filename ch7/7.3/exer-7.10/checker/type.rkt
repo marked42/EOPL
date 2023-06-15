@@ -8,6 +8,8 @@
   (int-type)
   (bool-type)
   (proc-type (arg-type type?) (result-type type?))
+  (void-type)
+  (ref-type (type type?))
   )
 
 (define (type-to-external-form ty)
@@ -20,6 +22,8 @@
                      (type-to-external-form result-type)
                      )
                )
+    (void-type () 'void)
+    (ref-type (type) (list 'ref type))
     )
   )
 

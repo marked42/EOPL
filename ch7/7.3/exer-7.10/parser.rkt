@@ -34,6 +34,8 @@
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
+    (type ("void") void-type)
+    (type ("refto" type) ref-type)
     )
   )
 
