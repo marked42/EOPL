@@ -525,6 +525,11 @@ let x = 0
    (list
     (list "let a = emptylist_ int in null?(a)" #t "null? returns true for emptylist")
     (list "let a = 1 in null?(a)" 'error "throws error when null? receives non list type value")
+
+    (list "cons(1, emptylist_ int)" '(1) "cons builds a int list from an int and another empty int list type")
+    (list "cons(1, emptylist_ bool)" 'error "cons throws error when element type and list element type is not same")
+
+    (list "null?(cons(1, emptylist_ int))" #f "null? returns false for non empty list")
     )
    )
   )

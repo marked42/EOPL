@@ -69,6 +69,7 @@
                     )
                   )
                 )
+    ; new stuff
     (emptylist-exp (element-type)
                    (list-type element-type)
                    )
@@ -80,6 +81,12 @@
                    )
                  )
                )
+    (cons-exp (exp1 exp2)
+              (let ([type1 (type-of exp1 tenv)] [type2 (type-of exp2 tenv)])
+                (check-equal-type! (list-type type1) type2 exp)
+                type2
+                )
+              )
     )
   )
 

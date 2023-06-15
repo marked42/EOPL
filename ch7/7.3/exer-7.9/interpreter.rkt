@@ -17,6 +17,7 @@
                expval->proc
                null-val
                null-val?
+               cell-val
                )]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
@@ -95,6 +96,11 @@
                  (bool-val (null-val? val1))
                  )
                )
+    (cons-exp (exp1 exp2)
+              (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                (cell-val val1 val2)
+                )
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
