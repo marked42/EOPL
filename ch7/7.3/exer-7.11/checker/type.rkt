@@ -8,6 +8,8 @@
   (int-type)
   (bool-type)
   (proc-type (arg-type type?) (result-type type?))
+  ; new stuff
+  (pair-type (type1 type?) (type2 type?))
   )
 
 (define (type-to-external-form ty)
@@ -20,6 +22,8 @@
                      (type-to-external-form result-type)
                      )
                )
+    ; new stuff
+    (pair-type (type1 type2) (list 'pairof type1 type2))
     )
   )
 
