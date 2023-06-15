@@ -5,10 +5,10 @@
 (provide (all-defined-out))
 
 (define-datatype type type?
-    (int-type)
-    (bool-type)
-    (proc-type (arg-type type?) (result-type type?))
-)
+  (int-type)
+  (bool-type)
+  (proc-type (arg-type type?) (result-type type?))
+  )
 
 (define (type-to-external-form ty)
   (cases type ty
