@@ -530,6 +530,10 @@ let x = 0
     (list "cons(1, emptylist_ bool)" 'error "cons throws error when element type and list element type is not same")
 
     (list "null?(cons(1, emptylist_ int))" #f "null? returns false for non empty list")
+
+    (list "list(1, 2)" '(1 2) "list builds a list of int")
+    (list "list()" 'error "list throws error when containing no elements")
+    (list "list(1, zero(1))" 'error "throws error element type are not same")
     )
    )
   )
