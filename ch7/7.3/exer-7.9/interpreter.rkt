@@ -8,7 +8,16 @@
                      extend-env
                      extend-env-rec
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (
+               num-val
+               expval->num
+               bool-val
+               expval->bool
+               proc-val
+               expval->proc
+               null-val
+               null-val?
+               )]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
  )
@@ -77,6 +86,15 @@
                   (value-of-exp body new-env)
                   )
                 )
+    ; new stuff
+    (emptylist-exp (element-type)
+                   (null-val)
+                   )
+    (null?-exp (exp1)
+               (let ([val1 (value-of-exp exp1 env)])
+                 (bool-val (null-val? val1))
+                 )
+               )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

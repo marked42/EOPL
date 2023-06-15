@@ -518,3 +518,13 @@ let x = 0
     )
    )
   )
+
+(define test-cases-exer-7.9
+  (append
+   test-cases-checked-lang
+   (list
+    (list "let a = emptylist_ int in null?(a)" #t "null? returns true for emptylist")
+    (list "let a = 1 in null?(a)" 'error "throws error when null? receives non list type value")
+    )
+   )
+  )
