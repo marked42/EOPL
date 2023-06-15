@@ -31,9 +31,14 @@
 
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
+    ; new stuff
+    (expression ("newpair" "("expression "," expression ")") newpair-exp)
+    (expression ("unpair" identifier identifier "=" expression "in" expression) unpair-exp)
+
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
+    (type ("pair-of" type "*" type")") pair-type)
     )
   )
 
