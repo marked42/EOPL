@@ -7,7 +7,7 @@
 (test-lang run sloppy->expval
            (append
             test-cases-proc-lang
-            test-cases-list-v1-exp
+            test-cases-list-v1
             test-cases-unpack-exp
             )
            )
