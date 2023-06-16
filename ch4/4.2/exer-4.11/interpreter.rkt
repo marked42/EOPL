@@ -8,7 +8,22 @@
                      extend-env
                      extend-env-rec
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc ref-val expval->ref)]
+ ["value.rkt" (
+               num-val
+               expval->num
+               bool-val
+               expval->bool
+               proc-val
+               expval->proc
+               ref-val
+               expval->ref
+               ; new stuff
+               null-val
+               cell-val
+               cell-val->first
+               cell-val->second
+               null-val?
+               )]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref!)]
  )
@@ -78,7 +93,6 @@
                   )
                 )
 
-    ; new stuff
     (newref-exp (exp1)
                 (ref-val (newref (value-of-exp exp1 env)))
                 )
@@ -96,6 +110,23 @@
                     )
                   )
                 )
+    ; new stuff
+    (list-exp (exps)
+              (let ([vals (value-of-exps exps env)])
+                (let build-list ([vals vals])
+                  (if (null? vals)
+                      (null-val)
+                      (let ((first (car vals)) (rest (cdr vals)))
+                        (cell-val first (build-list rest))
+                        )
+                      )
+                  )
+                )
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+(define (value-of-exps exps env)
+  (map (lambda (exp) (value-of-exp exp env)) exps)
   )
