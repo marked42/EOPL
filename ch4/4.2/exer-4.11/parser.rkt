@@ -30,10 +30,12 @@
 
     (expression ("letrec" identifier "(" identifier ")" "=" expression "in" expression) letrec-exp)
 
-    ; new stuff
     (expression ("newref" "(" expression ")") newref-exp)
     (expression ("deref" "(" expression ")") deref-exp)
     (expression ("setref" "(" expression "," expression")") setref-exp)
+
+    ; new stuff
+    (expression ("list" "("(separated-list expression ",")")") list-exp)
     )
   )
 

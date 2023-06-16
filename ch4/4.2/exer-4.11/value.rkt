@@ -17,6 +17,10 @@
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
   (ref-val (ref reference?))
+
+  ; new stuff
+  (null-val)
+  (cell-val (first expval?) (second expval?))
   )
 
 (define (expval->num val)
@@ -47,11 +51,49 @@
     )
   )
 
+; new stuff
+(define (cell-val->first val)
+  (cases expval val
+    (cell-val (first second) first)
+    (null-val () (null-val))
+    (else "error")
+    )
+  )
+
+(define (cell-val->second val)
+  (cases expval val
+    (cell-val (first second) second)
+    (null-val () (null-val))
+    (else "error")
+    )
+  )
+
+(define (null-val? val)
+  (cases expval val
+    (null-val () #t)
+    (else #f)
+    )
+  )
+
+(define (cell-val? val)
+  (cases expval val
+    (cell-val (first second) #t)
+    (else #f)
+    )
+  )
+
 (define sloppy->expval
   (lambda (sloppy-val)
     (cond
       ((number? sloppy-val) (num-val sloppy-val))
       ((boolean? sloppy-val) (bool-val sloppy-val))
+      ; new stuff
+      ((null? sloppy-val) (null-val))
+      ((pair? sloppy-val)
+       (let ((first (car sloppy-val)) (second (cdr sloppy-val)))
+         (cell-val (sloppy->expval first) (sloppy->expval second))
+         )
+       )
       (else
        (eopl:error 'sloppy->expval
                    "Can't convert sloppy value to expval: ~s"

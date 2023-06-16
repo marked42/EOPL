@@ -247,6 +247,13 @@ letrec mul(x, y)
    )
   )
 
+(define test-cases-list-exp
+  (list
+   (list  "list(1, 2, 3)" (list 1 2 3) "list-exp")
+   (list  "let x = 4 in list(x, -(x, 1), -(x, 3))" (list 4 3 1) "list-exp")
+   )
+  )
+
 (define test-cases-list-v1-exp
   (list
    (list "emptylist" '() "emptylist-exp")
@@ -266,10 +273,7 @@ letrec mul(x, y)
 (define test-cases-list-v2-exp
   (append
    test-cases-list-v1-exp
-   (list
-    (list  "list(1, 2, 3)" (list 1 2 3) "list-exp")
-    (list  "let x = 4 in list(x, -(x, 1), -(x, 3))" (list 4 3 1) "list-exp")
-    )
+   test-cases-list-exp
    )
   )
 
