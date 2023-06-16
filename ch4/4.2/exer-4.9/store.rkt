@@ -1,10 +1,10 @@
 #lang eopl
 
-(require racket/list)
+(require racket/list racket/vector)
 
 (provide (all-defined-out))
 
-(define (empty-store) '())
+(define (empty-store) (make-vector 0 0))
 
 (define the-store 'uninitialized)
 
@@ -21,18 +21,18 @@
 (define (reference? v) (integer? v))
 
 (define (newref val)
-  (let ([next-ref (length the-store)])
-    (set! the-store (append the-store (list val)))
+  (let ([next-ref (vector-length the-store)])
+    (set! the-store (vector-append the-store (vector val)))
     next-ref
     )
   )
 
 (define (deref ref)
-  (list-ref the-store ref)
+  (vector-ref the-store ref)
   )
 
 (define (setref! ref val)
-  (set! the-store (list-set the-store ref val))
+  (vector-set! the-store ref val)
   )
 
 (define (report-invalid-reference ref the-store)
