@@ -254,7 +254,7 @@ letrec mul(x, y)
    )
   )
 
-(define test-cases-list-v1-exp
+(define test-cases-list-v1
   (list
    (list "emptylist" '() "emptylist-exp")
    (list "cons(1, 2)" (cons 1 2) "cons-exp")
@@ -270,9 +270,9 @@ letrec mul(x, y)
    )
   )
 
-(define test-cases-list-v2-exp
+(define test-cases-list-v2
   (append
-   test-cases-list-v1-exp
+   test-cases-list-v1
    test-cases-list-exp
    )
   )

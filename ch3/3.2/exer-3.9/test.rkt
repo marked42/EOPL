@@ -7,6 +7,6 @@
 (test-lang run sloppy->expval
            (append
             test-cases-let-lang
-            test-cases-list-v1-exp
+            test-cases-list-v1
             )
            )
