@@ -27,12 +27,18 @@
     )
   )
 
-(define (deref ref)
-  (list-ref the-store ref)
+(define (deref ref-or-vec)
+  (if (vector? ref-or-vec)
+      (vector-ref ref-or-vec 0)
+      (list-ref the-store ref-or-vec)
+      )
   )
 
-(define (setref! ref val)
-  (set! the-store (list-set the-store ref val))
+(define (setref! ref-or-vec val)
+  (if (vector? ref-or-vec)
+      (vector-set! ref-or-vec 0 val)
+      (set! the-store (list-set the-store ref-or-vec val))
+      )
   )
 
 (define (report-invalid-reference ref the-store)
