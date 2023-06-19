@@ -9,7 +9,7 @@
 
 (define-datatype proc proc?
   (procedure
-   (var symbol?)
+   (vars (list-of symbol?))
    (body expression?)
    (saved-env environment?)
    )
@@ -17,8 +17,8 @@
 
 (define (apply-procedure proc1 arg store)
   (cases proc proc1
-    (procedure (var body saved-env)
-               (value-of-exp body (extend-env* (list var) (list arg) saved-env) store)
+    (procedure (vars body saved-env)
+               (value-of-exp body (extend-env* vars (list arg) saved-env) store)
                )
     )
   )

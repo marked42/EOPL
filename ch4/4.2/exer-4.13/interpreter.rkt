@@ -81,7 +81,7 @@
                )
              )
     (proc-exp (var body)
-              (an-answer (proc-val (procedure var body env)) store)
+              (an-answer (proc-val (procedure (list var) body env)) store)
               )
     (call-exp (rator rand)
               (let* ([lst (value-of-exp1-exp2 rator rand env store)] [rator-val (first lst)] [rand-val (second lst)] [new-store (third lst)])
