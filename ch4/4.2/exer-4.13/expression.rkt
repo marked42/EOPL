@@ -13,8 +13,8 @@
    (exp1 expression?)
    (body expression?)
    )
-  (proc-exp (var symbol?) (body expression?))
-  (call-exp (rator expression?) (rand expression?))
+  (proc-exp (vars (list-of symbol?)) (body expression?))
+  (call-exp (rator expression?) (rands (list-of expression?)))
   (letrec-exp (p-name symbol?) (b-var symbol?) (p-body expression?) (body expression?))
 
   ; new stuff

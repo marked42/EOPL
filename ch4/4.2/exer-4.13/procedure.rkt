@@ -15,10 +15,10 @@
    )
   )
 
-(define (apply-procedure proc1 arg store)
+(define (apply-procedure proc1 args store)
   (cases proc proc1
     (procedure (vars body saved-env)
-               (value-of-exp body (extend-env* vars (list arg) saved-env) store)
+               (value-of-exp body (extend-env* vars args saved-env) store)
                )
     )
   )
