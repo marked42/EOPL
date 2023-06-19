@@ -10,7 +10,7 @@
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
- ["checker/main.rkt" (type-of-program)]
+ ["inferrer/main.rkt" (type-of-program)]
  )
 
 (provide (all-defined-out))
