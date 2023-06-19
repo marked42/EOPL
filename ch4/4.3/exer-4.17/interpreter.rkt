@@ -10,7 +10,7 @@
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
- ["store.rkt" (initialize-store! newref deref setref!)]
+ ["store.rkt" (initialize-store! newref deref setref! vals->refs)]
  )
 
 (provide (all-defined-out))
@@ -59,10 +59,10 @@
                   )
               )
             )
-    (let-exp (var exp1 body)
-             (let ([val (value-of-exp exp1 env)])
+    (let-exp (vars exps body)
+             (let ([vals (value-of-exps exps env)])
                ; new stuff
-               (value-of-exp body (extend-env* (list var) (list (newref val)) env))
+               (value-of-exp body (extend-env* vars (vals->refs vals) env))
                )
              )
     (proc-exp (vars body)

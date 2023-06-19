@@ -4,7 +4,7 @@
 (lazy-require
  ["expression.rkt" (expression?)]
  ["interpreter.rkt" (value-of-exp)]
- ["store.rkt" (newref)]
+ ["store.rkt" (newref vals->refs)]
  )
 
 (provide (all-defined-out))
@@ -21,7 +21,7 @@
   (cases proc proc1
     (procedure (vars body saved-env)
                ; new stuff
-               (value-of-exp body (extend-env* vars (map (lambda (arg) (newref arg)) args) saved-env))
+               (value-of-exp body (extend-env* vars (vals->refs args) saved-env))
                )
     )
   )
