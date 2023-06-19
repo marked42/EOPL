@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "environment.rkt")
+(require racket/lazy-require "environment.rkt" "answer.rkt")
 (lazy-require
  ["expression.rkt" (expression?)]
  ["interpreter.rkt" (value-of-exp)])
@@ -15,10 +15,10 @@
    )
   )
 
-(define (apply-procedure proc1 arg)
+(define (apply-procedure proc1 arg store)
   (cases proc proc1
     (procedure (var body saved-env)
-               (value-of-exp body (extend-env var arg saved-env))
+               (value-of-exp body (extend-env var arg saved-env) store)
                )
     )
   )
