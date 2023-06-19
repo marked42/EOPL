@@ -67,8 +67,13 @@
             )
     (let-exp (var exp1 body)
              (let ([val (value-of-exp exp1 env)])
-               ; new stuff
                (value-of-exp body (extend-env var val env))
+               )
+             )
+    (letmutable-exp (var exp1 body)
+             (let ([val (value-of-exp exp1 env)])
+               ; new stuff
+               (value-of-exp body (extend-env var (newref val) env))
                )
              )
     (proc-exp (var body)
