@@ -358,6 +358,29 @@ let x = 0
    )
   )
 
+(define test-cases-letmutable-exp
+  (list
+   (list "
+letmutable x = 0
+  in letrec even(dummy)
+            = if zero?(x)
+              then 1
+              else begin
+                set x = -(x,1);
+                (odd 888)
+              end
+            odd(dummy)
+            = if zero?(x)
+              then 0
+              else begin
+                set x = -(x,1);
+                (even 888)
+              end
+        in begin set x = 13; (odd -888) end
+" 1 "letmutable declares mutable variables")
+   )
+  )
+
 (define test-cases-implicit-refs-lang
   (append
    test-cases-letrec-lang-with-multiple-declarations
