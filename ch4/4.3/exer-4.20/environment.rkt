@@ -12,7 +12,7 @@
   (empty-env)
   (extend-env
    (var symbol?)
-   (val reference?)
+   (val (lambda (val) (or (reference? val) (expval? val))))
    (saved-env environment?)
    )
   (extend-env-rec*
@@ -24,10 +24,10 @@
   )
 
 (define (init-env)
-  ; new stuff
-  (extend-env 'i (newref (num-val 1))
-              (extend-env 'v (newref (num-val 5))
-                          (extend-env 'x (newref (num-val 10))
+  ; immutable variables
+  (extend-env 'i (num-val 1)
+              (extend-env 'v (num-val 5)
+                          (extend-env 'x (num-val 10)
                                       (empty-env)
                                       )
                           )
@@ -46,7 +46,7 @@
                      (let ([index (index-of p-names search-var)])
                        (if index
                            ; new stuff
-                           (newref (proc-val (procedure (list-ref b-vars index) (list-ref p-bodies index) env)))
+                           (proc-val (procedure (list-ref b-vars index) (list-ref p-bodies index) env))
                            (apply-env saved-env search-var)
                            )
                        )
