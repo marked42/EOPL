@@ -17,11 +17,11 @@
    )
   )
 
-(define (apply-procedure proc1 arg)
+(define (apply-procedure proc1 args)
   (cases proc proc1
     (procedure (vars body saved-env)
                ; new stuff
-               (value-of-exp body (extend-env* vars (list (newref arg)) saved-env))
+               (value-of-exp body (extend-env* vars (map (lambda (arg) (newref arg)) args) saved-env))
                )
     )
   )
