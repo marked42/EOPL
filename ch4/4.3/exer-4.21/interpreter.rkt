@@ -96,12 +96,22 @@
                      )
                  )
                )
-    ; new stuff
     (assign-exp (var exp1)
                 (let ([val1 (value-of-exp exp1 env)])
                   (setref! (apply-env env var) val1)
                   )
                 )
+
+    ; new stuff
+    (setdynamic-exp (var exp1 body)
+      (let* ([ref (apply-env env var)] [old-val (deref ref)] [new-val (value-of-exp exp1 env)])
+        (setref! ref new-val)
+        (let ((body-val (value-of-exp body env)))
+          (setref! ref old-val)
+          body-val
+        )
+      )
+    )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

@@ -389,6 +389,17 @@ letmutable x = 0
    )
   )
 
+(define test-cases-setdynamic-exp
+  (list
+    (list "
+let x = 11
+      in let p = proc (y) -(y,x)
+in -(setdynamic x = 17 during (p 22), (p 13))
+" 3 "setdynamic expression"
+    )
+  )
+)
+
 (define test-cases-mutable-pair-exp
   (list
    (list "
