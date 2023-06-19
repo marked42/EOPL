@@ -5,7 +5,7 @@
  ["environment.rkt" (
                      init-env
                      apply-env
-                     extend-env
+                     extend-env*
                      extend-env-rec
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc ref-val expval->ref)]
@@ -75,7 +75,7 @@
              (let ([ans (value-of-exp exp1 env store)])
                (cases answer ans
                  (an-answer (val store)
-                            (value-of-exp body (extend-env var val env) store)
+                            (value-of-exp body (extend-env* (list var) (list val) env) store)
                             )
                  )
                )
