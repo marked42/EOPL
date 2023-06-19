@@ -10,7 +10,7 @@
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
- ["store.rkt" (initialize-store! newref deref setref!)]
+ ["store.rkt" (initialize-store! newref deref setref! reference?)]
  )
 
 (provide (all-defined-out))
@@ -31,7 +31,13 @@
   (cases expression exp
     (const-exp (num) (num-val num))
     ; new stuff
-    (var-exp (var) (deref (apply-env env var)))
+    (var-exp (var) (let ([ref-or-val (apply-env env var)])
+                    (if (reference? ref-or-val)
+                      (deref ref-or-val)
+                      ref-or-val
+                    )
+                   )
+    )
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -62,7 +68,7 @@
     (let-exp (var exp1 body)
              (let ([val (value-of-exp exp1 env)])
                ; new stuff
-               (value-of-exp body (extend-env var (newref val) env))
+               (value-of-exp body (extend-env var val env))
                )
              )
     (proc-exp (var body)
@@ -98,8 +104,11 @@
                )
     ; new stuff
     (assign-exp (var exp1)
-                (let ([val1 (value-of-exp exp1 env)])
-                  (setref! (apply-env env var) val1)
+                (let ([val1 (value-of-exp exp1 env)] [ref-or-val (apply-env env var)])
+                  (if (reference? ref-or-val)
+                    (setref! ref-or-val val1)
+                    (eopl:error 'value-of-exp "Cannot assign expression ~s to immutable variable ~s" exp1 var)
+                    )
                   )
                 )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
