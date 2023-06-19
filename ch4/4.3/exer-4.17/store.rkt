@@ -38,3 +38,7 @@
 (define (report-invalid-reference ref the-store)
   (eopl:error 'setref! "illegal reference ~s in store ~s" ref the-store)
   )
+
+(define (vals->refs vals)
+  (map (lambda (val) (newref val)) vals)
+)
