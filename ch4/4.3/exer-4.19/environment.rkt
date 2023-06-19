@@ -12,15 +12,25 @@
   (empty-env)
   (extend-env*
    (vars (list-of symbol?))
-   (vals (list-of reference?))
+   (vals (list-of (lambda (val) (or (reference? val) (vector? val)))))
    (saved-env environment?)
    )
-  (extend-env-rec*
-   (p-names (list-of symbol?))
-   (b-vars (list-of symbol?))
-   (p-bodies (list-of expression?))
-   (saved-env environment?)
-   )
+  )
+
+(define (extend-env-rec* p-names b-vars p-bodies saved-env)
+  (let ([vectors (map (lambda (p-name) (make-vector 1)) p-names)])
+    (let ([new-env (extend-env* p-names vectors saved-env)])
+      (map (lambda (vec b-var p-body)
+        (vector-set!
+          vec
+          0
+          ; procedure body recursive refers to new-env
+          (proc-val (procedure b-var p-body new-env))
+          )
+      ) vectors b-vars p-bodies)
+      new-env
+    )
+  )
   )
 
 (define (init-env)
@@ -42,15 +52,6 @@
                       )
                   )
                 )
-    (extend-env-rec* (p-names b-vars p-bodies saved-env)
-                     (let ([index (index-of p-names search-var)])
-                       (if index
-                           ; new stuff
-                           (newref (proc-val (procedure (list-ref b-vars index) (list-ref p-bodies index) env)))
-                           (apply-env saved-env search-var)
-                           )
-                       )
-                     )
     (else (report-no-binding-found search-var))
     )
   )
