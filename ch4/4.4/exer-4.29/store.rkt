@@ -20,6 +20,10 @@
 
 (define (reference? v) (integer? v))
 
+(define (next-ref)
+  (length the-store)
+)
+
 (define (newref val)
   (let ([next-ref (length the-store)])
     (set! the-store (append the-store (list val)))

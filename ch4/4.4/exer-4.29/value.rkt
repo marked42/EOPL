@@ -3,6 +3,8 @@
 (require racket/lazy-require "expression.rkt")
 (lazy-require
  ["procedure.rkt" (proc?)]
+ ["store.rkt" (reference?)]
+ ["array.rkt" (array?)]
  )
 
 (provide (all-defined-out))
@@ -15,6 +17,7 @@
   (num-val (num number?))
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
+  (array-val (arr1 array?))
   )
 
 (define (expval->num val)
@@ -38,6 +41,12 @@
     )
   )
 
+(define (expval->array val)
+  (cases expval val
+    (array-val (arr1) arr1)
+    (else (report-expval-extractor-error 'array val))
+    )
+  )
 
 (define sloppy->expval
   (lambda (sloppy-val)

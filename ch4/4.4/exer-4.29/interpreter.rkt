@@ -8,9 +8,10 @@
                      extend-env
                      extend-env-rec*
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc array-val expval->array)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref!)]
+ ["array.rkt" (new-array array-ref array-set!)]
  )
 
 (provide (all-defined-out))
@@ -96,12 +97,28 @@
                      )
                  )
                )
-    ; new stuff
     (assign-exp (var exp1)
                 (let ([val1 (value-of-exp exp1 env)])
                   (setref! (apply-env env var) val1)
                   )
                 )
+
+    ; new stuff
+    (newarray-exp (exp1 exp2)
+                  (let* ([val1 (value-of-exp exp1 env)] [len (expval->num val1)] [val2 (value-of-exp exp2 env)])
+                    (array-val (new-array len val2))
+                  )
+    )
+    (arrayref-exp (exp1 exp2)
+                  (let* ([val1 (value-of-exp exp1 env)] [arr (expval->array val1)] [val2 (value-of-exp exp2 env)] [index (expval->num val2)])
+                    (array-ref arr index)
+                  )
+    )
+    (arrayset-exp (exp1 exp2 exp3)
+                  (let* ([val1 (value-of-exp exp1 env)] [arr (expval->array val1)] [val2 (value-of-exp exp2 env)] [index (expval->num val2)] [val3 (value-of-exp exp3 env)])
+                    (array-set! arr index val3)
+                  )
+    )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

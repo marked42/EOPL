@@ -19,8 +19,12 @@
 
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
 
-  ; new stuff
   (assign-exp (var symbol?) (exp1 expression?))
+
+  ; new stuff
+  (newarray-exp (exp1 expression?) (exp2 expression?))
+  (arrayref-exp (exp1 expression?) (exp2 expression?))
+  (arrayset-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
   )
 
 (define-datatype program program?
