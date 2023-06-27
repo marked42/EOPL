@@ -38,6 +38,7 @@
     (expression ("newarray" "("expression "," expression")") newarray-exp)
     (expression ("arrayref" "(" expression"," expression")") arrayref-exp)
     (expression ("arrayset" "(" expression"," expression "," expression ")") arrayset-exp)
+    (expression ("arraylength" "(" expression ")") arraylength-exp)
     )
   )
 

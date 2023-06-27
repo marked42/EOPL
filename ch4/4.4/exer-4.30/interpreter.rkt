@@ -11,7 +11,7 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc array-val expval->array)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref!)]
- ["array.rkt" (new-array array-ref array-set!)]
+ ["array.rkt" (new-array array-ref array-set! array-length)]
  )
 
 (provide (all-defined-out))
@@ -117,6 +117,11 @@
     (arrayset-exp (exp1 exp2 exp3)
                   (let* ([val1 (value-of-exp exp1 env)] [arr (expval->array val1)] [val2 (value-of-exp exp2 env)] [index (expval->num val2)] [val3 (value-of-exp exp3 env)])
                     (array-set! arr index val3)
+                  )
+    )
+    (arraylength-exp (exp1)
+                  (let* ([val1 (value-of-exp exp1 env)] [arr (expval->array val1)])
+                    (array-length arr)
                   )
     )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))

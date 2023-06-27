@@ -8,5 +8,7 @@
     (append
         test-cases-implicit-refs-lang
         test-cases-array-exp
+        test-cases-array-check-index-exp
+        test-cases-array-length-exp
     )
 )

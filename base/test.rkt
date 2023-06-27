@@ -437,6 +437,61 @@ let a = newarray(2,-99)
    )
   )
 
+(define test-cases-array-check-index-exp
+  (list
+   (list "
+let a = newarray(2,-99)
+  in arrayref(a, -1)
+      " 'error "array ref index out of bounds")
+   (list "
+let a = newarray(2,-99)
+  in arrayref(a, 0)
+      " -99 "array ref index within range")
+   (list "
+let a = newarray(2,-99)
+  in arrayref(a, 1)
+      " -99 "array ref index within range")
+   (list "
+let a = newarray(2,-99)
+  in arrayref(a, 2)
+      " 'error "array ref index out of bounds")
+   (list "
+let a = newarray(2,-99)
+  in arrayref(a, 3)
+      " 'error "array ref index out of bounds")
+
+   (list "
+let a = newarray(2,-99)
+  in arrayset(a, -1, 42)
+      " 'error "array set index out of bounds")
+   (list "
+let a = newarray(2,-99)
+  in arrayset(a, 0, 42)
+      " 42 "array set index within range")
+   (list "
+let a = newarray(2,-99)
+  in arrayset(a, 1, 42)
+      " 42 "array set index within range")
+   (list "
+let a = newarray(2,-99)
+  in arrayset(a, 2, 42)
+      " 'error "array set index out of bounds")
+   (list "
+let a = newarray(2,-99)
+  in arrayset(a, 3, 42)
+      " 'error "array set index out of bounds")
+   )
+  )
+
+(define test-cases-array-length-exp
+  (list
+   (list "
+let a = newarray(2,-99)
+  in arraylength(a)
+      " 2 "array")
+   )
+  )
+
 (define test-cases-call-by-reference
   (list
    (list "

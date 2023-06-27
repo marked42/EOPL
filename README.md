@@ -549,6 +549,10 @@ let x = 3
 1. 引用的更新，增加了`assign-exp(var, exp)`语句，首先获取变量`var`保存的引用值，然后更新引用指向的数据为`exp`的值。
 1. 引用的读取，`var-exp(var)`，读取变量`var`的引用值，然后获取引用指向的数据。
 
+### exer 4.29 / 4.30
+
+将数组表示为一个`(start . len)`的对，`start`代表起始元素的`ref`。
+
 ### letmutable
 
 混合使用 let 和 mut

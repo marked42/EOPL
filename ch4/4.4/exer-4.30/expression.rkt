@@ -25,6 +25,7 @@
   (newarray-exp (exp1 expression?) (exp2 expression?))
   (arrayref-exp (exp1 expression?) (exp2 expression?))
   (arrayset-exp (exp1 expression?) (exp2 expression?) (exp3 expression?))
+  (arraylength-exp (exp1 expression?))
   )
 
 (define-datatype program program?

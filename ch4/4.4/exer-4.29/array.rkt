@@ -3,6 +3,7 @@
 (require racket/lazy-require)
 (lazy-require
  ["store.rkt" (reference? next-ref newref deref setref! show-store)]
+ ["value.rkt" (num-val)]
  )
 
 (provide (all-defined-out))
@@ -26,10 +27,10 @@
     )
 )
 
-(define (check-array-index start len index)
+(define (check-array-index len index)
     (cond
         [(< index 0) (eopl:error 'check-array-index "array index cannot be smaller than first element index 0, get ~s" index)]
-        [(>= index (+ len start)) (eopl:error 'check-array-index "array index cannot be greater than last element index ~s, get ~s" (+ start len) index)]
+        [(>= index len) (eopl:error 'check-array-index "array index cannot be greater than last element index ~s, get ~s" (- len 1) index)]
         [else #t]
     )
 )
@@ -37,7 +38,7 @@
 (define (array-ref arr index)
     (cases array arr
         (an-array (start len)
-            (check-array-index start len index)
+            (check-array-index len index)
             (deref (+ start index))
         )
     )
@@ -46,8 +47,9 @@
 (define (array-set! arr index val)
     (cases array arr
         (an-array (start len)
-            (check-array-index start len index)
+            (check-array-index len index)
             (setref! (+ start index) val)
+            val
         )
     )
 )
