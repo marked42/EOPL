@@ -32,8 +32,12 @@
 
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
 
-    ; new stuff
     (expression ("set" identifier "=" expression) assign-exp)
+
+    ; new stuff
+    (expression ("newarray" "("expression "," expression")") newarray-exp)
+    (expression ("arrayref" "(" expression"," expression")") arrayref-exp)
+    (expression ("arrayset" "(" expression"," expression "," expression ")") arrayset-exp)
     )
   )
 
