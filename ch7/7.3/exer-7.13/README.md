@@ -1,6 +1,8 @@
-#### Rules
+# Exercise 7.13
 
-```
+## Rules
+
+```eopl
 let var = exp1 in body
 ```
 
@@ -12,9 +14,9 @@ $$
     }{(typeof \; (let\textrm{-} exp \; var \; exp1 \; body) \; tenv) = t_2}
 $$
 
-#### Exercise 1
+## Exercise 1
 
-```
+```eopl
 let x = 4 in (x 3)
 ```
 
@@ -56,9 +58,9 @@ let x = 4 in (x 3)
 
 $int = int \rightarrow t1$ cannot be true
 
-#### Exercise 2
+## Exercise 2
 
-```
+```eopl
 let f = proc(z) z in proc (x) -((f x), 1)
 ```
 
@@ -207,9 +209,9 @@ let f = proc(z) z in proc (x) -((f x), 1)
 |           | $t_z = int$                 |
 |           | $t_x = int$                 |
 
-#### Exercise 3
+## Exercise 3
 
-```
+```eopl
 let p = zero?(1) in if p then 88 else 99
 ```
 
@@ -297,10 +299,10 @@ let p = zero?(1) in if p then 88 else 99
 |           | $t_1 = bool$  |
 |           | $t_2 = int$   |
 
-#### Exercise 4
+## Exercise 4
 
-```
-
+```eopl
+let p = proc(z) z in if p then 88 else 99
 ```
 
 | Expression                                | Type Variable |
