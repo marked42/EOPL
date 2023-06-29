@@ -1710,7 +1710,31 @@ The no-occurrence invariant
 得到等式`t1 = t2`的过程中，`t2`中自由变量类型，已经被替换为`substitution`中的值，所以只需要将`subst`中所有等式右侧
 值中的`t1`替换为`t2`就可以保持 no-occurrence invariant。
 
-### HM Type System
+### Exercise 7.17
+
+Constant time substitution construction
+
+### Exercise 7.18
+
+cache substitution optimization
+
+### Constant time Variable Access
+
+Exercise 7.22
+
+### Recursive Type
+
+Exercise 7.25
+
+### Exercise 7.27
+
+Divide type inference into two phases, first generate all equations, then solve them.
+
+Wand, Mitchell. 1987. A Simple Algorithm and Proof for Type Inference
+
+### Hindley-Milner Type System
+
+Exercise 7.28 Parametric Polymorphism
 
 1. / Type Variable / Type / Quantified Type / Type Scheme
 
@@ -1759,6 +1783,12 @@ different type variables in a type
 1. bound variables (quantified type) type variables defined by quantified type
 1. unbound free variables (look in typing context), type variables defined in typing context
 1. other variables, implicitly treated as all-quantified (type variables) 类型标注中类型变量隐式的作为 quantified type variable
+
+### Algorithm W (Exercise 7.29)
+
+### Value Restriction (Exercise 7.30)
+
+### References
 
 1. CS 452 Foundations of Software Martin Odersky, EPFL [Note](https://kjaer.io/fos/) [Course Website](http://lampwww.epfl.ch/teaching/archive/type_systems/2010/docs/week01-2x2.pdf) [Repo](https://github.com/jxiw/Foundation-of-software/tree/master)
 1. [Hindley Milner Type System Wiki](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system)
