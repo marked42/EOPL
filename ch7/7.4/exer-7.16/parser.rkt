@@ -26,12 +26,15 @@
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
 
-    (expression ("proc" "(" identifier ":" optional-type")" expression) proc-exp)
+    (expression ("proc" "(" identifier optional-type")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
 
-    (expression ("letrec" optional-type identifier "(" identifier ":" optional-type ")" "=" expression "in" expression) letrec-exp)
+    (expression ("letrec" optional-type identifier "(" identifier optional-type ")" "=" expression "in" expression) letrec-exp)
 
-    (optional-type ("?") no-type)
+    (optional-type () no-type)
+    ; parameter type annotation has prefixing ':'
+    (optional-type (":" type) a-type)
+    ; letrec return type has no prefixing ':'
     (optional-type (type) a-type)
 
     (type ("int") int-type)

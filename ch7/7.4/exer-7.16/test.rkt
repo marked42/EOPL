@@ -157,7 +157,7 @@ let times = proc (x: int) proc (y: int) -(x,y) % not really times
 " 'int "letrec apply fact")
 
    (list "
-letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
+letrec fact(x) = if zero?(x) then 1 else -(x, (fact -(x,1)))
   in fact
 " '(int -> int) "pgm7b")
    )
@@ -165,13 +165,13 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
 
 (define test-cases-circular-types
   (list
-   (list "letrec ? f(x: ?) = (f f) in 33" 'error "dont infer circular")
+   (list "letrec f(x) = (f f) in 33" 'error "dont infer circular")
    )
   )
 
 (define test-cases-polymorphic
   (list
-   (list "letrec ? f(x: ?) = (f x) in f" '(tvar0 -> tvar1) "polymorphic type")
+   (list "letrec f(x) = (f x) in f" '(tvar0 -> tvar1) "polymorphic type")
    )
   )
 
