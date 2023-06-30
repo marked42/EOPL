@@ -22,7 +22,15 @@
     )
   )
 
-(define substitution? (list-of (pair-of tvar-type? type?)))
+(define (cached-type? val)
+  (and
+   (pair? val)
+   (symbol? (car val))
+   (type? (cdr val))
+   )
+  )
+
+(define substitution? (list-of (pair-of tvar-type? cached-type?)))
 
 (define (apply-subst-to-type ty subst)
   (cases type ty
@@ -36,7 +44,7 @@
                  ; no-occurrence invariant is not needed anymore, cause any var at left side in subst
                  ; will be repeatedly replaced with corresponding type at right side, until ty contains
                  ; no vars in subst or a type error is found during this replacement.
-                 (if tmp (apply-subst-to-type (mcdr tmp) subst) ty)
+                 (if tmp (apply-subst-to-type (cdr (mcdr tmp)) subst) ty)
                  )
                )
     )
@@ -59,7 +67,7 @@
 ; constant time substitution extension
 (define (extend-subst subst tvar ty)
   (cons
-   (mcons tvar ty)
+   (mcons tvar (cons 'original ty))
    subst
    )
   )
