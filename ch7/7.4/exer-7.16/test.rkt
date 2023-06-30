@@ -6,7 +6,7 @@
 (require "../../../base/test.rkt")
 (require "inferrer/main.rkt" "inferrer/equal-up-to-gensyms.rkt")
 
-; (test-lang run sloppy->expval test-cases-checked-lang)
+(test-lang run sloppy->expval test-cases-checked-lang)
 
 (define (test-inferrer-cases test-cases)
   (let ([equal-answer? (lambda (ans correct-ans msg) (check-equal? ans correct-ans msg))])
