@@ -33,7 +33,10 @@
                )
     (tvar-type (sn)
                (let ([tmp (assoc ty subst)])
-                 (if tmp (cdr tmp) ty)
+                 ; no-occurrence invariant is not needed anymore, cause any var at left side in subst
+                 ; will be repeatedly replaced with corresponding type at right side, until ty contains
+                 ; no vars in subst or a type error is found during this replacement.
+                 (if tmp (apply-subst-to-type (cdr tmp) subst) ty)
                  )
                )
     )
@@ -41,17 +44,11 @@
 
 (define (empty-subst) '())
 
-; preserves no-occurrence of invariant
+; constant time substitution extension
 (define (extend-subst subst tvar ty)
   (cons
    (cons tvar ty)
-   (map
-    (lambda (p)
-      (let ([oldlhs (car p)] [oldrhs (cdr p)])
-        (cons oldlhs (apply-one-subst oldrhs tvar ty))
-        )
-      )
-    subst)
+   subst
    )
   )
 
