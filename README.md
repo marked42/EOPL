@@ -1753,9 +1753,23 @@ The no-occurrence invariant
 
 所以得到的`subst`中只可能出现$t_i = f(t_j) (i < j)$，形成一个拓扑排序，不可能出现直接或者间接的循环引用。
 
-对`apply-subst-to-type`可以做缓存优化，使得同一个类型`ty`只会被展开一次（Exercise 7.18）。
+#### Cache Optimization
 
-### Constant time Variable Access
+`apply-subst-to-type`递归调用自身的过程中，对于同一个类型变量会多次调用，可以做缓存优化，使得同一个类型变量只展开一次。
+
+$
+t_1 = t_2 \rightarrow t_3 \\
+t_2 = int \\
+t_3 = int
+$
+
+$t_1$的展开结果是$int \rightarrow int$，结果保存在`subst`列表中。
+
+首先将`subst`中的元素从`pair`类型（`(t1 . type)`）修改为可变的`mpair`类型，这样可以更新`t1`对应的类型`type`，为了标记`type`是否已经被展开，将`type`修改为一个`(symbol . type)`的类型。`(original . type)`代表`type`是原始值，没有展开；`(cache . type)`代表`type`是展开过得值，直接使用。
+
+这个技巧在实现惰性求值（`thunk`）和`call-by-need`中都有使用。
+
+### Constant Time Variable Access
 
 Exercise 7.22
 

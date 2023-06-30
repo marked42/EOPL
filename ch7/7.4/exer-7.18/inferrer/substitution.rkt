@@ -44,7 +44,17 @@
                  ; no-occurrence invariant is not needed anymore, cause any var at left side in subst
                  ; will be repeatedly replaced with corresponding type at right side, until ty contains
                  ; no vars in subst or a type error is found during this replacement.
-                 (if tmp (apply-subst-to-type (cdr (mcdr tmp)) subst) ty)
+                 (if tmp
+                     (let* ([right (mcdr tmp)] [tag (car right)] [real-type (cdr right)])
+                       (if (eq? tag 'cache)
+                           real-type
+                           (let ([real-type (apply-subst-to-type real-type subst)])
+                             (set-mcdr! tmp (cons 'cache real-type))
+                             real-type
+                             )
+                           )
+                       )
+                     ty)
                  )
                )
     )
