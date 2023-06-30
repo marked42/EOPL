@@ -15,8 +15,8 @@
              (if (equal? expected 'error)
                  (check-exn exn:fail? (lambda () (check-program-type source)))
                  (let ([prog-type (check-program-type source)])
-                  (equal-answer? (apply-subst-to-sexp (canonical-subst prog-type) prog-type) expected msg)
-                  )
+                   (equal-answer? (apply-subst-to-sexp (canonical-subst prog-type) prog-type) expected msg)
+                   )
                  )
              )
            ) test-cases)
@@ -177,17 +177,17 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
 
 (define test-cases-inferrer-lang
   (append
-    test-cases-simple-arithmetic
-    test-cases-nested-arithmetic
-    test-cases-simple-variables
-    test-cases-simple-unbound-variables
-    test-cases-simple-conditionals
-    test-cases-simple-let
-    test-cases-nested-let
-    test-cases-simple-applications
-    test-cases-simple-letrecs
-    test-cases-procedures
-    test-cases-circular-types
+   test-cases-simple-arithmetic
+   test-cases-nested-arithmetic
+   test-cases-simple-variables
+   test-cases-simple-unbound-variables
+   test-cases-simple-conditionals
+   test-cases-simple-let
+   test-cases-nested-let
+   test-cases-simple-applications
+   test-cases-simple-letrecs
+   test-cases-procedures
+   test-cases-circular-types
    test-cases-polymorphic
    )
   )
