@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt")
+(require racket "type.rkt")
 (provide (all-defined-out))
 
 (define (apply-one-subst ty0 tvar ty1)
@@ -18,7 +18,7 @@
 
 (define (pair-of pred1 pred2)
   (lambda (val)
-    (and (pair? val) (pred1 (car val)) (pred2 (cdr val)))
+    (and (mpair? val) (pred1 (mcar val)) (pred2 (mcdr val)))
     )
   )
 
@@ -32,14 +32,26 @@
                (proc-type (apply-subst-to-type arg-type subst) (apply-subst-to-type result-type subst))
                )
     (tvar-type (sn)
-               (let ([tmp (assoc ty subst)])
+               (let ([tmp (find-subst ty subst)])
                  ; no-occurrence invariant is not needed anymore, cause any var at left side in subst
                  ; will be repeatedly replaced with corresponding type at right side, until ty contains
                  ; no vars in subst or a type error is found during this replacement.
-                 (if tmp (apply-subst-to-type (cdr tmp) subst) ty)
+                 (if tmp (apply-subst-to-type (mcdr tmp) subst) ty)
                  )
                )
     )
+  )
+
+(define (find-subst ty subst)
+  (if (null? subst)
+      #f
+      (let* ([head (car subst)] [left (mcar head)])
+        (if (equal? ty left)
+            head
+            (find-subst ty (cdr subst))
+            )
+        )
+      )
   )
 
 (define (empty-subst) '())
@@ -47,7 +59,7 @@
 ; constant time substitution extension
 (define (extend-subst subst tvar ty)
   (cons
-   (cons tvar ty)
+   (mcons tvar ty)
    subst
    )
   )
