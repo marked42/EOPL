@@ -1710,13 +1710,50 @@ The no-occurrence invariant
 得到等式`t1 = t2`的过程中，`t2`中自由变量类型，已经被替换为`substitution`中的值，所以只需要将`subst`中所有等式右侧
 值中的`t1`替换为`t2`就可以保持 no-occurrence invariant。
 
-### Exercise 7.17
+### Constant Time Substitution Extension (Exercise 7.17 / 7.18)
 
-Constant time substitution construction
+当前的`extend-subst`函数对$\sigma$扩展，增加一个新的变量等式$t_{new} = tv_{new}$时，需要对$\sigma$中已经存在的所有等式的右侧进行更新，将$t_{new}$替换为$tv_{new}$，维持`no-occurrence`不变量。`extend-subst`的时间复杂度跟$\sigma$的大小有关。
 
-### Exercise 7.18
+通过抛弃`no-occurrence`不变量，可以将`extend-subst`改进为常量时间复杂度，实现比较简单，直接拼接列表。
 
-cache substitution optimization
+```scheme
+(define (extend-subst subst tvar ty)
+  (cons
+   (cons tvar ty)
+   subst
+   )
+  )
+```
+
+类型替换的工作被转移到`apply-subst-to-type`中，在`tvar-type`中得到变量`ty`在`subst`中对应的类型值`tmp`，因为已经没有`no-occurrence`的保证，所以`tmp`可能包含`subst`中的等式左边的变量，所以对`tmp`递归调用`apply-subst-to-type`，最终将输入类型`ty`展开得到的结果中不包含`subst`中的已知变量。
+
+```scheme
+(define (apply-subst-to-type ty subst)
+  (cases type ty
+    ...
+    (tvar-type (sn)
+               (let ([tmp (assoc ty subst)])
+                 ; no-occurrence invariant is not needed anymore, cause any var at left side in subst
+                 ; will be repeatedly replaced with corresponding type at right side, until ty contains
+                 ; no vars in subst or a type error is found during this replacement.
+                 (if tmp (apply-subst-to-type (cdr tmp) subst) ty)
+                 )
+               )
+    )
+  )
+```
+
+考虑$tmp = t_1$，`subst`中包含$t_1 = t_1 \rightarrow t_2$，这样`t_1`会被无限展开，`apply-subst-to-type`形成死循环，这种情况在上述实现中会出现么？
+
+每次`unifier`函数还是进行`no-occurrence?`的检查，保证变量不能递归包含自身，这样$t_1 = t_1 \rightarrow t_2$这种直接递归的等式不会被添加到`subst`中。
+
+那么是否可能出现间接循环引用的情况$t_1 = t_2 \quad t_2 = t_1$？
+
+考虑只包含一个等式的`subst` $t_1 = t_2$，$tmp_1$被替换后展开了所有的$t_1$，因此只可能包含$t_2$，同时`no-occurrence?`检查保证了$t_2$不可能包含自身，所以$t_2$只可能包含其他的类型$t_i (i > 2)$。
+
+所以得到的`subst`中只可能出现$t_i = f(t_j) (i < j)$，形成一个拓扑排序，不可能出现直接或者间接的循环引用。
+
+对`apply-subst-to-type`可以做缓存优化，使得同一个类型`ty`只会被展开一次（Exercise 7.18）。
 
 ### Constant time Variable Access
 
@@ -1803,3 +1840,4 @@ different type variables in a type
 John C. Reynolds, Towards a Theory of Type Structure, 1974Hindley, R., The Principal Type-scheme of an Object in Combinatory Logic, Transactions of the American Mathematical Society 146, 29-60,1969
 
 1. https://course.ccs.neu.edu/cs4410sp19/
+****
