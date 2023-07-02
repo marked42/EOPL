@@ -36,7 +36,7 @@
 
     (type ("int") int-type)
     (type ("bool") bool-type)
-    (type ("(" type "->" type")") proc-type)
+    (type ("(" (separated-list type "*") "->" type")") proc-type)
     (type ("%tvar-type" number) tvar-type)
     )
   )

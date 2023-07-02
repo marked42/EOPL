@@ -1,20 +1,26 @@
 #lang eopl
 
-(require "type.rkt")
+(require racket "type.rkt")
 (provide (all-defined-out))
 
 (define (apply-one-subst ty0 tvar ty1)
   (cases type ty0
     (int-type () (int-type))
     (bool-type () (bool-type))
-    (proc-type (arg-type result-type)
-               (proc-type (apply-one-subst arg-type tvar ty1) (apply-one-subst result-type tvar ty1))
+    (proc-type (arg-types result-type)
+               (proc-type
+                (apply-one-subst-to-types arg-types tvar ty1)
+                (apply-one-subst result-type tvar ty1))
                )
     (tvar-type (sn)
                (if (equal? ty0 tvar) ty1 ty0)
                )
     )
   )
+
+(define (apply-one-subst-to-types types tvar ty1)
+  (map (lambda (ty) (apply-one-subst ty tvar ty1)) types)
+)
 
 (define (pair-of pred1 pred2)
   (lambda (val)
@@ -28,8 +34,10 @@
   (cases type ty
     (int-type () (int-type))
     (bool-type () (bool-type))
-    (proc-type (arg-type result-type)
-               (proc-type (apply-subst-to-type arg-type subst) (apply-subst-to-type result-type subst))
+    (proc-type (arg-types result-type)
+               (proc-type
+                (map (lambda (arg-type) (apply-subst-to-type arg-type subst)) arg-types)
+                (apply-subst-to-type result-type subst))
                )
     (tvar-type (sn)
                (let ([tmp (assoc ty subst)])
@@ -59,9 +67,9 @@
   (cases type ty
     (int-type () #t)
     (bool-type () #t)
-    (proc-type (arg-type result-type)
+    (proc-type (arg-types result-type)
                (and
-                (no-occurrence? tvar arg-type)
+                (andmap (lambda (arg-type) (no-occurrence? tvar arg-type)) arg-types)
                 (no-occurrence? tvar result-type)
                 )
                )

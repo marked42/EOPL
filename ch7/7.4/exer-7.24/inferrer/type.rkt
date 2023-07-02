@@ -7,7 +7,7 @@
 (define-datatype type type?
   (int-type)
   (bool-type)
-  (proc-type (arg-type type?) (result-type type?))
+  (proc-type (arg-types (list-of type?)) (result-type type?))
   (tvar-type (sn integer?))
   )
 
@@ -28,22 +28,22 @@
 
 (define (proc-type? ty)
   (cases type ty
-    (proc-type (arg-type result-type) #t)
+    (proc-type (arg-types result-type) #t)
     (else #f)
     )
   )
 
-(define (proc-type->arg-type ty)
+(define (proc-type->arg-types ty)
   (cases type ty
-    (proc-type (arg-type result-type) arg-type)
-    (else (eopl:error 'proc-type->arg-type "Not a proc-type: ~s" ty))
+    (proc-type (arg-types result-type) arg-types)
+    (else (eopl:error 'proc-type->arg-types "Not a proc-type: ~s" ty))
     )
   )
 
 (define (proc-type->result-type ty)
   (cases type ty
-    (proc-type (arg-type result-type) result-type)
-    (else (eopl:error 'proc-type->arg-type "Not a proc-type: ~s" ty))
+    (proc-type (arg-types result-type) result-type)
+    (else (eopl:error 'proc-type->result-type "Not a proc-type: ~s" ty))
     )
   )
 
@@ -73,11 +73,11 @@
   (cases type ty
     (int-type () 'int)
     (bool-type () 'bool)
-    (proc-type (arg-type result-type)
-               (list (type-to-external-form arg-type)
-                     '->
-                     (type-to-external-form result-type)
-                     )
+    (proc-type (arg-types result-type)
+               (append
+                (map type-to-external-form arg-types)
+                (list '-> (type-to-external-form result-type))
+                )
                )
     (tvar-type (serial-number)
                (string->symbol (string-append "tvar" (number->string serial-number)))
