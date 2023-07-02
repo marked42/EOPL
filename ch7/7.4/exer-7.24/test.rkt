@@ -175,6 +175,18 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
    )
   )
 
+(define test-cases-let-exp-with-multiple-declarations
+  (list
+   (list "let a = 1 b = 2 in -(a, b)" 'int "let exp with multiple declarations")
+   (list "
+let x = 30
+      in let x = -(x,1)
+             y = -(x,2)
+         in -(x,y)
+   " 'int "let exp with multiple declarations")
+   )
+  )
+
 (define test-cases-inferrer-lang
   (append
    test-cases-simple-arithmetic
@@ -189,6 +201,8 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
    test-cases-procedures
    test-cases-circular-types
    test-cases-polymorphic
+
+   test-cases-let-exp-with-multiple-declarations
    )
   )
 
