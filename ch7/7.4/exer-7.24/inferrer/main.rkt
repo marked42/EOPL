@@ -11,8 +11,15 @@
 
 (provide (all-defined-out))
 
+(define (type-or-type-list? val)
+  (or
+    (type? val)
+    ((list-of type?) val)
+  )
+)
+
 (define-datatype answer answer?
-  (an-answer (ty type?) (subst substitution?))
+  (an-answer (ty type-or-type-list?) (subst substitution?))
   )
 
 (define (type-of-program pgm)
@@ -79,10 +86,10 @@
                          )
               )
             )
-    (let-exp (var exp1 body)
-             (cases answer (type-of exp1 tenv subst)
-               (an-answer (exp1-type subst)
-                          (type-of body (extend-tenv* (list var) (list exp1-type) tenv) subst)
+    (let-exp (vars exps body)
+             (cases answer (type-of-exps exps tenv subst)
+               (an-answer (types subst)
+                          (type-of body (extend-tenv* vars types tenv) subst)
                           )
                )
              )
@@ -133,3 +140,16 @@
 (define (check-program-type str)
   (type-to-external-form (type-of-program (scan&parse str)))
   )
+
+(define (type-of-exps exps tenv subst)
+  (let loop ([types '()] [exps exps] [subst subst])
+    (if (null? exps)
+      (an-answer (reverse types) subst)
+      (cases answer (type-of (car exps) tenv subst)
+        (an-answer (ty subst1)
+          (loop (cons ty types) (cdr exps) subst1)
+        )
+      )
+    )
+  )
+)
