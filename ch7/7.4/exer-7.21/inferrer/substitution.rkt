@@ -24,32 +24,38 @@
 
 (define substitution? (list-of (pair-of tvar-type? type?)))
 
-(define (apply-subst-to-type ty subst)
+(define the-subst 'uninitialized)
+
+(define (get-the-subst) the-subst)
+
+(define (initialize-subst!) (set! the-subst '()))
+
+(define (apply-subst-to-type ty)
   (cases type ty
     (int-type () (int-type))
     (bool-type () (bool-type))
     (proc-type (arg-type result-type)
-               (proc-type (apply-subst-to-type arg-type subst) (apply-subst-to-type result-type subst))
+               (proc-type (apply-subst-to-type arg-type) (apply-subst-to-type result-type))
                )
     (tvar-type (sn)
-               (let ([tmp (assoc ty subst)])
+               (let ([tmp (assoc ty the-subst)])
                  ; no-occurrence invariant is not needed anymore, cause any var at left side in subst
                  ; will be repeatedly replaced with corresponding type at right side, until ty contains
                  ; no vars in subst or a type error is found during this replacement.
-                 (if tmp (apply-subst-to-type (cdr tmp) subst) ty)
+                 (if tmp (apply-subst-to-type (cdr tmp)) ty)
                  )
                )
     )
   )
 
-(define (empty-subst) '())
-
 ; constant time substitution extension
-(define (extend-subst subst tvar ty)
-  (cons
-   (cons tvar ty)
-   subst
-   )
+(define (extend-subst tvar ty)
+  (set! the-subst
+    (cons
+      (cons tvar ty)
+      the-subst
+      )
+    )
   )
 
 (define (no-occurrence? tvar ty)
