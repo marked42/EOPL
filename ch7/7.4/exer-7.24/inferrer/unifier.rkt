@@ -21,7 +21,7 @@
            )
        ]
       [(and (proc-type? ty1) (proc-type? ty2))
-       (let ([subst (unifier (proc-type->arg-type ty1) (proc-type->arg-type ty2) subst exp)])
+       (let ([subst (unifier-types (proc-type->arg-types ty1) (proc-type->arg-types ty2) subst exp)])
          (let ([subst (unifier (proc-type->result-type ty1) (proc-type->result-type ty2) subst exp)])
            subst
            )
@@ -31,6 +31,15 @@
       )
     )
   )
+
+(define (unifier-types types1 types2 subst exp)
+  (if (null? types1)
+    subst
+    (let ([subst (unifier (car types1) (car types2) subst exp)])
+      (unifier-types (cdr types1) (cdr types2) subst exp)
+    )
+  )
+)
 
 (define (report-no-occurrence-violation ty1 ty2 exp)
   (eopl:error
