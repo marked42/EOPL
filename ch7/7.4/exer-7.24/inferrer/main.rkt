@@ -119,8 +119,10 @@
                   )
                 )
               )
-    (letrec-exp (p-result-otype p-name b-var b-var-otype p-body letrec-body)
-                (let ([p-result-type (otype->type p-result-otype)] [b-var-type (otype->type b-var-otype)])
+    (letrec-exp (p-result-otype p-name b-typed-var p-body letrec-body)
+                (let ([p-result-type (otype->type p-result-otype)]
+                      [b-var (typed-var->var b-typed-var)]
+                      [b-var-type (otype->type (typed-var->type b-typed-var))])
                   (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type (list b-var-type) p-result-type)) tenv)])
                     (cases answer (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body) subst)
                       (an-answer (p-body-type subst)
