@@ -11,6 +11,7 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["inferrer/main.rkt" (type-of-program)]
+ ["typed-var.rkt" (typed-var->var)]
  )
 
 (provide (all-defined-out))
@@ -62,8 +63,8 @@
                (value-of-exp body (extend-env* vars vals env))
                )
              )
-    (proc-exp (var var-type body)
-              (proc-val (procedure (list var) body env))
+    (proc-exp (typed-var body)
+              (proc-val (procedure (list (typed-var->var typed-var)) body env))
               )
     (call-exp (rator rand)
               (let ([rator-val (value-of-exp rator env)] [rand-val (value-of-exp rand env)])

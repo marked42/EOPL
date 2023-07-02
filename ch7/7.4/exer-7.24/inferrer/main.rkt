@@ -7,6 +7,7 @@
          "equal-up-to-gensyms.rkt"
          "../expression.rkt"
          "../parser.rkt"
+         "../typed-var.rkt"
          )
 
 (provide (all-defined-out))
@@ -93,8 +94,8 @@
                           )
                )
              )
-    (proc-exp (var otype body)
-              (let ([var-type (otype->type otype)])
+    (proc-exp (typed-var body)
+              (let ([var (typed-var->var typed-var)] [var-type (otype->type (typed-var->type typed-var))])
                 (cases answer (type-of body (extend-tenv* (list var) (list var-type) tenv) subst)
                   (an-answer (result-type subst)
                              (an-answer (proc-type (list var-type) result-type) subst)
