@@ -175,6 +175,14 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
    )
   )
 
+(define test-cases-pair
+  (list
+   (list "newpair(1, 2)" '(pairof int int) "newpair exp")
+   (list "let a = newpair(1, zero?(1)) in unpair b c = a in b" 'int "unpair pair exp")
+   (list "let a = newpair(1, zero?(1)) in unpair b c = a in c" 'bool "unpair pair exp")
+   )
+  )
+
 (define test-cases-inferrer-lang
   (append
    test-cases-simple-arithmetic
@@ -189,6 +197,7 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
    test-cases-procedures
    test-cases-circular-types
    test-cases-polymorphic
+   test-cases-pair
    )
   )
 

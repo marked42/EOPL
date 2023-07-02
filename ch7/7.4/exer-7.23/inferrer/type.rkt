@@ -8,6 +8,7 @@
   (int-type)
   (bool-type)
   (proc-type (arg-type type?) (result-type type?))
+  (pair-type (ty1 type?) (ty2 type?))
   (tvar-type (sn integer?))
   )
 
@@ -47,6 +48,20 @@
     )
   )
 
+(define (pair-type->type1 ty)
+  (cases type ty
+    (pair-type (type1 type2) type1)
+    (else (eopl:error 'proc-type->type1 "Not a pair-type: ~s" ty))
+    )
+  )
+
+(define (pair-type->type2 ty)
+  (cases type ty
+    (pair-type (type1 type2) type2)
+    (else (eopl:error 'proc-type->type2 "Not a pair-type: ~s" ty))
+    )
+  )
+
 (define-datatype optional-type optional-type?
   (no-type)
   (a-type (ty type?))
@@ -77,6 +92,12 @@
                (list (type-to-external-form arg-type)
                      '->
                      (type-to-external-form result-type)
+                     )
+               )
+    (pair-type (ty1 ty2)
+               (list 'pairof
+                     (type-to-external-form ty1)
+                     (type-to-external-form ty2)
                      )
                )
     (tvar-type (serial-number)
