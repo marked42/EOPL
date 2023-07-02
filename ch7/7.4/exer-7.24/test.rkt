@@ -187,6 +187,12 @@ let x = 30
    )
   )
 
+(define test-cases-proc-exp-with-multiple-arguments
+  (list
+   (list "let f = proc(x: ?, y: ?) -(x,-(0,y)) in (f 3 4)" 'int "proc-exp with multiple arguments")
+   )
+  )
+
 (define test-cases-inferrer-lang
   (append
    test-cases-simple-arithmetic
@@ -203,6 +209,7 @@ let x = 30
    test-cases-polymorphic
 
    test-cases-let-exp-with-multiple-declarations
+   test-cases-proc-exp-with-multiple-arguments
    )
   )
 

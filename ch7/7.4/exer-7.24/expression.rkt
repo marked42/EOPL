@@ -14,8 +14,8 @@
    (exps (list-of expression?))
    (body expression?)
    )
-  (proc-exp (typed-var typed-var?) (body expression?))
-  (call-exp (rator expression?) (rand expression?))
+  (proc-exp (typed-var (list-of typed-var?)) (body expression?))
+  (call-exp (rator expression?) (rand (list-of expression?)))
   (letrec-exp (p-result-otype optional-type?) (p-name symbol?) (b-var symbol?) (b-var-otype optional-type?) (p-body expression?) (body expression?))
   )
 
