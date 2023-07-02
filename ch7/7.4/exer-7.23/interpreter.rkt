@@ -8,7 +8,7 @@
                      extend-env
                      extend-env-rec
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc pair-val expval->pair)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["inferrer/main.rkt" (type-of-program)]
  )
@@ -75,6 +75,17 @@
     (letrec-exp (p-result-type p-name b-var b-var-type p-body body)
                 (let ([new-env (extend-env-rec p-name b-var p-body env)])
                   (value-of-exp body new-env)
+                  )
+                )
+    ; new stuff
+    (newpair-exp (exp1 exp2)
+                 (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                   (pair-val val1 val2)
+                   )
+                 )
+    (unpair-exp (var1 var2 exp1 body)
+                (let* ([val1 (value-of-exp exp1 env)] [pair (expval->pair val1)])
+                  (value-of-exp body (extend-env var1 (car pair) (extend-env var2 (cdr pair) env)))
                   )
                 )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))

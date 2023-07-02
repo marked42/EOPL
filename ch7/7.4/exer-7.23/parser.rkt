@@ -31,6 +31,10 @@
 
     (expression ("letrec" optional-type identifier "(" identifier ":" optional-type ")" "=" expression "in" expression) letrec-exp)
 
+    ; new stuff
+    (expression ("newpair" "("expression "," expression ")") newpair-exp)
+    (expression ("unpair" identifier identifier "=" expression "in" expression) unpair-exp)
+
     (optional-type ("?") no-type)
     (optional-type (type) a-type)
 
@@ -38,6 +42,8 @@
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
     (type ("%tvar-type" number) tvar-type)
+    ; new stuff
+    (type ("pair-of" type "*" type) pair-type)
     )
   )
 
