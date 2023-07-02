@@ -1,7 +1,7 @@
 #lang eopl
 
 (require "expression.rkt")
-(require "inferrer/type.rkt")
+(require "inferrer/type.rkt" "typed-var.rkt")
 (provide (all-defined-out))
 
 (define the-lexical-spec
@@ -26,10 +26,12 @@
 
     (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
 
-    (expression ("proc" "(" identifier ":" optional-type")" expression) proc-exp)
+    (expression ("proc" "("typed-var")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
 
     (expression ("letrec" optional-type identifier "(" identifier ":" optional-type ")" "=" expression "in" expression) letrec-exp)
+
+    (typed-var (identifier ":" optional-type) a-typed-var)
 
     (optional-type ("?") no-type)
     (optional-type (type) a-type)
