@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt")
+(require racket "type.rkt")
 (provide (all-defined-out))
 
 (define (apply-one-subst ty0 tvar ty1)
@@ -28,7 +28,8 @@
 
 (define (get-the-subst) the-subst)
 
-(define (initialize-subst!) (set! the-subst '()))
+; use hash-table to represent substituion so type variable access is constant time
+(define (initialize-subst!) (set! the-subst (hash)))
 
 (define (apply-subst-to-type ty)
   (cases type ty
@@ -38,11 +39,11 @@
                (proc-type (apply-subst-to-type arg-type) (apply-subst-to-type result-type))
                )
     (tvar-type (sn)
-               (let ([tmp (assoc ty the-subst)])
+               (let ([tmp (hash-ref the-subst ty #f)])
                  ; no-occurrence invariant is not needed anymore, cause any var at left side in subst
                  ; will be repeatedly replaced with corresponding type at right side, until ty contains
                  ; no vars in subst or a type error is found during this replacement.
-                 (if tmp (apply-subst-to-type (cdr tmp)) ty)
+                 (if tmp (apply-subst-to-type tmp) ty)
                  )
                )
     )
@@ -50,12 +51,7 @@
 
 ; constant time substitution extension
 (define (extend-subst tvar ty)
-  (set! the-subst
-    (cons
-      (cons tvar ty)
-      the-subst
-      )
-    )
+  (set! the-subst (hash-set the-subst tvar ty))
   )
 
 (define (no-occurrence? tvar ty)
