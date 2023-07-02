@@ -5,7 +5,8 @@
 (provide (all-defined-out))
 
 (define (unifier ty1 ty2 subst exp)
-  (let ([ty1 (apply-subst-to-type ty1 subst)] [ty2 (apply-subst-to-type ty2 subst)])
+  (let ([ty1 (if (tvar-type? ty1) (apply-subst-to-type ty1 subst) ty1)]
+        [ty2 (if (tvar-type? ty2) (apply-subst-to-type ty2 subst) ty2)])
     (cond
       [(equal? ty1 ty2) subst]
       [(tvar-type? ty1)
