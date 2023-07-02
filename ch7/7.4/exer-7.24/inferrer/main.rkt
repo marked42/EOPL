@@ -119,23 +119,47 @@
                   )
                 )
               )
-    (letrec-exp (p-result-otype p-name b-typed-var p-body letrec-body)
-                (let ([p-result-type (otype->type p-result-otype)]
-                      [b-var (typed-var->var b-typed-var)]
-                      [b-var-type (otype->type (typed-var->type b-typed-var))])
-                  (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type (list b-var-type) p-result-type)) tenv)])
-                    (cases answer (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body) subst)
-                      (an-answer (p-body-type subst)
-                                 (let ([subst (unifier p-body-type p-result-type subst p-body)])
-                                   (type-of letrec-body tenv-for-letrec-body subst)
-                                   )
-                                 )
-                      )
+    (letrec-exp (p-result-otypes p-names b-typed-vars p-bodies letrec-body)
+                (let ([p-result-types (map (lambda (p-result-otype) (otype->type p-result-otype)) p-result-otypes)]
+                      [b-vars (map typed-var->var b-typed-vars)]
+                      [b-var-types (map (lambda (b-typed-var) (otype->type (typed-var->type b-typed-var))) b-typed-vars)])
+                  (let* ([tenv-for-letrec-body (get-tenv-for-letrec-body p-names b-var-types p-result-types tenv)]
+                         [subst (unifer-p-bodies b-vars b-var-types p-bodies p-result-types tenv-for-letrec-body subst)])
+                    (type-of letrec-body tenv-for-letrec-body subst)
                     )
                   )
                 )
     )
   )
+
+(define (unifer-p-bodies b-vars b-var-types p-bodies p-result-types tenv subst)
+  (let loop ([b-vars b-vars] [b-var-types b-var-types] [p-bodies p-bodies] [p-result-types p-result-types] [subst subst])
+    (if (null? b-vars)
+      subst
+      (let ([b-var (car b-vars)] [b-var-type (car b-var-types)] [p-body (car p-bodies)] [p-result-type (car p-result-types)])
+        (cases answer (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv) subst)
+          (an-answer (p-body-type subst)
+            (let ([subst (unifier p-body-type p-result-type subst p-body)])
+              (loop
+                (cdr b-vars)
+                (cdr b-var-types)
+                (cdr p-bodies)
+                (cdr p-result-types)
+                subst)
+            )
+          )
+        )
+      )
+    )
+  )
+)
+
+(define (get-tenv-for-letrec-body p-names b-var-types p-result-types tenv)
+  (extend-tenv*
+    p-names
+    (map (lambda (b-var-type p-result-type) (proc-type (list b-var-type) p-result-type)) b-var-types p-result-types)
+    tenv)
+)
 
 (define (report-rator-not-a-proc-type rator-type rator)
   (eopl:error 'type-of-expression "Rator not a proc type: ~%~s~%had rator type ~s" rator (type-to-external-form rator-type))

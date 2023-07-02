@@ -193,6 +193,16 @@ let x = 30
    )
   )
 
+(define test-cases-letrec-exp-with-multiple-declarartions
+  (list
+   (list "
+letrec ? double(x: ?) = if zero?(x) then 0 else -((double -(x,1)), -2)
+       ? triple(x: ?) = if zero?(x) then 0 else -((triple -(x,1)), -3)
+    in (triple (double 6))
+" 'int "letrec-exp with multiple declarations")
+   )
+  )
+
 (define test-cases-inferrer-lang
   (append
    test-cases-simple-arithmetic
@@ -210,6 +220,7 @@ let x = 30
 
    test-cases-let-exp-with-multiple-declarations
    test-cases-proc-exp-with-multiple-arguments
+   test-cases-letrec-exp-with-multiple-declarartions
    )
   )
 
