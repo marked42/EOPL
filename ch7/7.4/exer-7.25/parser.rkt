@@ -31,6 +31,12 @@
 
     (expression ("letrec" optional-type identifier "(" identifier ":" optional-type ")" "=" expression "in" expression) letrec-exp)
 
+    ; new stuff
+    (expression ("emptylist") emptylist-exp)
+    (expression ("null?" "(" expression ")") null?-exp)
+    (expression ("cons" "(" expression "," expression ")") cons-exp)
+    (expression ("list" "(" expression (arbno "," expression) ")") list-exp)
+
     (optional-type ("?") no-type)
     (optional-type (type) a-type)
 

@@ -40,7 +40,7 @@
                  )
                )
     (list-type (element-type)
-               (list-type (apply-subst-to-type element-type ty subst))
+               (list-type (apply-subst-to-type element-type subst))
                )
     )
   )

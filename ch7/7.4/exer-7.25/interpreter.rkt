@@ -8,7 +8,7 @@
                      extend-env
                      extend-env-rec
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["inferrer/main.rkt" (type-of-program)]
  )
@@ -77,6 +77,36 @@
                   (value-of-exp body new-env)
                   )
                 )
+    ; new stuff
+    (emptylist-exp ()
+                   (null-val)
+                   )
+    (null?-exp (exp1)
+               (let ([val1 (value-of-exp exp1 env)])
+                 (bool-val (null-val? val1))
+                 )
+               )
+    (cons-exp (exp1 exp2)
+              (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
+                (cell-val val1 val2)
+                )
+              )
+    (list-exp (exp1 exps)
+              (let ([val1 (value-of-exp exp1 env)] [vals (value-of-exps exps env)])
+                (let build-list ([vals (cons val1 vals)])
+                  (if (null? vals)
+                      (null-val)
+                      (let ((first (car vals)) (rest (cdr vals)))
+                        (cell-val first (build-list rest))
+                        )
+                      )
+                  )
+                )
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+(define (value-of-exps exps env)
+  (map (lambda (exp) (value-of-exp exp env)) exps)
   )

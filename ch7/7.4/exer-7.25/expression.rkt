@@ -17,6 +17,12 @@
   (proc-exp (var symbol?) (var-otype optional-type?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
   (letrec-exp (p-result-otype optional-type?) (p-name symbol?) (b-var symbol?) (b-var-otype optional-type?) (p-body expression?) (body expression?))
+
+  ; new stuff
+  (emptylist-exp)
+  (null?-exp (exp1 expression?))
+  (cons-exp (exp1 expression?) (exp2 expression?))
+  (list-exp (exp1 expression?) (exps (list-of expression?)))
   )
 
 (define-datatype program program?

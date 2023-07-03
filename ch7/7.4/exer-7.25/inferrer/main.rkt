@@ -123,6 +123,47 @@
                     )
                   )
                 )
+
+    ; new stuff
+    (emptylist-exp () (an-answer (list-type (fresh-var-type)) subst))
+    (null?-exp (exp1)
+               (let ([ans (type-of exp1 tenv subst)])
+                 (cases answer ans
+                   (an-answer (ty1 subst1)
+                              (if (list-type? ty1)
+                                  (an-answer (bool-type) subst1)
+                                  (eopl:error 'null?-exp "accepts only list type, got ~s" (type-to-external-form ty1))
+                                  )
+                              )
+                   )
+                 )
+               )
+    (cons-exp (exp1 exp2)
+              (cases answer (type-of exp1 tenv subst)
+                (an-answer (ty1 subst1)
+                           (cases answer (type-of exp2 tenv subst1)
+                             (an-answer (ty2 subst2)
+                                        (let ([subst (unifier (list-type ty1) ty2 subst2 exp)])
+                                          (an-answer ty2 subst)
+                                          )
+                                        )
+                             )
+                           )
+                )
+              )
+    (list-exp (exp1 exps)
+              (cases answer (type-of exp1 tenv subst)
+                (an-answer (ty1 subst1)
+                           (let* ([p (type-of-exps exps tenv subst1)]
+                                  [types (car p)]
+                                  [subst (cdr p)]
+                                  )
+                             (check-list-equal-element-types ty1 types)
+                             (an-answer (list-type ty1) subst)
+                             )
+                           )
+                )
+              )
     )
   )
 
@@ -132,4 +173,30 @@
 
 (define (check-program-type str)
   (type-to-external-form (type-of-program (scan&parse str)))
+  )
+
+(define (check-list-equal-element-types ty1 types)
+  (map
+   (lambda (type)
+     (if (equal? ty1 type)
+         #t
+         (eopl:error 'list-exp "element type not equal ~s != ~s" ty1 type)
+         ))
+   types)
+  )
+
+; an-answer ty field is type?, cannot wrap accept list-of type?
+; so return a pair instead of an-answer
+(define (type-of-exps exps tenv subst)
+  (let loop ([types '()] [exps exps] [subst subst])
+    (if (null? exps)
+        ; return pair
+        (cons (reverse types) subst)
+        (cases answer (type-of (car exps) tenv subst)
+          (an-answer (ty subst1)
+                     (loop (cons ty types) (cdr exps) subst1)
+                     )
+          )
+        )
+    )
   )

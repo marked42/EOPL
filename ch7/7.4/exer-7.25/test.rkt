@@ -175,6 +175,23 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
    )
   )
 
+(define test-cases-list-exp
+  (list
+   (list "let a = emptylist in null?(a)" 'bool "null? returns true for emptylist")
+   (list "let a = emptylist in null?(1)" 'error "null? throws error for non list type")
+
+   (list "let a = emptylist in let b = cons(1, a) in a" '(listof int) "infer empty list a to be of (listof int) type")
+
+   (list "cons(1, emptylist)" '(listof int) "cons builds a int list from an int and another empty list type")
+   (list "cons(zero?(1), emptylist)" '(listof bool) "cons builds a bool list from an bool and another empty list type")
+
+   (list "cons(1, 1)" 'error "cons throws error when second element is not list")
+
+   (list "list(1, 2)" '(listof int) "list builds a list of int")
+   (list "list(1, zero(1))" 'error "throws error element type are not same")
+   )
+  )
+
 (define test-cases-inferrer-lang
   (append
    test-cases-simple-arithmetic
@@ -189,6 +206,8 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
    test-cases-procedures
    test-cases-circular-types
    test-cases-polymorphic
+
+   test-cases-list-exp
    )
   )
 
