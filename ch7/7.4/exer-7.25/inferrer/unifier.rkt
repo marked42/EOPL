@@ -27,6 +27,11 @@
            )
          )
        ]
+      [(and (list-type? ty1) (list-type? ty2))
+       (let ([subst (unifier (list-type->element-type ty1) (list-type->element-type ty2) subst exp)])
+         subst
+         )
+       ]
       [else (report-unification-failure ty1 ty2 exp)]
       )
     )

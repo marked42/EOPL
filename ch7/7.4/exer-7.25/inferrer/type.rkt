@@ -9,6 +9,7 @@
   (bool-type)
   (proc-type (arg-type type?) (result-type type?))
   (tvar-type (sn integer?))
+  (list-type (element-type type?))
   )
 
 (define (atomic-type? ty)
@@ -82,5 +83,6 @@
     (tvar-type (serial-number)
                (string->symbol (string-append "tvar" (number->string serial-number)))
                )
+    (list-type (element-type) (list 'listof (type-to-external-form element-type)))
     )
   )
