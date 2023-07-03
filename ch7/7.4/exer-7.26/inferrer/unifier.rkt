@@ -27,6 +27,11 @@
            )
          )
        ]
+      [(and (ref-type? ty1) (ref-type? ty2))
+       (let ([subst (unifier (ref-type->type ty1) (ref-type->type ty2) subst exp)])
+         subst
+         )
+       ]
       [else (report-unification-failure ty1 ty2 exp)]
       )
     )

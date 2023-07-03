@@ -9,6 +9,9 @@
   (bool-type)
   (proc-type (arg-type type?) (result-type type?))
   (tvar-type (sn integer?))
+  ; new stuff
+  (void-type)
+  (ref-type (type type?))
   )
 
 (define (atomic-type? ty)
@@ -47,6 +50,20 @@
     )
   )
 
+(define (ref-type? ty)
+  (cases type ty
+    (ref-type (ty1) #t)
+    (else #f)
+    )
+  )
+
+(define (ref-type->type ty)
+  (cases type ty
+    (ref-type (ty1) ty1)
+    (else (eopl:error 'ref-type->type "Not a ref-type: ~s" ty))
+    )
+  )
+
 (define-datatype optional-type optional-type?
   (no-type)
   (a-type (ty type?))
@@ -79,6 +96,8 @@
                      (type-to-external-form result-type)
                      )
                )
+    (void-type () 'void)
+    (ref-type (type) (list 'ref (type-to-external-form type)))
     (tvar-type (serial-number)
                (string->symbol (string-append "tvar" (number->string serial-number)))
                )

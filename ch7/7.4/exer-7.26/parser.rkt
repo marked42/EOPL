@@ -38,6 +38,9 @@
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
     (type ("%tvar-type" number) tvar-type)
+    ; new stuff
+    (type ("void") void-type)
+    (type ("refto" type) ref-type)
     )
   )
 

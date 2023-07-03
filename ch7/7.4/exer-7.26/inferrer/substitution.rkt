@@ -13,6 +13,8 @@
     (tvar-type (sn)
                (if (equal? ty0 tvar) ty1 ty0)
                )
+    (void-type () (void-type))
+    (ref-type (ty) (ref-type (apply-one-subst ty tvar ty1)))
     )
   )
 
@@ -36,6 +38,8 @@
                  (if tmp (cdr tmp) ty)
                  )
                )
+    (void-type () (void-type))
+    (ref-type (ty) (ref-type (apply-subst-to-type ty subst)))
     )
   )
 
@@ -66,5 +70,7 @@
                 )
                )
     (tvar-type (serial-number) (not (equal? tvar ty)))
+    (void-type () #t)
+    (ref-type (ty) (no-occurrence? tvar ty))
     )
   )
