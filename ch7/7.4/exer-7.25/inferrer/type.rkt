@@ -34,6 +34,20 @@
     )
   )
 
+(define (list-type? ty)
+  (cases type ty
+    (list-type (element-type) #t)
+    (else #f)
+    )
+  )
+
+(define (list-type->element-type ty)
+  (cases type ty
+    (list-type (element-type) element-type)
+    (else (eopl:error 'list-type->element-type "Not a list-type: ~s" ty))
+    )
+  )
+
 (define (proc-type->arg-type ty)
   (cases type ty
     (proc-type (arg-type result-type) arg-type)
