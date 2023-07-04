@@ -95,6 +95,7 @@ animals[1] = new Elephant();
 
 ### References
 
+1. [hindley-milner-typescript-minimal](https://github.com/domdomegg/hindley-milner-typescript-minimal)
 1. [Unification](<https://en.wikipedia.org/wiki/Unification_(computer_science)#Substitution>) John Alan Robinson
 1. A machine-oriented logic based on the resolution principle J.A. Robinson's 1965
 1. An Efficient Unification algorithm by Martelli and Montanari
