@@ -1,7 +1,7 @@
 #lang eopl
 
 (require racket racket/list rackunit)
-(require "interpreter.rkt")
+(require "interpreter.rkt" "expression.rkt" "transformer.rkt")
 (require "value.rkt")
 (require "../../../base/test.rkt")
 (require "inferrer/main.rkt" "inferrer/equal-up-to-gensyms.rkt")
@@ -172,6 +172,12 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
 (define test-cases-polymorphic
   (list
    (list "letrec ? f(x: ?) = (f x) in f" '(tvar0 -> tvar1) "polymorphic type")
+   )
+  )
+
+(define test-cases-polymorhpic-let
+  (list
+   (list "let f = proc (x: ?) in if (f zero?(0)) then (f 11) else (f 22)" 'int "polymorphic let")
    )
   )
 

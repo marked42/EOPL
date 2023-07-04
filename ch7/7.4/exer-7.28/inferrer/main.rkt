@@ -7,6 +7,7 @@
          "equal-up-to-gensyms.rkt"
          "../expression.rkt"
          "../parser.rkt"
+         "../transformer.rkt"
          )
 
 (provide (all-defined-out))
@@ -19,7 +20,7 @@
   (reset-fresh-var)
   (cases program pgm
     (a-program (exp1)
-               (let ([ans (type-of exp1 (init-tenv) (empty-subst))])
+               (let ([ans (type-of (transform-let-exp exp1) (init-tenv) (empty-subst))])
                  (cases answer ans
                    (an-answer (ty subst)
                               (apply-subst-to-type ty subst)
@@ -80,11 +81,7 @@
               )
             )
     (let-exp (var exp1 body)
-             (cases answer (type-of exp1 tenv subst)
-               (an-answer (exp1-type subst)
-                          (type-of body (extend-tenv var exp1-type tenv) subst)
-                          )
-               )
+             (eopl:error "type-of don't support let-exp, let-exp should be already transformed, ~s" exp)
              )
     (proc-exp (var otype body)
               (let ([var-type (otype->type otype)])
