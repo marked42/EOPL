@@ -1779,9 +1779,53 @@ Exercise 7.25
 
 ### Exercise 7.27
 
-Divide type inference into two phases, first generate all equations, then solve them.
+当前的类型推导过程在`type-of`中收集类型等式，在`unifier`中对等式求解，二者**交替**进行。[Wand的方法](https://web.cs.ucla.edu/~palsberg/course/cs239/reading/wand87.pdf)将这两步拆分开，第一步收集所有的类型等式（equations），然后再使用 unification 算法求解所有等式。
 
-Wand, Mitchell. 1987. A Simple Algorithm and Proof for Type Inference
+```scheme
+(define (type-of exp tenv equations)
+  (cases expression exp
+    (const-exp (num) (an-answer (int-type) equations))
+    (var-exp (var) (an-answer (apply-tenv tenv var) equations))
+    (diff-exp (exp1 exp2)
+              (cases answer (type-of exp1 tenv equations)
+                (an-answer (ty1 equations)
+                           ; collect equations only
+                           (let ([equations (extend-equations ty1 (int-type) equations exp1)])
+                             (cases answer (type-of exp2 tenv equations)
+                               (an-answer (ty2 equations)
+                                          (let ([equations (extend-equations ty2 (int-type) equations exp2)])
+                                            (an-answer (int-type) equations)
+                                            )
+                                          )
+                               )
+                             )
+                           )
+                )
+              )
+    ...
+  )
+)
+```
+
+等式收集完成后`unify`统一求解，然后替换`ty`获得整个表达式的类型。
+
+```scheme
+(define (type-of-program pgm)
+  (reset-fresh-var)
+  (cases program pgm
+    (a-program (exp1)
+               (let ([ans (type-of exp1 (init-tenv) (empty-equations))])
+                 (cases answer ans
+                   (an-answer (ty equations)
+                              ; solve equations
+                              (apply-subst-to-type ty (unify equations))
+                              )
+                   )
+                 )
+               )
+    )
+  )
+```
 
 ### Hindley-Milner Type System
 
@@ -1854,4 +1898,3 @@ different type variables in a type
 John C. Reynolds, Towards a Theory of Type Structure, 1974Hindley, R., The Principal Type-scheme of an Object in Combinatory Logic, Transactions of the American Mathematical Society 146, 29-60,1969
 
 1. https://course.ccs.neu.edu/cs4410sp19/
-****
