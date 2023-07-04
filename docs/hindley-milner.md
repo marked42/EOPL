@@ -54,6 +54,11 @@ different type variables in a type
 
 ### Algorithm W
 
+### Algorithm J
+
+1. https://github.com/jfecher/algorithm-j/blob/master/j.ml
+1. [How OCaml type checker works -- or what polymorphism and garbage collection have in common](https://okmij.org/ftp/ML/generalization.html)
+
 ### Better Error Messages
 
 1. [Generalizing Hindley-Milner Type Inference Algorithms](http://www.cs.uu.nl/research/techreps/repo/CS-2002/2002-031.pdf)
