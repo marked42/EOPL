@@ -2,8 +2,6 @@
 
 (provide (all-defined-out))
 
-(provide (all-defined-out))
-
 (define-datatype type type?
   (int-type)
   (bool-type)
