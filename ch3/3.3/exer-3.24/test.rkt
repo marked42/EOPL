@@ -106,6 +106,22 @@ let maketimes = proc (maker)
                             ((makefact makefact) x)
                 in (fact 3)
    " 6 "fact(3) = 6")
+
+   (list "
+let make-even = proc (make-even)
+                    proc (make-odd)
+                        proc (x)
+                            if zero?(x)
+                            then 1
+                            else (((make-odd make-odd) make-even) -(x, 1))
+    in let make-odd = proc (make-odd)
+                        proc (make-even)
+                            proc (x)
+                                if zero?(x)
+                                then 0
+                                else (((make-even make-even) make-odd) -(x, 1))
+        in (((make-odd make-odd) make-even) 13)
+   " 1 "mutually recursive")
    )
   )
 
