@@ -172,6 +172,12 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
 (define test-cases-polymorphic
   (list
    (list "letrec ? f(x: ?) = (f x) in f" '(tvar0 -> tvar1) "polymorphic type")
+   (list "
+   let f = proc (x : ?) x
+      in if (f zero?(0))
+         then (f 11)
+         else (f 22)
+   " 'error "dont's support parametric polymorphism")
    )
   )
 
