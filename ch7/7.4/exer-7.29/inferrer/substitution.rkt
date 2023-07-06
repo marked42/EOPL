@@ -13,6 +13,7 @@
     (tvar-type (sn)
                (if (equal? ty0 tvar) ty1 ty0)
                )
+    (generic-type (mono vars) (eopl:error 'apply-one-subst "generic-type not supported."))
     )
   )
 
@@ -36,6 +37,7 @@
                  (if tmp (cdr tmp) ty)
                  )
                )
+    (generic-type (mono vars) (eopl:error 'apply-one-subst "generic-type not supported."))
     )
   )
 
@@ -66,5 +68,6 @@
                 )
                )
     (tvar-type (serial-number) (not (equal? tvar ty)))
+    (generic-type (mono vars) (eopl:error 'apply-one-subst "generic-type not supported."))
     )
   )
