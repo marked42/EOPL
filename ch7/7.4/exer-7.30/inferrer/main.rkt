@@ -84,7 +84,11 @@
     (let-exp (var exp1 body)
              (cases answer (type-of exp1 tenv subst)
                (an-answer (exp1-type subst)
-                          (type-of body (extend-tenv var (generalize exp1-type) tenv) subst)
+                          ; generalize only value type
+                          (if (is-value-type? exp1-type)
+                              (type-of body (extend-tenv var (generalize exp1-type) tenv) subst)
+                              (type-of body (extend-tenv var exp1-type tenv) subst)
+                              )
                           )
                )
              )

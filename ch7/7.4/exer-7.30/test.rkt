@@ -179,6 +179,11 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
          then (f 11)
          else (f 22)
    " 'int "support polymorphic id procedure")
+   (list "
+   let f = newref(proc (x : ?) x)
+      in let g = setref(f, proc (x: ?) -(x,1))
+        in (deref(f) zero?(1))
+   " 'error "value restriction")
    )
   )
 
