@@ -4,7 +4,8 @@
 (require "interpreter.rkt")
 (require "value.rkt")
 (require "../../../base/test.rkt")
-(require "inferrer/main.rkt" "inferrer/equal-up-to-gensyms.rkt")
+(require "inferrer/main.rkt" "inferrer/equal-up-to-gensyms.rkt" "type-test.rkt")
+
 
 (test-lang run sloppy->expval test-cases-checked-lang)
 
@@ -177,7 +178,7 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
       in if (f zero?(0))
          then (f 11)
          else (f 22)
-   " 'error "dont's support parametric polymorphism")
+   " 'int "support polymorphic id procedure")
    )
   )
 
@@ -199,3 +200,5 @@ letrec ? fact(x: ?) = if zero?(x) then 1 else -(x, (fact -(x,1)))
   )
 
 (test-inferrer-cases test-cases-inferrer-lang)
+
+(test-generic-type)

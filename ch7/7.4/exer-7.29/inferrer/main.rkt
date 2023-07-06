@@ -33,7 +33,8 @@
 (define (type-of exp tenv subst)
   (cases expression exp
     (const-exp (num) (an-answer (int-type) subst))
-    (var-exp (var) (an-answer (apply-tenv tenv var) subst))
+    ; instantiate generic type when referencing var
+    (var-exp (var) (an-answer (instantiate-type (apply-tenv tenv var)) subst))
     (diff-exp (exp1 exp2)
               (cases answer (type-of exp1 tenv subst)
                 (an-answer (ty1 subst1)
@@ -79,10 +80,11 @@
                          )
               )
             )
+    ; let-polymorphism, generalize exp1 type, type of var will be instantiated when used
     (let-exp (var exp1 body)
              (cases answer (type-of exp1 tenv subst)
                (an-answer (exp1-type subst)
-                          (type-of body (extend-tenv var exp1-type tenv) subst)
+                          (type-of body (extend-tenv var (generalize exp1-type) tenv) subst)
                           )
                )
              )
