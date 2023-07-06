@@ -9,6 +9,8 @@
   (tvar-type (sn integer?))
   ; support polymorphic function only
   (generic-type (mono type?) (vars (list-of tvar-type?)))
+  (void-type)
+  (ref-type (type type?))
   )
 
 (define (atomic-type? ty)
@@ -44,6 +46,20 @@
   (cases type ty
     (proc-type (arg-type result-type) result-type)
     (else (eopl:error 'proc-type->arg-type "Not a proc-type: ~s" ty))
+    )
+  )
+
+(define (ref-type? ty)
+  (cases type ty
+    (ref-type (ty1) #t)
+    (else #f)
+    )
+  )
+
+(define (ref-type->type ty)
+  (cases type ty
+    (ref-type (ty1) ty1)
+    (else (eopl:error 'ref-type->type "Not a ref-type: ~s" ty))
     )
   )
 
@@ -83,6 +99,8 @@
     (tvar-type (serial-number)
                (string->symbol (string-append "tvar" (number->string serial-number)))
                )
+    (void-type () 'void)
+    (ref-type (type) (list 'ref (type-to-external-form type)))
     )
   )
 
