@@ -14,6 +14,8 @@
                (if (equal? ty0 tvar) ty1 ty0)
                )
     (generic-type (mono vars) (eopl:error 'apply-one-subst "generic-type not supported."))
+    (void-type () (void-type))
+    (ref-type (ty) (ref-type (apply-one-subst ty tvar ty1)))
     )
   )
 
@@ -38,6 +40,8 @@
                  )
                )
     (generic-type (mono vars) (eopl:error 'apply-one-subst "generic-type not supported."))
+    (void-type () (void-type))
+    (ref-type (ty) (ref-type (apply-subst-to-type ty subst)))
     )
   )
 
@@ -69,5 +73,7 @@
                )
     (tvar-type (serial-number) (not (equal? tvar ty)))
     (generic-type (mono vars) (eopl:error 'apply-one-subst "generic-type not supported."))
+    (void-type () #t)
+    (ref-type (ty) (no-occurrence? tvar ty))
     )
   )
