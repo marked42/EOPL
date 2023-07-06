@@ -157,3 +157,11 @@
       )
     )
   )
+
+; only ref-type is non-value in current type system
+(define (is-value-type? ty)
+  (cases type ty
+    (ref-type (ty) #f)
+    (else #t)
+    )
+  )
