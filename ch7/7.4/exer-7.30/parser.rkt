@@ -31,6 +31,11 @@
 
     (expression ("letrec" optional-type identifier "(" identifier ":" optional-type ")" "=" expression "in" expression) letrec-exp)
 
+    ; new stuff
+    (expression ("newref" "(" expression ")") newref-exp)
+    (expression ("deref" "(" expression ")") deref-exp)
+    (expression ("setref" "(" expression "," expression ")") setref-exp)
+
     (optional-type ("?") no-type)
     (optional-type (type) a-type)
 
