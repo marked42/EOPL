@@ -331,7 +331,7 @@ $$
 
 #### 表达式类型
 
-对表达式的类型推导在 [type-of](../ch7/7.4/inferred/inferrer/main.rkt#L33)中，返回一个[an-answer](../ch7/7.4/inferred/inferrer/main.rkt#L14)结构，包含了表达式类型`result-type`和分析到当前表达式为止得到的`subst`两个字段。`type-of`中对表达式分析的过程中，替换列`subst`的是不断更新的，这里使用了在函数间传递积累的形式实现，也可以实现为一个全局的数据，参考[Exercise 7.21](../ch7/7.4/exer-7.21/inferrer/substitution.rkt#L27)。对于`proc-exp`中使用`?`代表的可选类型`otype`调用`otype->type`进行转换，内部调用`fresh-var-type`生成一个新的`tvar-type`，使用这个新类型变量继续后续的推导。`letrec-exp`表达式中的可选类型是相同的方式处理。
+对表达式的类型推导在 [type-of](../ch7/7.4/inferred/inferrer/main.rkt#L33)中，返回一个[an-answer](../ch7/7.4/inferred/inferrer/main.rkt#L14)结构，包含了表达式类型`result-type`和分析到当前表达式为止得到的`subst`两个字段。`type-of`中对表达式分析的过程中，替换列`subst`是不断更新的，这里使用了在函数间传递积累的形式实现，也可以实现为一个全局的数据，参考[Exercise 7.21](../ch7/7.4/exer-7.21/inferrer/substitution.rkt#L27)。对于`proc-exp`中使用`?`代表的可选类型`otype`调用`otype->type`进行转换，内部调用`fresh-var-type`生成一个新的`tvar-type`，使用这个新类型变量继续后续的推导。`letrec-exp`表达式中的可选类型是相同的方式处理。
 
 ```scheme
 (define (type-of exp tenv subst)
@@ -461,7 +461,7 @@ $$
   )
 ```
 
-然后[apply-subst-to-sexp](../ch7/7.4/inferred/inferrer/equal-up-to-gensyms.rkt#L27)将类型替换为重新变量过的类型变量。将替换列表引用到类型上。类型 $t_2 \rightarrow t_2$ 替换 $t2$ 为 $t_1$，得到 $t_1 \rightarrow t_1$。
+然后[apply-subst-to-sexp](../ch7/7.4/inferred/inferrer/equal-up-to-gensyms.rkt#L27)将类型替换为重新变量过的类型变量。将替换列表引用到类型上。类型 $t_2 \rightarrow t_2$ 替换 $t_2$ 为 $t_1$，得到 $t_1 \rightarrow t_1$。
 
 ```scheme
 
@@ -484,11 +484,11 @@ $$
 
 ### 替换列表优化
 
-#### 无循环引用
+#### 单向引用
 
 当前的`extend-subst`函数对 `subst` 扩展，增加一个新的变量等式$t_{new} = tv_{new}$时，需要对 `subst` 中已经存在的所有等式的右侧进行更新，将$t_{new}$替换为$tv_{new}$，维持`no-occurrence`不变量。`extend-subst`的时间复杂度跟 `subst` 的大小有关。通过抛弃**no-occurrence**不变量，可以将`extend-subst`改进为常量时间复杂度（Exercise 7.17 / 7.18）。
 
-考虑下面的替换列，虽然 $t_1$ 的右侧 $int \rightarrow t_2$ 使用了类型变量 $t_2$，不满足**no-occurrence invariant**，但是只存在单向引用，不存在循环引用，$t_1$ 使用了 $t_2$，$t_2$ 使用了 $t_3$。通过两步替换仍然可以得到 $t_1 = int \rightarrow (int \rightarrow int)$。也就是使用**只存在单向引用**这样一个比**no-occurrence invariant**更**弱一点**的条件，也能表示合法的解信息。
+考虑下面的替换列，虽然 $t_1$ 的右侧 $int \rightarrow t_2$ 使用了类型变量 $t_2$，不满足**no-occurrence invariant**，但是只存在单向引用，不存在循环引用，$t_1$ 使用了 $t_2$，$t_2$ 使用了 $t_3$。通过两步替换仍然可以得到 $t_1 = int \rightarrow (int \rightarrow int)$。也就是使用**只存在单向引用**这样一个比**no-occurrence invariant**更**弱一点**的条件，也能表示合法的替换列。
 
 $$
 t_1 = int \rightarrow t_2 \\
@@ -496,7 +496,7 @@ t_2 = int \rightarrow t_3 \\
 t_3 = int
 $$
 
-这种方案的有点在列表的拼接可以从线性时间复杂度优化为常量时间复杂度，`extend-subst`此时实现为直接拼接列表。
+这种方案的优点在于列表的拼接可以从线性时间复杂度优化为常量时间复杂度，`extend-subst`实现为直接拼接列表。
 
 ```scheme
 (define (extend-subst subst tvar ty)
@@ -528,7 +528,7 @@ $$
   )
 ```
 
-由于使用了**只有单向引用**的条件，在[apply-subst-to-type](../ch7/7.4/exer-7.21/inferrer/substitution.rkt#L27)中，得到类型变量`ty`在`subst`中对应的具体类型`tmp`后，`tmp`可能包含替换列中的类型变量，所以需要递归调用`apply-subst-to-type`对等式右侧也就是`(cdr tmp)`进行展开，最终得到的结果类型中不包含`subst`中的已知类型变量。
+由于使用了**只有单向引用**的条件，在[apply-subst-to-type](../ch7/7.4/exer-7.21/inferrer/substitution.rkt#L27)中，得到类型变量`ty`在`subst`中对应的等式`tmp`后，等式右侧可能包含替换列中的类型变量，所以需要递归调用`apply-subst-to-type`对等式右侧也就是`(cdr tmp)`进行展开，最终得到的结果类型中不包含`subst`中的已知类型变量。
 
 ```scheme
 (define (apply-subst-to-type ty subst)
@@ -550,15 +550,15 @@ $$
 
 `apply-subst-to-type`递归调用自身的过程中，对于同一个类型变量会多次展开，可以做缓存优化，使得同一个类型变量只展开一次。
 
-$
+$$
 t_1 = t_2 \rightarrow t_3 \\
 t_2 = int \\
 t_3 = int
-$
+$$
 
-$t_1$的展开结果是$int \rightarrow int$，结果保存在`subst`列表中。
+$t_1$ 的展开结果是 $int \rightarrow int$，结果保存在`subst`列表中。
 
-首先将`subst`中的元素从`pair`类型（`(t1 . type)`）修改为可变的`mpair`类型，这样可以更新`t1`对应的类型`type`，为了标记`type`是否已经被展开，将`type`修改为一个`(symbol . type)`的类型。`(original . type)`代表`type`是原始值，没有展开；`(cache . type)`代表`type`是展开过得值，直接使用。
+首先将`subst`中的元素从`pair`类型`(t1 . type)`修改为可变的`mpair`类型，这样可以更新`t1`对应的类型`type`，为了标记`type`是否已经被展开，将`type`修改为一个`(symbol . type)`的类型。`(original . type)`代表`type`是原始类型没有展开；`(cache . type)`代表`type`是展开过的类型，可以直接使用。
 
 这个技巧在实现惰性求值`thunk`和`call-by-need`中都有使用。
 
@@ -620,13 +620,11 @@ $t_1$的展开结果是$int \rightarrow int$，结果保存在`subst`列表中�
 let f = proc (x : ?) x in if (f zero?(0)) then (f 11) else (f 22)
 ```
 
-但是实际上恒等函数`proc (x) x`可以接受任意参数类型，运行时都不会出错，恒等函数实际可以有多个参数类型，被称为参数化多态。当前的类型推导不够准确，不支持函数的参数化多态。函数以字面值的形式直接使用的话，每个函数都是独立的类型，只有函数使用`let`表达式赋值给变量，然后一个函数变量**多处**使用时才出现需要支持多态的情况，所以也被称为 Let 多态（[Let-polymorphism](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system#Let-polymorphism_2)）。
-
-下面介绍几种方法来支持多态。
+但是实际上恒等函数`proc (x) x`可以接受任意参数类型，运行时都不会出错。允许恒等函数有多个不同参数类型，被称为参数化多态。当前的类型推导不够准确，不支持函数的参数化多态。函数以字面值的形式直接使用的话，每个函数都是独立的类型。只有函数使用`let`表达式赋值给变量，然后一个函数变量**多处**使用时才出现需要支持多态的情况，所以也被称为 Let 多态（[Let-polymorphism](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system#Let-polymorphism_2)）。
 
 #### 多份实例（Exercise 7.28）
 
-最简单的方法是将`let x = e1 in e2`表达式进行[转换](../ch7/7.4/exer-7.28/transformer.rkt#L7)，将`e2`中使用到`x`的地方替换为`e1`，这样`e1`有多份拷贝，每个可以有**不同的**类型。转换方法使用环境变量的形式，记录`let`表达式中`x`变量对应的表达式`e1`，这样可以在`e2`中查询替换，转换支持嵌套的`let`表达式。
+支持多态最简单的方法是将`let x = e1 in e2`表达式进行[转换](../ch7/7.4/exer-7.28/transformer.rkt#L7)，将`e2`中使用到`x`的地方替换为`e1`，这样`e1`有多份拷贝，每个可以有**不同的**类型。转换方法使用环境变量的形式，记录`let`表达式中`x`变量对应的表达式`e1`，这样可以在`e2`中查询替换，转换支持嵌套的`let`表达式。
 
 ```scheme
 (define (transform-let-exp exp)
@@ -662,7 +660,7 @@ $$
 
 $$
 int \rightarrow int \\
-bool \rightarrow int \\
+bool \rightarrow bool \\
 (int \rightarrow int) \rightarrow (int \rightarrow int) \\
 ...
 $$
@@ -671,7 +669,7 @@ $$
 
 对`let x = e1 in e2`进行类型推导时，将`e1`推导为多态类型，然后在任何使用`x`的地方，将多态类型实例化为具体的类型，这些类型之间互相独立，这样实现了多态类型的支持。
 
-将当前的类型称为单一类型（monotype），定义类型`generic-type`表示多态类型，包含了一个具体的类型`mono` 和这个类型的若干类型变量参数`vars`，这里直接使用`tvar-type` 记录类型参数。
+将`int-type`和`bool-type`称为单一类型（monotype），因为这些类型不可能包含类型变量`tvar-type`，所以不能泛化。定义类型`generic-type`表示多态类型，包含了一个具体的类型`mono`和这个类型的若干类型变量参数`vars`，这里直接使用`tvar-type`记录类型参数。
 
 ```eopl
 (define-datatype type type?
