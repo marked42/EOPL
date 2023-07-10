@@ -66,7 +66,7 @@
                )
              )
     (proc-exp (var body)
-              (proc-val (procedure var body env))
+              (proc-val (procedure (list var) body env))
               )
     (call-exp (rator rand)
               (let ((rator-val (value-of-exp rator env)))
