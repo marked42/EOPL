@@ -20,7 +20,6 @@
   )
 
 (define (value-of-program prog)
-  ; new stuff
   (initialize-store!)
   (cases program prog
     (a-program (exp1) (value-of-exp exp1 (init-env)))
@@ -30,7 +29,6 @@
 (define (value-of-exp exp env)
   (cases expression exp
     (const-exp (num) (num-val num))
-    ; new stuff
     (var-exp (var) (deref (apply-env env var)))
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
@@ -61,10 +59,12 @@
             )
     (let-exp (var exp1 body)
              (let ([val (value-of-exp exp1 env)])
-               ; new stuff
                (value-of-exp body (extend-env var (newref val) env))
                )
              )
+    (letref-exp (var exp1 body)
+                (value-of-exp body (extend-env var (value-of-operand exp1 env) env))
+                )
     (proc-exp (var body)
               (proc-val (procedure var body env))
               )
