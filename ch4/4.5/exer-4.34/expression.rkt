@@ -13,6 +13,11 @@
    (exp1 expression?)
    (body expression?)
    )
+  (letref-exp
+   (var symbol?)
+   (exp1 expression?)
+   (body expression?)
+   )
   (proc-exp (var symbol?) (body expression?))
   (call-exp (rator expression?) (rand expression?))
   (letrec-exp (p-names (list-of symbol?)) (b-vars (list-of symbol?)) (p-bodies (list-of expression?)) (body expression?))

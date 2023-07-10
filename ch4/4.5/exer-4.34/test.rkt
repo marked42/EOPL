@@ -4,4 +4,22 @@
 (require "value.rkt")
 (require "../../../base/test.rkt")
 
-(test-lang run sloppy->expval test-cases-call-by-reference-lang)
+(define test-cases-letref-exp
+  (list
+   (list "
+   let a = 1
+    in letref b = a
+        in begin
+            set b = 2;
+            a
+        end
+    " 2 "letref-exp")
+   )
+  )
+
+(test-lang run sloppy->expval
+           (append
+            test-cases-call-by-reference-lang
+            test-cases-letref-exp
+            )
+           )
