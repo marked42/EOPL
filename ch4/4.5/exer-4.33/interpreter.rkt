@@ -20,7 +20,6 @@
   )
 
 (define (value-of-program prog)
-  ; new stuff
   (initialize-store!)
   (cases program prog
     (a-program (exp1) (value-of-exp exp1 (init-env)))
@@ -96,7 +95,6 @@
                      )
                  )
                )
-    ; new stuff
     (assign-exp (var exp1)
                 (let ([val1 (value-of-exp exp1 env)])
                   (setref! (apply-env env var) val1)
@@ -107,8 +105,8 @@
   )
 
 (define (value-of-operand rand env)
-  (cases expression rand
-    (var-exp (var) (apply-env env var))
-    (else (newref (value-of-exp rand env)))
+  (cases operand rand
+    (ref-operand (var) (apply-env env var))
+    (value-operand (exp1) (newref (value-of-exp exp1 env)))
     )
   )

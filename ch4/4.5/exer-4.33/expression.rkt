@@ -14,7 +14,7 @@
    (body expression?)
    )
   (proc-exp (var symbol?) (body expression?))
-  (call-exp (rator expression?) (rand expression?))
+  (call-exp (rator expression?) (rand operand?))
   (letrec-exp (p-names (list-of symbol?)) (b-vars (list-of symbol?)) (p-bodies (list-of expression?)) (body expression?))
 
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
@@ -27,4 +27,9 @@
   (a-program
    (exp1 expression?)
    )
+  )
+
+(define-datatype operand operand?
+  (ref-operand (var symbol?))
+  (value-operand (exp1 expression?))
   )

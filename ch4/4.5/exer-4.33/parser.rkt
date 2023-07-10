@@ -26,7 +26,10 @@
     (expression ("let" identifier "=" expression "in" expression) let-exp)
 
     (expression ("proc" "(" identifier ")" expression) proc-exp)
-    (expression ("("expression expression")" ) call-exp)
+    (expression ("("expression operand")" ) call-exp)
+
+    (operand ("ref" identifier) ref-operand)
+    (operand (expression) value-operand)
 
     (expression ("letrec" (arbno identifier "(" identifier ")" "=" expression) "in" expression) letrec-exp)
 
