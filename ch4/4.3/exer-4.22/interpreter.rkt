@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "parser.rkt" "expression.rkt")
+(require racket/lazy-require racket/list "parser.rkt" "expression.rkt")
 (lazy-require
  ["environment.rkt" (
                      init-env
@@ -8,7 +8,7 @@
                      extend-env*
                      extend-env-rec*
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val is-uninitialized?)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref!)]
  )
@@ -16,22 +16,74 @@
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program (scan&parse str))
+  (result-of-program (scan&parse str))
   )
 
-(define (value-of-program prog)
+(define (result-of-program prog)
   ; new stuff
   (initialize-store!)
   (cases program prog
-    (a-program (exp1) (value-of-exp exp1 (init-env)))
+    (a-program (body) (result-of body (init-env)))
+    )
+  )
+
+(define (result-of stat env)
+  (cases statement stat
+    (assign-statement (var exp1)
+                      (let ([val1 (value-of-exp exp1 env)])
+                        (setref! (apply-env env var) val1)
+                        val1
+                        )
+                      )
+    (print-statement (exp1)
+                     (let ([val1 (value-of-exp exp1 env)])
+                       (eopl:pretty-print val1)
+                       val1
+                       )
+                     )
+    (block-statement (stats)
+                     (let ([vals (map (lambda (stat) (result-of stat env)) stats)])
+                       (last vals)
+                       )
+                     )
+    (if-statement (exp1 consequent alternate)
+                  (let ([val1 (value-of-exp exp1 env)])
+                    (if (expval->bool val1)
+                        (result-of consequent env)
+                        (result-of alternate env)
+                        )
+                    )
+                  )
+    (while-statement (exp1 body)
+                     (let loop ()
+                       (let ([val (value-of-exp exp1 env)])
+                         (if (expval->bool val)
+                             (begin
+                               (result-of body env)
+                               (loop)
+                               )
+                             (null-val)
+                             )
+                         )
+                       )
+                     )
+    (var-statement (vars body)
+                   (result-of body (extend-env* vars (map (lambda (var) (newref (null-val))) vars) env))
+                   )
     )
   )
 
 (define (value-of-exp exp env)
   (cases expression exp
     (const-exp (num) (num-val num))
-    ; new stuff
-    (var-exp (var) (deref (apply-env env var)))
+    (var-exp (var)
+             (let ([val (deref (apply-env env var))])
+               (if (is-uninitialized? val)
+                   (eopl:error 'value-of-exp "Cannot use uninitialized var ~s before initialization." var)
+                   val
+                   )
+               )
+             )
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -41,6 +93,24 @@
                   )
                 )
               )
+    (sum-exp (exp1 exp2)
+             (let ([val1 (value-of-exp exp1 env)]
+                   [val2 (value-of-exp exp2 env)])
+               (let ((num1 (expval->num val1))
+                     (num2 (expval->num val2)))
+                 (num-val (+ num1 num2))
+                 )
+               )
+             )
+    (mul-exp (exp1 exp2)
+             (let ([val1 (value-of-exp exp1 env)]
+                   [val2 (value-of-exp exp2 env)])
+               (let ((num1 (expval->num val1))
+                     (num2 (expval->num val2)))
+                 (num-val (* num1 num2))
+                 )
+               )
+             )
     (zero?-exp (exp1)
                (let ([val (value-of-exp exp1 env)])
                  (let ([num (expval->num val)])
@@ -51,57 +121,30 @@
                    )
                  )
                )
-    (if-exp (exp1 exp2 exp3)
-            (let ([val1 (value-of-exp exp1 env)])
-              (if (expval->bool val1)
-                  (value-of-exp exp2 env)
-                  (value-of-exp exp3 env)
-                  )
-              )
-            )
-    (let-exp (var exp1 body)
+    (not-exp (exp1)
              (let ([val (value-of-exp exp1 env)])
-               ; new stuff
-               (value-of-exp body (extend-env* (list var) (list (newref val)) env))
-               )
-             )
-    (proc-exp (var body)
-              (proc-val (procedure var body env))
-              )
-    (call-exp (rator rand)
-              (let ((rator-val (value-of-exp rator env)) (rand-val (value-of-exp rand env)))
-                (let ((proc1 (expval->proc rator-val)))
-                  (apply-procedure proc1 rand-val)
-                  )
-                )
-              )
-    (letrec-exp (p-names b-vars p-bodies body)
-                (let ((new-env (extend-env-rec* p-names b-vars p-bodies env)))
-                  (value-of-exp body new-env)
-                  )
-                )
-    (begin-exp (exp1 exps)
-               (let value-of-begin-exps ([exps (cons exp1 exps)])
-                 (if (null? exps)
-                     (eopl:error 'value-of-exp "begin expression should have at lease one expression")
-                     (let ((first-exp (car exps)) (rest-exps (cdr exps)))
-                       ; always calculate first exp cause it may has side effects
-                       (let ((first-val (value-of-exp first-exp env)))
-                         (if (null? rest-exps)
-                             first-val
-                             (value-of-begin-exps rest-exps)
-                             )
-                         )
-                       )
+               (let ([bool (expval->bool val)])
+                 (if bool
+                     (bool-val #f)
+                     (bool-val #t)
                      )
                  )
                )
-    ; new stuff
-    (assign-exp (var exp1)
-                (let ([val1 (value-of-exp exp1 env)])
-                  (setref! (apply-env env var) val1)
+             )
+    (proc-exp (vars body)
+              (proc-val (procedure vars body env))
+              )
+    (call-exp (rator rands)
+              (let ((rator-val (value-of-exp rator env)) (rand-vals (value-of-exps rands env)))
+                (let ((proc1 (expval->proc rator-val)))
+                  (apply-procedure proc1 rand-vals)
                   )
                 )
+              )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
+  )
+
+(define (value-of-exps exps env)
+  (map (lambda (exp) (value-of-exp exp env)) exps)
   )

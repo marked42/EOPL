@@ -14,26 +14,26 @@
     ))
 
 (define the-grammar
-  '((program (expression) a-program)
+  '((program (statement) a-program)
+
+    (statement (identifier "=" expression) assign-statement)
+    (statement ("print" expression) print-statement)
+    (statement ("{" (separated-list statement ";") "}") block-statement)
+    (statement ("if" expression statement statement) if-statement)
+    (statement ("while" expression statement) while-statement)
+    (statement ("var" (separated-list identifier ",") ";" statement) var-statement)
+
     (expression (number) const-exp)
     (expression (identifier) var-exp)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)
+    (expression ("+" "(" expression "," expression ")") sum-exp)
+    (expression ("*" "(" expression "," expression ")") mul-exp)
     (expression ("zero?" "(" expression ")") zero?-exp)
+    (expression ("not" "(" expression ")") not-exp)
 
-    (expression ("if" expression "then" expression "else" expression) if-exp)
-
-    (expression ("let" identifier "=" expression "in" expression) let-exp)
-
-    (expression ("proc" "(" identifier ")" expression) proc-exp)
-    (expression ("("expression expression")" ) call-exp)
-
-    (expression ("letrec" (arbno identifier "(" identifier ")" "=" expression) "in" expression) letrec-exp)
-
-    (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
-
-    ; new stuff
-    (expression ("set" identifier "=" expression) assign-exp)
+    (expression ("proc" "(" (separated-list identifier ",") ")" expression) proc-exp)
+    (expression ("("expression (arbno expression)")" ) call-exp)
     )
   )
 
