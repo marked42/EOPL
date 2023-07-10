@@ -55,6 +55,18 @@ var x; {
   print 1
 }
    " 1 "example 4")
+
+   (list "
+var x,y,z; {
+  x = 3;
+  y = 4;
+  z = 0;
+  do-while not(zero?(x)) {
+    z = +(z,y); x = -(x,1)
+  };
+  print z
+}
+   " 12 "do while")
    )
   )
 

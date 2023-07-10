@@ -26,6 +26,7 @@
   (block-statement (stat1 (list-of statement?)))
   (if-statement (exp1 expression?) (consequent statement?) (alternate statement?))
   (while-statement (exp1 expression?) (body statement?))
+  (do-while-statement (exp1 expression?) (body statement?))
   (var-statement (vars (list-of symbol?)) (body statement?))
   (read-statement (var symbol?))
   )
