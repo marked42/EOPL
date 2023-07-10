@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "expression.rkt")
+(require "expression.rkt" "module.rkt")
 (require "checker/type.rkt")
 (provide (all-defined-out))
 
@@ -15,7 +15,18 @@
     ))
 
 (define the-grammar
-  '((program (expression) a-program)
+  '((program ((arbno module-definition) expression) a-program)
+
+    (module-definition ("module" identifier "interface" interface "body" module-body) a-module-definition)
+
+    (interface ("[" (arbno declaration)"]") simple-interface)
+    (declaration (identifier ":" type) var-declaration)
+
+    (module-body ("[" (arbno definition) "]") definitions-module-body)
+    (definition (identifier "=" expression) val-definition)
+
+    (expression ("from" identifier "take" identifier) qualified-var-exp)
+
     (expression (number) const-exp)
     (expression (identifier) var-exp)
 

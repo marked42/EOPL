@@ -1,29 +1,79 @@
 #lang eopl
 
-(require racket/lazy-require "parser.rkt" "expression.rkt")
+(require racket/lazy-require "parser.rkt" "expression.rkt" "module.rkt")
 (lazy-require
  ["environment.rkt" (
-                     init-env
+                     empty-env
                      apply-env
                      extend-env
                      extend-env-rec
+                     extend-env-with-module
+                     lookup-qualified-var-in-env
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
+ ["module.rkt" (simple-module)]
  )
 
 (provide (all-defined-out))
 
 (define (run str)
-  (value-of-program (scan&parse str))
+  (let ([prog (scan&parse str)])
+    (type-of-program prog)
+    (value-of-program prog)
+    )
   )
 
 (define (value-of-program prog)
-  (type-of-program prog)
   (cases program prog
-    (a-program (exp1) (value-of-exp exp1 (init-env)))
+    (a-program (m-defs body)
+               (let ([env (add-module-definitions-to-env m-defs (empty-env))])
+                 (value-of-exp body env)
+                 )
+               )
     )
+  )
+
+(define (add-module-definitions-to-env defs env)
+  (if (null? defs)
+      env
+      (cases module-definition (car defs)
+        (a-module-definition (m-name expected-interface m-body)
+                             (add-module-definitions-to-env
+                              (cdr defs)
+                              (extend-env-with-module
+                               m-name
+                               (value-of-module-body m-body env)
+                               env
+                               )
+                              )
+                             )
+        )
+      )
+  )
+
+(define (value-of-module-body m-body env)
+  (cases module-body m-body
+    (definitions-module-body (definitions)
+      (simple-module (definitions-to-env definitions env))
+      )
+    )
+  )
+
+(define (definitions-to-env defs env)
+  (if (null? defs)
+      env
+      (cases definition (car defs)
+        (val-definition (var-name exp)
+                        (definitions-to-env
+                          (cdr defs)
+                          ; let* scoping rule
+                          (extend-env var-name (value-of-exp exp env) env)
+                          )
+                        )
+        )
+      )
   )
 
 (define (value-of-exp exp env)
@@ -77,6 +127,9 @@
                   (value-of-exp body new-env)
                   )
                 )
+    (qualified-var-exp (m-name var-name)
+                       (lookup-qualified-var-in-env m-name var-name env)
+                       )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
