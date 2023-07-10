@@ -391,14 +391,14 @@ letmutable x = 0
 
 (define test-cases-setdynamic-exp
   (list
-    (list "
+   (list "
 let x = 11
       in let p = proc (y) -(y,x)
 in -(setdynamic x = 17 during (p 22), (p 13))
 " 3 "setdynamic expression"
-    )
   )
-)
+   )
+  )
 
 (define test-cases-mutable-pair-exp
   (list
@@ -658,5 +658,80 @@ let glo = pair(11,22)
                     in -(left(loc),right(loc))
       in (f glo)
       " 88 "mutable-pair")
+   )
+  )
+
+(define test-cases-simple-modules
+  (list
+   (list "
+module m1
+  interface [
+    a : int
+    b : int
+    c : int
+  ]
+  body [
+    a = 33
+    x = -(a,1) %= 32
+    b = -(a,x) %= 1
+    c = -(x,b) %= 31
+  ]
+let a = 10
+      in -(-(from m1 take a, from m1 take b), a)
+      " 22 "Exmaple 8.1 single module")
+
+   (list "
+module m1
+  interface [u : int]
+  body [u = 44]
+module m2
+  interface [v : int]
+  body [v = -(from m1 take u,11)] %= 33
+-(from m1 take u, from m2 take v) %= 11
+      " 11 "multiple modules with let* scoping rule")
+
+   (list "
+module m1
+  interface [u : bool]
+  body [u = 33]
+from m1 take u
+      " 'error "Example 8.2 module m1 u declared as bool, implemented as int")
+
+   (list "
+module m1
+  interface [
+    u : int
+    v : int
+  ]
+  body [u = 33]
+44
+      " 'error "Example 8.3 module m1 missing implementation for v: int ")
+
+   (list "
+module m1
+  interface [u : int v : int]
+  body [v = 33 u = 44]
+from m1 take u
+      " 'error "Example 8.4 module m1 declaration order and implementation order mismatch")
+
+   (list "
+module m1
+  interface [u : int]
+  body [u = 44]
+module m2
+  interface [v : int]
+  body [v = -(from m1 take u,11)] %= 33
+-(from m1 take u, from m2 take v)
+      " 11 "Example 8.5 module definitions uses let* scoping rule, correct order: m1, m2")
+
+   (list "
+module m2
+  interface [v : int]
+  body [v = -(from m1 take u,11)]
+module m1
+  interface [u : int]
+  body [u = 44]
+-(from m1 take u, from m2 take v)
+      " 'error "Example 8.5 module definitions uses let* scoping rule, incorrect order: m2, m1")
    )
   )

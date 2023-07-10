@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "expression.rkt")
+(require racket/lazy-require "expression.rkt" "module.rkt")
 (lazy-require
  ["value.rkt" (num-val expval? proc-val)]
  ["procedure.rkt" (procedure)]
@@ -20,16 +20,11 @@
    (p-body expression?)
    (saved-env environment?)
    )
-  )
-
-(define (init-env)
-  (extend-env 'i (num-val 1)
-              (extend-env 'v (num-val 5)
-                          (extend-env 'x (num-val 10)
-                                      (empty-env)
-                                      )
-                          )
-              )
+  (extend-env-with-module
+   (m-name symbol?)
+   (m-val typed-module?)
+   (saved-env environment?)
+   )
   )
 
 (define (apply-env env search-var)
@@ -50,6 +45,34 @@
                         )
                     )
     (else (report-no-binding-found search-var))
+    )
+  )
+
+(define (lookup-qualified-var-in-env m-name var-name env)
+  (let ([m-val (lookup-module-name-in-env m-name env)])
+    (cases typed-module m-val
+      (simple-module (bindings)
+                     (apply-env bindings var-name)
+                     )
+      )
+    )
+  )
+
+(define (lookup-module-name-in-env m-name env)
+  (cases environment env
+    (extend-env (var val saved-env)
+                (lookup-module-name-in-env m-name saved-env)
+                )
+    (extend-env-rec (p-name b-var p-body saved-env)
+                    (lookup-module-name-in-env m-name saved-env)
+                    )
+    (extend-env-with-module (this-m-name m-val saved-env)
+                            (if (equal? m-name this-m-name)
+                                m-val
+                                (lookup-module-name-in-env m-name saved-env)
+                                )
+                            )
+    (else (eopl:error 'lookup-module-name-in-env "fail to find module name ~s" m-name))
     )
   )
 
