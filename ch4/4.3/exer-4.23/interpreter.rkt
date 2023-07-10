@@ -70,7 +70,18 @@
     (var-statement (vars body)
                    (result-of body (extend-env* vars (map (lambda (var) (newref (null-val))) vars) env))
                    )
+    (read-statement (var)
+                    (let* ([val (read-from-stdin)] [num (string->number val)])
+                      (setref! (apply-env env var) (num-val num))
+                      (num-val num)
+                      )
+                    )
     )
+  )
+
+; fake implementation for easy test
+(define (read-from-stdin)
+  "1"
   )
 
 (define (value-of-exp exp env)

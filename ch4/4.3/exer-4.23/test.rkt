@@ -48,6 +48,13 @@ var f,x; {
   print (f 4 x)
 }
    " 12 "example 4")
+
+   (list "
+var x; {
+  read x;
+  print 1
+}
+   " 1 "example 4")
    )
   )
 
