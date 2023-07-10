@@ -15,6 +15,7 @@
   (num-val (num number?))
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
+  (null-val)
   )
 
 (define (expval->num val)
@@ -38,12 +39,19 @@
     )
   )
 
+(define (is-uninitialized? val)
+  (cases expval val
+    (null-val () #t)
+    (else #f)
+    )
+  )
 
 (define sloppy->expval
   (lambda (sloppy-val)
     (cond
       ((number? sloppy-val) (num-val sloppy-val))
       ((boolean? sloppy-val) (bool-val sloppy-val))
+      ((eq? 'null sloppy-val) (null-val))
       (else
        (eopl:error 'sloppy->expval
                    "Can't convert sloppy value to expval: ~s"
