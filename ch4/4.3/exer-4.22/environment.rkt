@@ -10,9 +10,9 @@
 
 (define-datatype environment environment?
   (empty-env)
-  (extend-env
-   (var symbol?)
-   (val reference?)
+  (extend-env*
+   (vars (list-of symbol?))
+   (vals (list-of reference?))
    (saved-env environment?)
    )
   (extend-env-rec*
@@ -25,23 +25,22 @@
 
 (define (init-env)
   ; new stuff
-  (extend-env 'i (newref (num-val 1))
-              (extend-env 'v (newref (num-val 5))
-                          (extend-env 'x (newref (num-val 10))
-                                      (empty-env)
-                                      )
-                          )
-              )
+  (extend-env* '(i v x)
+               (list (newref (num-val 1)) (newref (num-val 5)) (newref (num-val 10)))
+               (empty-env)
+               )
   )
 
 (define (apply-env env search-var)
   (cases environment env
-    (extend-env (var val saved-env)
-                (if (eqv? search-var var)
-                    val
-                    (apply-env saved-env search-var)
-                    )
-                )
+    (extend-env* (vars vals saved-env)
+                 (let ([index (index-of vars search-var)])
+                   (if index
+                       (list-ref vals index)
+                       (apply-env saved-env search-var)
+                       )
+                   )
+                 )
     (extend-env-rec* (p-names b-vars p-bodies saved-env)
                      (let ([index (index-of p-names search-var)])
                        (if index
