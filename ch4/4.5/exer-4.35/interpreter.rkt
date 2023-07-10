@@ -8,7 +8,7 @@
                      extend-env
                      extend-env-rec*
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc ref-val)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref!)]
  )
@@ -96,12 +96,14 @@
                      )
                  )
                )
-    ; new stuff
     (assign-exp (var exp1)
                 (let ([val1 (value-of-exp exp1 env)])
                   (setref! (apply-env env var) val1)
                   )
                 )
+    (ref-exp (var)
+             (ref-val (apply-env env var))
+             )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

@@ -25,6 +25,8 @@
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
 
+    (expression ("ref" identifier) ref-exp)
+
     (expression ("proc" "(" identifier ")" expression) proc-exp)
     (expression ("("expression expression")" ) call-exp)
 
