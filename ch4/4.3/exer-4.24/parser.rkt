@@ -21,6 +21,7 @@
     (statement ("{" (separated-list statement ";") "}") block-statement)
     (statement ("if" expression statement statement) if-statement)
     (statement ("while" expression statement) while-statement)
+    (statement ("do-while" expression statement) do-while-statement)
     (statement ("var" (separated-list identifier ",") ";" statement) var-statement)
     (statement ("read" identifier) read-statement)
 
