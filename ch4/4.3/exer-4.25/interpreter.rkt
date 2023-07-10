@@ -79,7 +79,11 @@
                           )
                         )
     (var-statement (vars body)
-                   (result-of body (extend-env* vars (map (lambda (var) (newref (null-val))) vars) env))
+                   (result-of body
+                              (extend-env*
+                               (map get-var-declaration-name vars)
+                               (map (lambda (var) (newref (value-of-exp (get-var-declaration-exp var) env))) vars)
+                               env))
                    )
     (read-statement (var)
                     (let* ([val (read-from-stdin)] [num (string->number val)])

@@ -14,59 +14,59 @@
 
    (list "if zero?(0) { print 1 } { print 2 }" 1 "if statement")
 
-   (list "var x,y; {x = 3; y = 4; print +(x,y)}" 7 "example 1")
+   (list "var x = 1, y = 2; {x = 3; y = 4; print +(x,y)}" 7 "example 1")
 
    (list "
-var x,y,z; {
-  x = 3;
-  y = 4;
-  z = 0;
-  while not(zero?(x)) {
-    z = +(z,y); x = -(x,1)
-  };
-  print z
-}
-   " 12 "example 2")
+   var x = 1, y = 2, z = 3; {
+     x = 3;
+     y = 4;
+     z = 0;
+     while not(zero?(x)) {
+       z = +(z,y); x = -(x,1)
+     };
+     print z
+   }
+      " 12 "example 2")
 
    (list "
-var x; {
-  x = 3;
-  print x;
-  var x;
-  {
-    x = 4;
-    print x
-  };
-  print x
-}
-   " 3 "example 3")
+   var x = 1; {
+     x = 3;
+     print x;
+     var x = 2;
+     {
+       x = 4;
+       print x
+     };
+     print x
+   }
+      " 3 "example 3")
 
    (list "
-var f,x; {
-  f = proc(x,y) *(x,y);
-  x = 3;
-  print (f 4 x)
-}
-   " 12 "example 4")
+   var f = 1, x = 2; {
+     f = proc(x,y) *(x,y);
+     x = 3;
+     print (f 4 x)
+   }
+      " 12 "example 4")
 
    (list "
-var x; {
-  read x;
-  print 1
-}
-   " 1 "example 4")
+   var x = 0; {
+     read x;
+     print 1
+   }
+      " 1 "example 4")
 
    (list "
-var x,y,z; {
-  x = 3;
-  y = 4;
-  z = 0;
-  do-while not(zero?(x)) {
-    z = +(z,y); x = -(x,1)
-  };
-  print z
-}
-   " 12 "do while")
+   var x = 1, y = 2, z = 3; {
+     x = 3;
+     y = 4;
+     z = 0;
+     do-while not(zero?(x)) {
+       z = +(z,y); x = -(x,1)
+     };
+     print z
+   }
+      " 12 "do while")
    )
   )
 

@@ -27,6 +27,27 @@
   (if-statement (exp1 expression?) (consequent statement?) (alternate statement?))
   (while-statement (exp1 expression?) (body statement?))
   (do-while-statement (exp1 expression?) (body statement?))
-  (var-statement (vars (list-of symbol?)) (body statement?))
+  (var-statement (vars (list-of var-declaration?)) (body statement?))
   (read-statement (var symbol?))
+  )
+
+(define-datatype var-declaration var-declaration?
+  (a-var-decl (name symbol?) (exp1 expression?))
+  )
+
+
+(define (get-var-declaration-name var)
+  (cases var-declaration var
+    (a-var-decl (var exp1)
+                var
+                )
+    )
+  )
+
+(define (get-var-declaration-exp var)
+  (cases var-declaration var
+    (a-var-decl (var exp1)
+                exp1
+                )
+    )
   )

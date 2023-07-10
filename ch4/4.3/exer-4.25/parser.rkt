@@ -22,8 +22,10 @@
     (statement ("if" expression statement statement) if-statement)
     (statement ("while" expression statement) while-statement)
     (statement ("do-while" expression statement) do-while-statement)
-    (statement ("var" (separated-list identifier ",") ";" statement) var-statement)
+    (statement ("var" (separated-list var-declaration ",") ";" statement) var-statement)
     (statement ("read" identifier) read-statement)
+
+    (var-declaration (identifier "=" expression) a-var-decl)
 
     (expression (number) const-exp)
     (expression (identifier) var-exp)
