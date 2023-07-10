@@ -67,6 +67,13 @@
      print z
    }
       " 12 "do while")
+
+   (list "
+    varrec odd  (x) if zero?(x) then 0 else (even -(x,1))
+           even (x) if zero?(x) then 1 else (odd -(x,1)); {
+       print (odd 13)
+    }
+       " 1 "mutually recursive proc declaration")
    )
   )
 

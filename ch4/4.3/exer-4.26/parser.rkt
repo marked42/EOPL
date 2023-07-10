@@ -23,6 +23,8 @@
     (statement ("while" expression statement) while-statement)
     (statement ("do-while" expression statement) do-while-statement)
     (statement ("var" (separated-list var-declaration ",") ";" statement) var-statement)
+    (statement ("varrec" (arbno identifier "("identifier")" expression) ";" statement) varrec-statement)
+
     (statement ("read" identifier) read-statement)
 
     (var-declaration (identifier "=" expression) a-var-decl)
@@ -35,6 +37,8 @@
     (expression ("*" "(" expression "," expression ")") mul-exp)
     (expression ("zero?" "(" expression ")") zero?-exp)
     (expression ("not" "(" expression ")") not-exp)
+
+    (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("proc" "(" (separated-list identifier ",") ")" expression) proc-exp)
     (expression ("("expression (arbno expression)")" ) call-exp)
