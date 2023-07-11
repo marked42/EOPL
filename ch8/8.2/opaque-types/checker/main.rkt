@@ -127,10 +127,11 @@
     (transparent-type-declaration? decl1)
     (opaque-type-declaration? decl2)
     )
-   (and
-    (opaque-type-declaration? decl1)
-    (opaque-type-declaration? decl2)
-    )
+  ; code different from the book
+  ;  (and
+  ;   (opaque-type-declaration? decl1)
+  ;   (opaque-type-declaration? decl2)
+  ;   )
    )
   )
 

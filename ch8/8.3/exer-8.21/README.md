@@ -9,7 +9,7 @@ first implement several helper procedures.
 
 integer k represented by 2*k.
 
-1. `zero` is `(plus zero zero)`
+1. `zero` is `zero`
 1. `succ` is original `succ` applied twice
 1. `pred` is original `pred` applied twice
 1. `is-zero` receives `x`, which is a representation of some 2 * k, get average of `zero` and `x`, which is `k`, and use
