@@ -50,11 +50,32 @@ let diff = proc (x, y) -(x,y)
    )
   )
 
+(define test-cases-letrec-in-module-body
+  (list
+   (list "
+module even-odd
+  interface [
+    even : (int -> bool)
+    odd  : (int -> bool)
+  ]
+  body
+    letrec bool local-odd  (x : int) = if zero?(x) then #f else (local-even -(x,1))
+           bool local-even (x : int) = if zero?(x) then #t else (local-odd  -(x,1))
+      in [
+        even = local-even
+        odd  = local-odd
+      ]
+(from even-odd take odd 13)
+      " #t "letrec in module body")
+   )
+  )
+
 (test-lang run sloppy->expval
            (
             append
-            test-cases-let-with-mutliple-declarations
-            test-cases-simple-modules
-            tests-cases-checked-letrec-with-multiple-declarations
+            ; test-cases-let-with-mutliple-declarations
+            ; test-cases-simple-modules
+            ; tests-cases-checked-letrec-with-multiple-declarations
+            test-cases-letrec-in-module-body
             )
            )
