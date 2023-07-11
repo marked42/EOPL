@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "parser.rkt" "expression.rkt" "module.rkt")
+(require racket/lazy-require racket/set "parser.rkt" "expression.rkt" "module.rkt")
 (lazy-require
  ["environment.rkt" (
                      empty-env
@@ -29,6 +29,7 @@
   (cases program prog
     (a-program (m-defs body)
                (let ([env (add-module-definitions-to-env m-defs (empty-env))])
+                 (eopl:pretty-print env)
                  (value-of-exp body env)
                  )
                )
@@ -44,7 +45,7 @@
                               (cdr defs)
                               (extend-env-with-module
                                m-name
-                               (value-of-module-body m-body env)
+                               (value-of-module-body m-body expected-interface env)
                                env
                                )
                               )
@@ -53,27 +54,40 @@
       )
   )
 
-(define (value-of-module-body m-body env)
-  (cases module-body m-body
-    (definitions-module-body (definitions)
-      (simple-module (definitions-to-env definitions env))
-      )
+(define (value-of-module-body m-body iface env)
+  (cases interface iface
+    (simple-interface (declarations)
+                      (cases module-body m-body
+                        (definitions-module-body (definitions)
+                          (simple-module (definitions-to-env definitions declarations env))
+                          )
+                        )
+                      )
     )
   )
 
-(define (definitions-to-env defs env)
-  (if (null? defs)
-      env
-      (cases definition (car defs)
-        (val-definition (var-name exp)
-                        (definitions-to-env
-                          (cdr defs)
-                          ; let* scoping rule
-                          (extend-env var-name (value-of-exp exp env) env)
-                          )
-                        )
-        )
+(define (definitions-to-env defs decls env)
+  (let ([visible-names (list->set (map decl->name decls))])
+    (let loop ([defs defs] [env env] [visible-env env])
+      (if (null? defs)
+          visible-env
+          (cases definition (car defs)
+            (val-definition (var-name exp)
+                            (loop
+                             (cdr defs)
+                             ; let* scoping rule
+                             (extend-env var-name (value-of-exp exp env) env)
+                             ; only add declared names to module environment
+                             (if (set-member? visible-names var-name)
+                                 (extend-env var-name (value-of-exp exp env) visible-env)
+                                 visible-env
+                                 )
+                             )
+                            )
+            )
+          )
       )
+    )
   )
 
 (define (value-of-exp exp env)
