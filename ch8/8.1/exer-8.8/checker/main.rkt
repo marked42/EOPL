@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt")
+(require racket/base "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt")
 
 (provide (all-defined-out))
 
@@ -81,26 +81,23 @@
   )
 
 (define (<:decls declarations1 declarations2 tenv)
-  (cond
-    [(null? declarations2) #t]
-    [(null? declarations1) #f]
-    (else (let* ([decl1 (car declarations1)]
-                 [name1 (decl->name decl1)]
-                 [decl2 (car declarations2)]
-                 [name2 (decl->name decl2)]
-                 )
-            (if (eqv? name1 name2)
-                (and
-                 (equal? (decl->type decl1) (decl->type decl2))
-                 (<:decls (cdr declarations1) (cdr declarations2) tenv)
-                 )
-                (<:decls (cdr declarations1) declarations2 tenv)
-                )
+  (if (null? declarations2)
+    #t
+    (andmap
+      (lambda (decl2)
+        (let ([name2 (decl->name decl2)])
+          (let ([decl1 (findf (lambda (decl1) (eqv? name2 (decl->name decl1))) declarations1)])
+            (if decl1
+              (equal? (decl->type decl1) (decl->type decl2))
+              #f
             )
           )
+        )
+      )
+      declarations2
+      )
     )
   )
-
 
 (define (type-of exp tenv)
   (cases expression exp
