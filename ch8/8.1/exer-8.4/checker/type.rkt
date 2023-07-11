@@ -5,15 +5,15 @@
 (define-datatype type type?
   (int-type)
   (bool-type)
-  (proc-type (arg-type type?) (result-type type?))
+  (proc-type (arg-types (list-of type?)) (result-type type?))
   )
 
 (define (type-to-external-form ty)
   (cases type ty
     (int-type () 'int)
     (bool-type () 'bool)
-    (proc-type (arg-type result-type)
-               (list (type-to-external-form arg-type)
+    (proc-type (arg-types result-type)
+               (list (map type-to-external-form arg-types)
                      '->
                      (type-to-external-form result-type)
                      )

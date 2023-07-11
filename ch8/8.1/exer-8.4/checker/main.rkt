@@ -136,16 +136,16 @@
              )
     (proc-exp (var var-type body)
               (let ([result-type (type-of body (extend-tenv* (list var) (list var-type) tenv))])
-                (proc-type var-type result-type)
+                (proc-type (list var-type) result-type)
                 )
               )
     (call-exp (rator rand)
               (let ([rator-type (type-of rator tenv)]
                     [rand-type (type-of rand tenv)])
                 (cases type rator-type
-                  (proc-type (arg-type result-type)
+                  (proc-type (arg-types result-type)
                              (begin
-                               (check-equal-type! arg-type rand-type rand)
+                               (map check-equal-type! arg-types (list result-type) (list rand))
                                result-type
                                )
                              )
@@ -154,7 +154,7 @@
                 )
               )
     (letrec-exp (p-result-type p-name b-var b-var-type p-body letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type b-var-type p-result-type)) tenv)])
+                (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type (list b-var-type) p-result-type)) tenv)])
                   (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body))])
                     (check-equal-type! p-body-type p-result-type p-body)
                     (type-of letrec-body tenv-for-letrec-body)

@@ -44,7 +44,7 @@
 
     (type ("int") int-type)
     (type ("bool") bool-type)
-    (type ("(" type "->" type")") proc-type)
+    (type ("(" (arbno type) "->" type")") proc-type)
     )
   )
 
