@@ -155,18 +155,31 @@
                   )
                 )
               )
-    (letrec-exp (p-result-type p-name b-var b-var-type p-body letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (proc-type (list b-var-type) p-result-type)) tenv)])
-                  (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body))])
-                    (check-equal-type! p-body-type p-result-type p-body)
-                    (type-of letrec-body tenv-for-letrec-body)
-                    )
+    (letrec-exp (p-result-types p-names b-vars b-var-types p-bodies letrec-body)
+                (let ([tenv-for-letrec-body (extend-tenv* p-names (map get-letrec-proc-type b-var-types p-result-types) tenv)])
+                  (map
+                   (lambda (p-result-type b-var b-var-type p-body)
+                     (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body))])
+                       (check-equal-type! p-body-type p-result-type p-body)
+                       )
+                     )
+                   p-result-types
+                   b-vars
+                   b-var-types
+                   p-bodies
+                   )
+
+                  (type-of letrec-body tenv-for-letrec-body)
                   )
                 )
     (qualified-var-exp (m-name var-name)
                        (lookup-qualified-var-in-tenv m-name var-name tenv)
                        )
     )
+  )
+
+(define (get-letrec-proc-type b-var-type p-result-type)
+  (proc-type (list b-var-type) p-result-type)
   )
 
 (define (report-rator-not-a-proc-type rator-type rator)

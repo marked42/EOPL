@@ -49,9 +49,12 @@ let diff = proc (x, y) -(x,y)
       " 22 "Exmaple 8.1 single module")
    )
   )
+
 (test-lang run sloppy->expval
            (
             append
             test-cases-let-with-mutliple-declarations
-            test-cases-simple-modules)
+            test-cases-simple-modules
+            tests-cases-checked-letrec-with-multiple-declarations
+            )
            )

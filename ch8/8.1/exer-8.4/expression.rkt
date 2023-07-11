@@ -23,7 +23,13 @@
    )
   (proc-exp (params (list-of parameter?)) (body expression?))
   (call-exp (rator expression?) (rands (list-of expression?)))
-  (letrec-exp (p-result-type type?) (p-name symbol?) (b-var symbol?) (b-var-type type?) (p-body expression?) (body expression?))
+  (letrec-exp
+   (p-result-types (list-of type?))
+   (p-names (list-of symbol?))
+   (b-vars (list-of symbol?))
+   (b-var-types (list-of type?))
+   (p-body (list-of expression?))
+   (body expression?))
 
   (qualified-var-exp (m-name symbol?) (var-name symbol?))
   )
