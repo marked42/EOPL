@@ -42,7 +42,7 @@
 
     (parameter (identifier ":" type) typed-parameter)
 
-    (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
+    (expression ("letrec" (arbno type identifier "(" identifier ":" type ")" "=" expression) "in" expression) letrec-exp)
 
     (type ("int") int-type)
     (type ("bool") bool-type)
