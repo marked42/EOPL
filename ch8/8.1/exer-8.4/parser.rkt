@@ -37,8 +37,10 @@
 
     (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
 
-    (expression ("proc" "(" identifier ":" type")" expression) proc-exp)
-    (expression ("("expression expression")" ) call-exp)
+    (expression ("proc" "(" (separated-list paramter ",") ")" expression) proc-exp)
+    (expression ("("expression (arbno expression)")" ) call-exp)
+
+    (parameter (identifier ":" type) typed-parameter)
 
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
 
