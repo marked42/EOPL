@@ -79,7 +79,14 @@
 (define (value-of-exp exp env)
   (cases expression exp
     (const-exp (num) (num-val num))
-    (var-exp (var) (apply-env env var))
+    (var-exp (var prop)
+             (cases property prop
+               (empty-property () (apply-env env var))
+               (var-property (name)
+                             (lookup-qualified-var-in-env var name env)
+                             )
+               )
+             )
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -127,9 +134,6 @@
                   (value-of-exp body new-env)
                   )
                 )
-    (qualified-var-exp (m-name var-name)
-                       (lookup-qualified-var-in-env m-name var-name env)
-                       )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

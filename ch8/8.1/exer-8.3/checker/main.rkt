@@ -105,7 +105,14 @@
 (define (type-of exp tenv)
   (cases expression exp
     (const-exp (num) (int-type))
-    (var-exp (var) (apply-tenv tenv var))
+    (var-exp (m-name prop)
+             (cases property prop
+               (empty-property () (apply-tenv tenv m-name))
+               (var-property (var-name)
+                             (lookup-qualified-var-in-tenv m-name var-name tenv)
+                             )
+               )
+             )
     (diff-exp (exp1 exp2)
               (let ([ty1 (type-of exp1 tenv)] [ty2 (type-of exp2 tenv)])
                 (check-equal-type! ty1 (int-type) exp1)
@@ -161,9 +168,6 @@
                     )
                   )
                 )
-    (qualified-var-exp (m-name var-name)
-                       (lookup-qualified-var-in-tenv m-name var-name tenv)
-                       )
     )
   )
 
