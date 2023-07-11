@@ -25,10 +25,12 @@
     (module-body ("[" (arbno definition) "]") definitions-module-body)
     (definition (identifier "=" expression) val-definition)
 
-    (expression ("from" identifier "take" identifier) qualified-var-exp)
+    (expression (identifier property) var-exp)
+
+    (property ("." identifier) var-property)
+    (property () empty-property)
 
     (expression (number) const-exp)
-    (expression (identifier) var-exp)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)
     (expression ("zero?" "(" expression ")") zero?-exp)
