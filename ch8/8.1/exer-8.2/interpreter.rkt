@@ -29,7 +29,6 @@
   (cases program prog
     (a-program (m-defs body)
                (let ([env (add-module-definitions-to-env m-defs (empty-env))])
-                 (eopl:pretty-print env)
                  (value-of-exp body env)
                  )
                )

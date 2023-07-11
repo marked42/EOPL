@@ -14,7 +14,7 @@ module m1
   interface [v : int]
   body [v = -(from m1 take u,11)] %= 33
 from m1 take u
-      " 11 "multiple modules with let* scoping rule")
+      " 'error "multiple modules with let* scoping rule")
 
    )
   )
