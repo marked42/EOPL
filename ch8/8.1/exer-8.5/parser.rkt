@@ -24,6 +24,7 @@
 
     (module-body ("[" (arbno definition) "]") definitions-module-body)
     (module-body ("letrec"(arbno type identifier "(" identifier ":" type ")" "=" expression) "in" "[" (arbno definition) "]") letrec-module-body)
+    (module-body ("let" (arbno identifier "=" expression) "in" "[" (arbno definition) "]") let-module-body)
 
     (definition (identifier "=" expression) val-definition)
 

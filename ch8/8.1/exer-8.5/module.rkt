@@ -27,6 +27,11 @@
    (p-bodies (list-of expression?))
    (definitions (list-of definition?))
    )
+  (let-module-body
+   (vars (list-of symbol?))
+   (exps (list-of expression?))
+   (definitions (list-of definition?))
+   )
   )
 
 (define-datatype interface interface?
