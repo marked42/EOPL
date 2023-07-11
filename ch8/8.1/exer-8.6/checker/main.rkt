@@ -34,8 +34,10 @@
 
 (define (interface-of m-body tenv)
   (cases module-body m-body
-    (definitions-module-body (definitions)
-      (simple-interface (definitions-to-declarations definitions tenv))
+    (definitions-module-body (modules definitions)
+      (let ([tenv (add-module-definitions-to-tenv modules tenv)])
+        (simple-interface (definitions-to-declarations definitions tenv))
+        )
       )
     )
   )

@@ -89,3 +89,21 @@ module m1
       " -1 "let in module body")
    )
   )
+
+(define test-cases-local-module
+  (list
+   (list "
+module m1
+  interface [u : int v : int]
+  body
+    module m2
+      interface [v : int]
+      body [v = 33]
+    [
+      u = 44
+      v = -(from m2 take v, 1) %= 32
+    ]
+-(from m1 take u, from m1 take v) %= 12
+      " 12 "local module definition")
+   )
+  )

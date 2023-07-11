@@ -55,8 +55,10 @@
 
 (define (value-of-module-body m-body env)
   (cases module-body m-body
-    (definitions-module-body (definitions)
-      (simple-module (definitions-to-env definitions env))
+    (definitions-module-body (modules definitions)
+      (let ([env (add-module-definitions-to-env modules env)])
+        (simple-module (definitions-to-env definitions env))
+        )
       )
     )
   )
