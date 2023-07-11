@@ -63,6 +63,11 @@
                           (simple-module (definitions-to-env definitions new-env))
                           )
                         )
+    (let-module-body (vars exps definitions)
+                     (let ([new-env (extend-env* vars (value-of-exps exps env) env)])
+                      (simple-module (definitions-to-env definitions new-env))
+                      )
+                     )
     )
   )
 

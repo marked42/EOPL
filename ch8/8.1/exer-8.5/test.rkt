@@ -70,12 +70,33 @@ module even-odd
    )
   )
 
+(define test-cases-let-in-module-body
+  (list
+   (list "
+module m1
+  interface [
+    left: int
+    right: int
+  ]
+  body
+    let a = 1
+        b = 2
+      in [
+        left = a
+        right = b
+      ]
+-(from m1 take left, from m1 take right)
+      " -1 "let in module body")
+   )
+  )
+
 (test-lang run sloppy->expval
            (
             append
-            ; test-cases-let-with-mutliple-declarations
-            ; test-cases-simple-modules
-            ; tests-cases-checked-letrec-with-multiple-declarations
+            test-cases-let-with-mutliple-declarations
+            test-cases-simple-modules
+            tests-cases-checked-letrec-with-multiple-declarations
             test-cases-letrec-in-module-body
+            test-cases-let-in-module-body
             )
            )

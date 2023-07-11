@@ -51,6 +51,11 @@
                             )
                           )
                         )
+    (let-module-body (vars exps definitions)
+                     (let ([new-env (extend-tenv* vars (type-of-exps exps tenv) tenv)])
+                      (simple-interface (definitions-to-declarations definitions new-env))
+                      )
+                     )
     )
   )
 
