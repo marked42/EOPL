@@ -129,9 +129,9 @@
               ty2
               )
             )
-    (let-exp (var exp1 body)
-             (let ([exp1-type (type-of exp1 tenv)])
-               (type-of body (extend-tenv* (list var) (list exp1-type) tenv))
+    (let-exp (vars exps body)
+             (let ([types (type-of-exps exps tenv)])
+               (type-of body (extend-tenv* vars types tenv))
                )
              )
     (proc-exp (var var-type body)
@@ -169,4 +169,8 @@
 
 (define (report-rator-not-a-proc-type rator-type rator)
   (eopl:error 'type-of-expression "Rator not a proc type: ~%~s~%had rator type ~s" rator (type-to-external-form rator-type))
+  )
+
+(define (type-of-exps exps tenv)
+  (map (lambda (exp) (type-of exp tenv)) exps)
   )
