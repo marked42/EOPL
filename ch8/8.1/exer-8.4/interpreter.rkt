@@ -5,7 +5,7 @@
  ["environment.rkt" (
                      empty-env
                      apply-env
-                     extend-env
+                     extend-env*
                      extend-env-rec
                      extend-env-with-module
                      lookup-qualified-var-in-env
@@ -69,7 +69,7 @@
                         (definitions-to-env
                           (cdr defs)
                           ; let* scoping rule
-                          (extend-env var-name (value-of-exp exp env) env)
+                          (extend-env* (list var-name) (list (value-of-exp exp env)) env)
                           )
                         )
         )
@@ -109,7 +109,7 @@
             )
     (let-exp (var exp1 body)
              (let ([val (value-of-exp exp1 env)])
-               (value-of-exp body (extend-env var val env))
+               (value-of-exp body (extend-env* (list var) (list val) env))
                )
              )
     (proc-exp (var var-type body)
