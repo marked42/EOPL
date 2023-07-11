@@ -661,7 +661,7 @@ let glo = pair(11,22)
    )
   )
 
-(define test-cases-simple-modules
+(define test-cases-simple-modules-common
   (list
    (list "
 module m1
@@ -709,13 +709,6 @@ module m1
 
    (list "
 module m1
-  interface [u : int v : int]
-  body [v = 33 u = 44]
-from m1 take u
-      " 'error "Example 8.4 module m1 declaration order and implementation order mismatch")
-
-   (list "
-module m1
   interface [u : int]
   body [u = 44]
 module m2
@@ -735,3 +728,21 @@ module m1
       " 'error "Example 8.5 module definitions uses let* scoping rule, incorrect order: m2, m1")
    )
   )
+
+(define simple-modules-example-8.4
+  (list
+   (list "
+module m1
+  interface [u : int v : int]
+  body [v = 33 u = 44]
+from m1 take u
+      " 'error "Example 8.4 module m1 declaration order and implementation order mismatch")
+   )
+  )
+
+(define test-cases-simple-modules
+  (append
+    test-cases-simple-modules-common
+    simple-modules-example-8.4
+  )
+)
