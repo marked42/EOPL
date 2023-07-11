@@ -37,6 +37,20 @@
     (definitions-module-body (definitions)
       (simple-interface (definitions-to-declarations definitions tenv))
       )
+    (letrec-module-body (p-result-types p-names b-vars b-var-types p-bodies definitions)
+                        (let ([tenv-for-letrec-body (get-tenv-for-letrec-body p-names b-var-types p-result-types tenv)])
+                          (check-p-body-types
+                           p-result-types
+                           b-vars
+                           b-var-types
+                           p-bodies
+                           tenv-for-letrec-body
+                           )
+                          (let ([tmp (definitions-to-declarations definitions tenv-for-letrec-body)])
+                            (simple-interface tmp)
+                            )
+                          )
+                        )
     )
   )
 
@@ -156,26 +170,46 @@
                 )
               )
     (letrec-exp (p-result-types p-names b-vars b-var-types p-bodies letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv* p-names (map get-letrec-proc-type b-var-types p-result-types) tenv)])
-                  (map
-                   (lambda (p-result-type b-var b-var-type p-body)
-                     (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body))])
-                       (check-equal-type! p-body-type p-result-type p-body)
-                       )
-                     )
+                (let ([tenv-for-letrec-body (get-tenv-for-letrec-body p-names b-var-types p-result-types tenv)])
+                  (check-p-body-types
                    p-result-types
                    b-vars
                    b-var-types
                    p-bodies
+                   tenv-for-letrec-body
                    )
-
                   (type-of letrec-body tenv-for-letrec-body)
                   )
                 )
     (qualified-var-exp (m-name var-name)
                        (lookup-qualified-var-in-tenv m-name var-name tenv)
                        )
+    (true-exp () (bool-type))
+    (false-exp () (bool-type))
+    (else (eopl:error 'type-of "unsupported expression type ~s" exp))
     )
+  )
+
+(define (get-tenv-for-letrec-body p-names b-var-types p-result-types tenv)
+  (extend-tenv* p-names (map get-letrec-proc-type b-var-types p-result-types) tenv)
+  )
+
+(define (get-p-body-type p-body b-var b-var-type tenv-for-letrec-body)
+  (type-of p-body (extend-tenv* (list b-var) (list b-var-type) tenv-for-letrec-body))
+  )
+
+(define (check-p-body-types p-result-types b-vars b-var-types p-bodies tenv-for-letrec-body)
+  (map
+   (lambda (p-result-type b-var b-var-type p-body)
+     (let ([p-body-type (get-p-body-type p-body b-var b-var-type tenv-for-letrec-body)])
+       (check-equal-type! p-body-type p-result-type p-body)
+       )
+     )
+   p-result-types
+   b-vars
+   b-var-types
+   p-bodies
+   )
   )
 
 (define (get-letrec-proc-type b-var-type p-result-type)

@@ -23,12 +23,17 @@
     (declaration (identifier ":" type) var-declaration)
 
     (module-body ("[" (arbno definition) "]") definitions-module-body)
+    (module-body ("letrec"(arbno type identifier "(" identifier ":" type ")" "=" expression) "in" "[" (arbno definition) "]") letrec-module-body)
+
     (definition (identifier "=" expression) val-definition)
 
     (expression ("from" identifier "take" identifier) qualified-var-exp)
 
     (expression (number) const-exp)
     (expression (identifier) var-exp)
+
+    (expression ("#t") true-exp)
+    (expression ("#f") false-exp)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)
     (expression ("zero?" "(" expression ")") zero?-exp)

@@ -19,6 +19,14 @@
 
 (define-datatype module-body module-body?
   (definitions-module-body (definitions (list-of definition?)))
+  (letrec-module-body
+   (p-result-types (list-of type?))
+   (p-names (list-of symbol?))
+   (b-vars (list-of symbol?))
+   (b-var-types (list-of type?))
+   (p-bodies (list-of expression?))
+   (definitions (list-of definition?))
+   )
   )
 
 (define-datatype interface interface?

@@ -32,6 +32,8 @@
    (body expression?))
 
   (qualified-var-exp (m-name symbol?) (var-name symbol?))
+  (true-exp)
+  (false-exp)
   )
 
 (define-datatype parameter parameter?
