@@ -4,7 +4,7 @@
 (require "value.rkt")
 (require "../../../base/test.rkt")
 
-(define test-cases-simple-modules
+(define test-cases-module-syntax-dot
   (list
    (list "
 module m1
@@ -79,4 +79,4 @@ module m1
    )
   )
 
-(test-lang run sloppy->expval test-cases-simple-modules)
+(test-lang run sloppy->expval test-cases-module-syntax-dot)
