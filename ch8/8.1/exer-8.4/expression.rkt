@@ -21,9 +21,25 @@
    (exps (list-of expression?))
    (body expression?)
    )
-  (proc-exp (var symbol?) (var-type type?) (body expression?))
-  (call-exp (rator expression?) (rand expression?))
+  (proc-exp (params (list-of parameter?)) (body expression?))
+  (call-exp (rator expression?) (rands (list-of expression?)))
   (letrec-exp (p-result-type type?) (p-name symbol?) (b-var symbol?) (b-var-type type?) (p-body expression?) (body expression?))
 
   (qualified-var-exp (m-name symbol?) (var-name symbol?))
+  )
+
+(define-datatype parameter parameter?
+  (typed-parameter (var symbol?) (ty type?))
+  )
+
+(define (parameter->var p)
+  (cases parameter p
+    (typed-parameter (var ty) var)
+    )
+  )
+
+(define (parameter->type p)
+  (cases parameter p
+    (typed-parameter (var ty) ty)
+    )
   )
