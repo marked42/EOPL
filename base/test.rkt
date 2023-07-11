@@ -746,3 +746,21 @@ from m1 take u
    simple-modules-example-8.4
    )
   )
+
+(define simple-modules-example-8.4
+  (list
+   (list "
+module m1
+  interface [u : int v : int]
+  body [v = 33 u = 44]
+from m1 take u
+      " 'error "Example 8.4 module m1 declaration order and implementation order mismatch")
+   )
+  )
+
+(define test-cases-simple-modules
+  (append
+   test-cases-simple-modules-common
+   simple-modules-example-8.4
+   )
+  )
