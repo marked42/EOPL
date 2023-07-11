@@ -39,6 +39,21 @@
     )
   )
 
+(define (has-module-name-in-tenv tenv m-name)
+  (cases type-environment tenv
+    (extend-tenv (var type saved-tenv)
+                 (has-module-name-in-tenv saved-tenv m-name)
+                 )
+    (extend-tenv-with-module (name iface saved-tenv)
+                             (if (equal? name m-name)
+                                 #t
+                                 (has-module-name-in-tenv saved-tenv m-name)
+                                 )
+                             )
+    (empty-tenv () #f)
+    )
+  )
+
 (define (lookup-module-name-in-tenv tenv m-name)
   (cases type-environment tenv
     (extend-tenv (var type saved-tenv)
