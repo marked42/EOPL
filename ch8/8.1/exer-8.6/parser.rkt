@@ -22,7 +22,7 @@
     (interface ("[" (arbno declaration)"]") simple-interface)
     (declaration (identifier ":" type) var-declaration)
 
-    (module-body ("[" (arbno definition) "]") definitions-module-body)
+    (module-body ((arbno module-definition) "[" (arbno definition) "]") definitions-module-body)
     (definition (identifier "=" expression) val-definition)
 
     (expression ("from" identifier "take" identifier) qualified-var-exp)
