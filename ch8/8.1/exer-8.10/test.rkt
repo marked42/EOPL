@@ -21,4 +21,9 @@ module m3
    )
   )
 
-(test-lang run sloppy->expval test-cases-import)
+(test-lang run sloppy->expval
+    (append
+        test-cases-simple-modules
+        test-cases-import
+    )
+)

@@ -18,7 +18,7 @@
   )
 
 (define-datatype module-body module-body?
-  (definitions-module-body (definitions (list-of definition?)))
+  (definitions-module-body (import-decl import-declaration?) (definitions (list-of definition?)))
   )
 
 (define-datatype interface interface?
@@ -48,3 +48,13 @@
                      )
     )
   )
+
+(define-datatype import-declaration import-declaration?
+  (empty-import-declaration)
+)
+
+(define (import-declaration->names decl)
+  (cases import-declaration decl
+    (empty-import-declaration () '())
+  )
+)

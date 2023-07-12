@@ -6,7 +6,7 @@
 
 (define (type-of-program pgm)
   (cases program pgm
-    (a-program (m-defs body)
+    (a-program (m-defs import-decl body)
                (let ([tenv (add-module-definitions-to-tenv m-defs (empty-tenv))])
                  (type-of body tenv)
                  )
@@ -34,7 +34,7 @@
 
 (define (interface-of m-body tenv)
   (cases module-body m-body
-    (definitions-module-body (definitions)
+    (definitions-module-body (import-decl definitions)
       (simple-interface (definitions-to-declarations definitions tenv))
       )
     )

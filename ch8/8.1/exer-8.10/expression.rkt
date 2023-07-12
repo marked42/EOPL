@@ -6,6 +6,7 @@
 (define-datatype program program?
   (a-program
    (m-defs (list-of module-definition?))
+   (import-decl import-declaration?)
    (body expression?)
    )
   )
