@@ -15,15 +15,17 @@
     ))
 
 (define the-grammar
-  '((program ((arbno module-definition) expression) a-program)
+  '((program ((arbno module-definition) import-declaration expression) a-program)
 
     (module-definition ("module" identifier "interface" interface "body" module-body) a-module-definition)
 
     (interface ("[" (arbno declaration)"]") simple-interface)
     (declaration (identifier ":" type) var-declaration)
 
-    (module-body ("[" (arbno definition) "]") definitions-module-body)
+    (module-body (import-declaration "[" (arbno definition) "]") definitions-module-body)
     (definition (identifier "=" expression) val-definition)
+
+    (import-declaration () empty-import-declaration)
 
     (expression ("from" identifier "take" identifier) qualified-var-exp)
 

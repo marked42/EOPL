@@ -27,7 +27,7 @@
 
 (define (value-of-program prog)
   (cases program prog
-    (a-program (m-defs body)
+    (a-program (m-defs import-decl body)
                (let ([env (add-module-definitions-to-env m-defs (empty-env))])
                  (value-of-exp body env)
                  )
@@ -55,7 +55,7 @@
 
 (define (value-of-module-body m-body env)
   (cases module-body m-body
-    (definitions-module-body (definitions)
+    (definitions-module-body (import-decl definitions)
       (simple-module (definitions-to-env definitions env))
       )
     )
