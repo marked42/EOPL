@@ -1,10 +1,11 @@
 #lang eopl
 
-(require racket/lazy-require)
+(require racket/list racket/lazy-require "checker/type.rkt")
 (lazy-require
- ["environment.rkt" (environment?)]
+ ["environment.rkt" (environment? apply-env)]
  ["expression.rkt" (expression?)]
  ["checker/type.rkt" (type?)]
+ ["value.rkt" (expval->module)]
  )
 
 (provide (all-defined-out))
@@ -47,4 +48,37 @@
                      ty
                      )
     )
+  )
+
+(define (get-qualified-var-mod val var-names)
+  (if (null? var-names)
+      val
+      (let ([mod (expval->module val)])
+        (cases typed-module mod
+          (simple-module (bindings)
+                         (get-qualified-var-mod
+                          (apply-env bindings (car var-names))
+                          (cdr var-names)
+                          )
+                         )
+          )
+        )
+      )
+  )
+
+(define (get-qualified-var-type ty var-names)
+  (if (null? var-names)
+      ty
+      (cases type ty
+        (module-type (vars types)
+                     (let ([index (index-of vars (car var-names))])
+                       (get-qualified-var-mod
+                        (list-ref types index)
+                        (cdr var-names)
+                        )
+                       )
+                     )
+        (else (eopl:error 'get-qualified-var-type "Expecte a module-type, get ~s" ty))
+        )
+      )
   )

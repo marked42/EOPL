@@ -3,6 +3,7 @@
 (require racket/lazy-require "expression.rkt")
 (lazy-require
  ["procedure.rkt" (proc?)]
+ ["module.rkt" (typed-module?)]
  )
 
 (provide (all-defined-out))
@@ -15,6 +16,7 @@
   (num-val (num number?))
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
+  (module-val (mod typed-module?))
   )
 
 (define (expval->num val)
@@ -38,6 +40,12 @@
     )
   )
 
+(define (expval->module val)
+  (cases expval val
+    (module-val (mod) mod)
+    (else (report-expval-extractor-error 'module val))
+    )
+  )
 
 (define sloppy->expval
   (lambda (sloppy-val)

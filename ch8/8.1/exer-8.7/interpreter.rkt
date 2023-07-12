@@ -7,13 +7,11 @@
                      apply-env
                      extend-env
                      extend-env-rec
-                     extend-env-with-module
-                     lookup-qualified-var-in-env
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc module-val)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
- ["module.rkt" (simple-module)]
+ ["module.rkt" (simple-module get-qualified-var-mod)]
  )
 
 (provide (all-defined-out))
@@ -42,7 +40,7 @@
         (a-module-definition (m-name expected-interface m-body)
                              (add-module-definitions-to-env
                               (cdr defs)
-                              (extend-env-with-module
+                              (extend-env
                                m-name
                                (value-of-module-body m-body env)
                                env
@@ -57,7 +55,7 @@
   (cases module-body m-body
     (definitions-module-body (modules definitions)
       (let ([env (add-module-definitions-to-env modules env)])
-        (simple-module (definitions-to-env definitions env))
+        (module-val (simple-module (definitions-to-env definitions env)))
         )
       )
     )
@@ -129,8 +127,10 @@
                   (value-of-exp body new-env)
                   )
                 )
-    (qualified-var-exp (m-name var-name)
-                       (lookup-qualified-var-in-env m-name var-name env)
+    (qualified-var-exp (m-name var-names)
+                       (let ([val (apply-env env m-name)])
+                         (get-qualified-var-mod val var-names)
+                         )
                        )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )

@@ -25,7 +25,7 @@
     (module-body ((arbno module-definition) "[" (arbno definition) "]") definitions-module-body)
     (definition (identifier "=" expression) val-definition)
 
-    (expression ("from" identifier "take" identifier) qualified-var-exp)
+    (expression ("from" identifier (arbno "take" identifier)) qualified-var-exp)
 
     (expression (number) const-exp)
     (expression (identifier) var-exp)
@@ -45,6 +45,7 @@
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
+    (type ("["(arbno identifier ":" type)"]") module-type)
     )
   )
 
