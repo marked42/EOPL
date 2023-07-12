@@ -33,6 +33,8 @@
     (expression ("-" "(" expression "," expression ")") diff-exp)
     (expression ("zero?" "(" expression ")") zero?-exp)
 
+    (expression ("print" "(" expression ")") print-exp)
+
     (expression ("if" expression "then" expression "else" expression) if-exp)
 
     (expression ("let" identifier "=" expression "in" expression) let-exp)
@@ -41,6 +43,7 @@
     (expression ("("expression expression")" ) call-exp)
 
     (expression ("letrec" type identifier "(" identifier ":" type ")" "=" expression "in" expression) letrec-exp)
+
 
     (type ("int") int-type)
     (type ("bool") bool-type)

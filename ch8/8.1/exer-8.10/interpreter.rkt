@@ -99,6 +99,12 @@
                    )
                  )
                )
+    (print-exp (exp1)
+               (let ([val (value-of-exp exp1 env)])
+                 (eopl:pretty-print val)
+                 val
+                 )
+               )
     (if-exp (exp1 exp2 exp3)
             (let ([val1 (value-of-exp exp1 env)])
               (if (expval->bool val1)

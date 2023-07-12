@@ -119,6 +119,7 @@
                  (bool-type)
                  )
                )
+    (print-exp (exp1) (type-of exp1 tenv))
     (if-exp (exp1 exp2 exp3)
             (let ([ty1 (type-of exp1 tenv)]
                   [ty2 (type-of exp2 tenv)]
