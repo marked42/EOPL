@@ -9,6 +9,7 @@
                      extend-env-rec
                      extend-env-with-module
                      lookup-qualified-var-in-env
+                     keep-only-dependencies
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
@@ -55,8 +56,10 @@
 
 (define (value-of-module-body m-body env)
   (cases module-body m-body
-    (definitions-module-body (definitions)
-      (simple-module (definitions-to-env definitions env))
+    (definitions-module-body (dependencies definitions)
+      (let ([visible-env (keep-only-dependencies dependencies env)])
+        (simple-module (definitions-to-env definitions visible-env))
+        )
       )
     )
   )

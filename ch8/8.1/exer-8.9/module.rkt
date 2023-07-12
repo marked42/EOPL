@@ -18,7 +18,7 @@
   )
 
 (define-datatype module-body module-body?
-  (definitions-module-body (definitions (list-of definition?)))
+  (definitions-module-body (dependencies (list-of symbol?)) (definitions (list-of definition?)))
   )
 
 (define-datatype interface interface?

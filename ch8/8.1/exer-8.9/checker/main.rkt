@@ -34,8 +34,8 @@
 
 (define (interface-of m-body tenv)
   (cases module-body m-body
-    (definitions-module-body (definitions)
-      (simple-interface (definitions-to-declarations definitions tenv))
+    (definitions-module-body (dependencies definitions)
+      (simple-interface (definitions-to-declarations definitions (keep-only-dependencies dependencies tenv)))
       )
     )
   )
