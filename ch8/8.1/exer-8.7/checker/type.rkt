@@ -1,11 +1,14 @@
 #lang eopl
 
+(require racket/string)
+
 (provide (all-defined-out))
 
 (define-datatype type type?
   (int-type)
   (bool-type)
   (proc-type (arg-type type?) (result-type type?))
+  (module-type (vars (list-of symbol?)) (types (list-of type?)))
   )
 
 (define (type-to-external-form ty)
@@ -18,7 +21,25 @@
                      (type-to-external-form result-type)
                      )
                )
+    (module-type (vars types)
+                 (string-append
+                  "["
+                  (string-join
+                   (map var-declaration-to-external-form vars types)
+                   " "
+                   )
+                  "]"
+                  )
+                 )
     )
+  )
+
+(define (var-declaration-to-external-form var ty)
+  (string-append
+   (symbol->string var)
+   " : "
+   (type-to-external-form ty)
+   )
   )
 
 (define (report-unequal-types ty1 ty2 exp)

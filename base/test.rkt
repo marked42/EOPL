@@ -742,7 +742,7 @@ from m1 take u
 
 (define test-cases-simple-modules
   (append
-    test-cases-simple-modules-common
-    simple-modules-example-8.4
+   test-cases-simple-modules-common
+   simple-modules-example-8.4
+   )
   )
-)

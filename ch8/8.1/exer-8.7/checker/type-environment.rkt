@@ -25,32 +25,13 @@
                      (apply-tenv saved-env search-var)
                      )
                  )
-    (else (eopl:error "Unbound variable ~s" search-var))
-    )
-  )
-
-(define (lookup-qualified-var-in-tenv m-name var-name tenv)
-  (let ([iface (lookup-module-name-in-tenv tenv m-name)])
-    (cases interface iface
-      (simple-interface (declarations)
-                        (lookup-variable-name-in-declarations var-name declarations)
-                        )
-      )
-    )
-  )
-
-(define (lookup-module-name-in-tenv tenv m-name)
-  (cases type-environment tenv
-    (extend-tenv (var type saved-tenv)
-                 (lookup-module-name-in-tenv saved-tenv m-name)
-                 )
-    (extend-tenv-with-module (name iface saved-tenv)
-                             (if (equal? name m-name)
-                                 iface
-                                 (lookup-module-name-in-tenv saved-tenv m-name)
+    (extend-tenv-with-module (name interface saved-tenv)
+                             (if (equal? name search-var)
+                                 interface
+                                 (apply-tenv saved-tenv search-var)
                                  )
                              )
-    (empty-tenv () (eopl:error 'lookup-module-name-in-tenv "fail to find module ~s" m-name))
+    (else (eopl:error "Unbound variable ~s" search-var))
     )
   )
 

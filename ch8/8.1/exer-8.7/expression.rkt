@@ -25,5 +25,5 @@
   (call-exp (rator expression?) (rand expression?))
   (letrec-exp (p-result-type type?) (p-name symbol?) (b-var symbol?) (b-var-type type?) (p-body expression?) (body expression?))
 
-  (qualified-var-exp (m-name symbol?) (var-name symbol?))
+  (qualified-var-exp (m-name symbol?) (var-names (list-of symbol?)))
   )

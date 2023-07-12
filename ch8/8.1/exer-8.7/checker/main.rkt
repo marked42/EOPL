@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt")
+(require racket/base "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt")
 
 (provide (all-defined-out))
 
@@ -42,12 +42,26 @@
     )
   )
 
+(define (interface->module-type iface-or-type)
+  (if (interface? iface-or-type)
+      (cases interface iface-or-type
+        (simple-interface (declarations)
+                          (module-type
+                           (map decl->name declarations)
+                           (map decl->type declarations)
+                           )
+                          )
+        )
+      iface-or-type
+      )
+  )
+
 (define (definitions-to-declarations definitions tenv)
   (if (null? definitions)
       '()
       (cases definition (car definitions)
         (val-definition (var-name exp)
-                        (let ([ty (type-of exp tenv)])
+                        (let* ([iface-or-type (type-of exp tenv)] [ty (interface->module-type iface-or-type)])
                           (cons
                            (var-declaration var-name ty)
                            (definitions-to-declarations
@@ -102,7 +116,6 @@
           )
     )
   )
-
 
 (define (type-of exp tenv)
   (cases expression exp
@@ -163,8 +176,20 @@
                     )
                   )
                 )
-    (qualified-var-exp (m-name var-name)
-                       (lookup-qualified-var-in-tenv m-name var-name tenv)
+    (qualified-var-exp (m-name var-names)
+                       (let ([iface (apply-tenv tenv m-name)])
+                         (cases interface iface
+                           (simple-interface (declarations)
+                                             (let* ([decl (findf (lambda (decl) (eqv? (decl->name decl) (car var-names))) declarations)]
+                                                    [ty (decl->type decl)])
+                                               (if (null? (cdr var-names))
+                                                   ty
+                                                   (get-qualified-var-type ty (cdr var-names))
+                                                   )
+                                               )
+                                             )
+                           )
+                         )
                        )
     )
   )
