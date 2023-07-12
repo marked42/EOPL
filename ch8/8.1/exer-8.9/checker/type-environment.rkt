@@ -67,3 +67,18 @@
         )
       )
   )
+
+(define (keep-only-dependencies dependencies tenv)
+  (cases type-environment tenv
+    (empty-tenv () tenv)
+    (extend-tenv (var val saved-tenv)
+                (extend-tenv var val (keep-only-dependencies dependencies saved-tenv))
+                )
+    (extend-tenv-with-module (m-name m-val saved-tenv)
+                            (if (member m-name dependencies)
+                              (extend-tenv-with-module m-name m-val (keep-only-dependencies dependencies saved-tenv))
+                              (keep-only-dependencies dependencies saved-tenv)
+                              )
+                            )
+  )
+)
