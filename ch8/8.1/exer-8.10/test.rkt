@@ -15,15 +15,13 @@ module m2
     body [x = print(2)]
 module m3
     interface []
-    body [x = print(3)]
+    body
+        import [m2]
+        [x = print(3)]
+import [m3,m1]
 33
       " 33 "import module on demand")
    )
   )
 
-(test-lang run sloppy->expval
-    (append
-        test-cases-simple-modules
-        test-cases-import
-    )
-)
+(test-lang run sloppy->expval test-cases-import)

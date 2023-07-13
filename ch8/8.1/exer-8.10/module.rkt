@@ -51,10 +51,12 @@
 
 (define-datatype import-declaration import-declaration?
   (empty-import-declaration)
-)
+  (named-import-declaration (vars (list-of symbol?)))
+  )
 
 (define (import-declaration->names decl)
   (cases import-declaration decl
     (empty-import-declaration () '())
+    (named-import-declaration (vars) vars)
+    )
   )
-)

@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "expression.rkt")
+(require racket racket/lazy-require "expression.rkt")
 (lazy-require
  ["procedure.rkt" (proc?)]
  )
@@ -15,6 +15,7 @@
   (num-val (num number?))
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
+  (module-val (mod mpair?))
   )
 
 (define (expval->num val)
@@ -38,6 +39,12 @@
     )
   )
 
+(define (expval->module val)
+  (cases expval val
+    (module-val (p) p)
+    (else (report-expval-extractor-error 'module val))
+    )
+  )
 
 (define sloppy->expval
   (lambda (sloppy-val)
