@@ -9,10 +9,39 @@
   (tvar-type (sn integer?))
   )
 
+(define (atomic-type? ty)
+  (cases type ty
+    (int-type () #t)
+    (bool-type () #t)
+    (else #f)
+    )
+  )
+
 (define (tvar-type? ty)
   (cases type ty
     (tvar-type (sn) #t)
     (else #f)
+    )
+  )
+
+(define (proc-type? ty)
+  (cases type ty
+    (proc-type (arg-type result-type) #t)
+    (else #f)
+    )
+  )
+
+(define (proc-type->arg-type ty)
+  (cases type ty
+    (proc-type (arg-type result-type) arg-type)
+    (else (eopl:error 'proc-type->arg-type "Not a proc-type: ~s" ty))
+    )
+  )
+
+(define (proc-type->result-type ty)
+  (cases type ty
+    (proc-type (arg-type result-type) result-type)
+    (else (eopl:error 'proc-type->arg-type "Not a proc-type: ~s" ty))
     )
   )
 

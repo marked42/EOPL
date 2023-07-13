@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt")
+(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "unifier.rkt")
 
 (provide (all-defined-out))
 
@@ -81,23 +81,22 @@
   )
 
 (define (<:decls declarations1 declarations2 tenv)
-  (cond
-    [(null? declarations2) #t]
-    [(null? declarations1) #f]
-    (else (let* ([decl1 (car declarations1)]
-                 [name1 (decl->name decl1)]
-                 [decl2 (car declarations2)]
-                 [name2 (decl->name decl2)]
-                 )
-            (if (eqv? name1 name2)
-                (and
-                 (equal? (decl->type decl1) (decl->type decl2))
-                 (<:decls (cdr declarations1) (cdr declarations2) tenv)
-                 )
-                (<:decls (cdr declarations1) declarations2 tenv)
-                )
+  (let loop ([declarations1 declarations1] [declarations2 declarations2] [subst '()])
+    (cond
+      [(null? declarations2) #t]
+      [(null? declarations1) #f]
+      (else (let* ([decl1 (car declarations1)]
+                   [name1 (decl->name decl1)]
+                   [decl2 (car declarations2)]
+                   [name2 (decl->name decl2)]
+                   )
+              (if (eqv? name1 name2)
+                  (loop (cdr declarations1) (cdr declarations2) (unifier (decl->type decl1) (decl->type decl2) subst (var-exp name1)))
+                  (loop (cdr declarations1) declarations2 subst)
+                  )
+              )
             )
-          )
+      )
     )
   )
 
