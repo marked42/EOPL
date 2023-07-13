@@ -2,6 +2,7 @@
 
 (require racket/lazy-require "parser.rkt" "expression.rkt" "module.rkt")
 (lazy-require
+ [racket (set-mcdr! mcdr mcar)]
  ["environment.rkt" (
                      empty-env
                      apply-env
@@ -10,7 +11,7 @@
                      extend-env-with-module
                      lookup-qualified-var-in-env
                      )]
- ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
+ ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc expval->module)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["checker/main.rkt" (type-of-program)]
  ["module.rkt" (simple-module)]
@@ -29,11 +30,29 @@
   (cases program prog
     (a-program (m-defs import-decl body)
                (let ([env (add-module-definitions-to-env m-defs (empty-env))])
+                 (import-modules! import-decl env)
                  (value-of-exp body env)
                  )
                )
     )
   )
+
+(define (import-modules! import-decl env)
+  (let ([names (import-declaration->names import-decl)])
+    (map (lambda (name)
+        (let* ([val (apply-env env name)]
+               [mod (expval->module val)]
+               [m-body (mcar mod)]
+               [mod-val (mcdr mod)]
+               )
+          (if (eqv? mod-val 'uninitialized)
+              (set-mcdr! mod (value-of-module-body m-body env))
+              #f
+          )
+        )
+    ) names)
+  )
+)
 
 (define (add-module-definitions-to-env defs env)
   (if (null? defs)
@@ -44,7 +63,7 @@
                               (cdr defs)
                               (extend-env-with-module
                                m-name
-                               (value-of-module-body m-body env)
+                               m-body
                                env
                                )
                               )
@@ -56,6 +75,7 @@
 (define (value-of-module-body m-body env)
   (cases module-body m-body
     (definitions-module-body (import-decl definitions)
+      (import-modules! import-decl env)
       (simple-module (definitions-to-env definitions env))
       )
     )

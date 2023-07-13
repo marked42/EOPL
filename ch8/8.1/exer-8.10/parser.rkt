@@ -26,6 +26,7 @@
     (definition (identifier "=" expression) val-definition)
 
     (import-declaration () empty-import-declaration)
+    (import-declaration ("import" "["(separated-list identifier ",")"]") named-import-declaration)
 
     (expression ("from" identifier "take" identifier) qualified-var-exp)
 
