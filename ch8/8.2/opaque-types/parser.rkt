@@ -21,9 +21,12 @@
 
     (interface ("[" (arbno declaration)"]") simple-interface)
     (declaration (identifier ":" type) var-declaration)
+    (declaration ("opaque" identifier) opaque-type-declaration)
+    (declaration ("transparent" identifier "=" type) transparent-type-declaration)
 
     (module-body ("[" (arbno definition) "]") definitions-module-body)
     (definition (identifier "=" expression) val-definition)
+    (definition ("type" identifier "=" type) type-definition)
 
     (expression ("from" identifier "take" identifier) qualified-var-exp)
 
@@ -45,6 +48,9 @@
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("(" type "->" type")") proc-type)
+
+    (type (identifier) named-type)
+    (type ("from" identifier "take" identifier) qualified-type)
     )
   )
 

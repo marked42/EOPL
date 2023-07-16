@@ -6,6 +6,8 @@
   (int-type)
   (bool-type)
   (proc-type (arg-type type?) (result-type type?))
+  (named-type (name symbol?))
+  (qualified-type (m-name symbol?) (t-name symbol?))
   )
 
 (define (type-to-external-form ty)
@@ -18,6 +20,8 @@
                      (type-to-external-form result-type)
                      )
                )
+    (named-type (name) name)
+    (qualified-type (m-name t-name) (list 'from m-name 'take t-name))
     )
   )
 

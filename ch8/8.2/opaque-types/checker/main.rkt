@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt")
+(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt")
 
 (provide (all-defined-out))
 
@@ -21,7 +21,9 @@
         (a-module-definition (m-name expected-interface m-body)
                              (let ([actual-interface (interface-of m-body tenv)])
                                (if (<:iface actual-interface expected-interface tenv)
-                                   (let ([new-tenv (extend-tenv-with-module m-name expected-interface tenv) ])
+                                   ; expand interfaces
+                                   (let* ([expanded-iface (expand-iface m-name expected-interface tenv)]
+                                          [new-tenv (extend-tenv-with-module m-name expanded-iface tenv)])
                                      (add-module-definitions-to-tenv (cdr defs) new-tenv)
                                      )
                                    (report-module-doesnt-satisfy-iface m-name expected-interface actual-interface)
@@ -56,6 +58,14 @@
                            )
                           )
                         )
+        (type-definition (var-name ty)
+                         (let ([new-env (extend-tenv-with-type var-name (expand-type ty tenv) tenv)])
+                          (cons
+                            (transparent-type-declaration var-name ty)
+                            (definitions-to-declarations (cdr definitions) new-env)
+                          )
+                         )
+                         )
         )
       )
   )
@@ -85,22 +95,51 @@
     [(null? declarations2) #t]
     [(null? declarations1) #f]
     (else (let* ([decl1 (car declarations1)]
-                 [name1 (decl->name decl1)]
+                 [name1 (declaration->name decl1)]
                  [decl2 (car declarations2)]
-                 [name2 (decl->name decl2)]
+                 [name2 (declaration->name decl2)]
                  )
             (if (eqv? name1 name2)
                 (and
-                 (equal? (decl->type decl1) (decl->type decl2))
+                 (<:decl (car declarations1) (car declarations1) tenv)
                  (<:decls (cdr declarations1) (cdr declarations2) tenv)
                  )
-                (<:decls (cdr declarations1) declarations2 tenv)
+                (<:decls (cdr declarations1) declarations2 (extend-tenv-with-declaration (car declarations1) tenv))
                 )
             )
           )
     )
   )
 
+(define (<:decl decl1 decl2 tenv)
+  (or
+    (and
+      (var-declaration? decl1)
+      (var-declaration? decl2)
+      (equiv-type? (declaration->type decl1) (declaration->type decl2) tenv)
+    )
+    (and
+      (transparent-type-declaration? decl1)
+      (transparent-type-declaration? decl2)
+      (equiv-type? (declaration->type decl1) (declaration->type decl2) tenv)
+    )
+    (and
+      (transparent-type-declaration? decl1)
+      (opaque-type-declaration? decl2)
+    )
+    (and
+      (opaque-type-declaration? decl1)
+      (opaque-type-declaration? decl2)
+    )
+  )
+)
+
+(define (equiv-type? ty1 ty2 tenv)
+  (equal?
+    (expand-type ty1 tenv)
+    (expand-type ty2 tenv)
+  )
+)
 
 (define (type-of exp tenv)
   (cases expression exp
@@ -131,12 +170,13 @@
             )
     (let-exp (var exp1 body)
              (let ([exp1-type (type-of exp1 tenv)])
-               (type-of body (extend-tenv var exp1-type tenv))
+               (type-of body (extend-tenv var (expand-type exp1-type tenv) tenv))
                )
              )
     (proc-exp (var var-type body)
-              (let ([result-type (type-of body (extend-tenv var var-type tenv))])
-                (proc-type var-type result-type)
+              (let* ([expanded-var-type (expand-type var-type tenv)]
+                     [result-type (type-of body (extend-tenv var expanded-var-type tenv))])
+                (proc-type expanded-var-type result-type)
                 )
               )
     (call-exp (rator rand)
@@ -154,15 +194,15 @@
                 )
               )
     (letrec-exp (p-result-type p-name b-var b-var-type p-body letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv p-name (proc-type b-var-type p-result-type) tenv)])
-                  (let ([p-body-type (type-of p-body (extend-tenv b-var b-var-type tenv-for-letrec-body))])
+                (let ([tenv-for-letrec-body (extend-tenv p-name (expand-type (proc-type b-var-type p-result-type) tenv) tenv)])
+                  (let ([p-body-type (type-of p-body (extend-tenv b-var (expand-type b-var-type tenv-for-letrec-body) tenv-for-letrec-body))])
                     (check-equal-type! p-body-type p-result-type p-body)
                     (type-of letrec-body tenv-for-letrec-body)
                     )
                   )
                 )
     (qualified-var-exp (m-name var-name)
-                       (lookup-qualified-var-in-tenv m-name var-name tenv)
+                       (lookup-qualified-type-in-tenv m-name var-name tenv)
                        )
     )
   )
