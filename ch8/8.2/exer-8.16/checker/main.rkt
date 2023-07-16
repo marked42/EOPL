@@ -173,21 +173,21 @@
                (type-of body (extend-tenv* vars (map (lambda (exp-type) (expand-type exp-type tenv)) exp-types) tenv))
                )
              )
-    (proc-exp (typed-var body)
-              (let* ([var (typed-var->var typed-var)]
-                     [var-type (typed-var->type typed-var)]
-                     [expanded-var-type (expand-type var-type tenv)]
-                     [result-type (type-of body (extend-tenv* (list var) (list expanded-var-type) tenv))])
-                (proc-type (list expanded-var-type) result-type)
+    (proc-exp (typed-vars body)
+              (let* ([vars (map typed-var->var typed-vars)]
+                     [var-types (map typed-var->type typed-vars)]
+                     [expanded-var-types (map (lambda (var-type) (expand-type var-type tenv)) var-types)]
+                     [result-type (type-of body (extend-tenv* vars expanded-var-types tenv))])
+                (proc-type expanded-var-types result-type)
                 )
               )
-    (call-exp (rator rand)
+    (call-exp (rator rands)
               (let ([rator-type (type-of rator tenv)]
-                    [rand-type (type-of rand tenv)])
+                    [rand-types (type-of-exps rands tenv)])
                 (cases type rator-type
                   (proc-type (arg-types result-type)
                              (begin
-                              (map (lambda (arg-type rand-type) (check-equal-type! arg-type rand-type rand)) arg-types (list rand-type))
+                              (map (lambda (arg-type rand-type rand) (check-equal-type! arg-type rand-type rand)) arg-types rand-types rands)
                                result-type
                                )
                              )
