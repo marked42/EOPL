@@ -246,5 +246,6 @@ let empty = from tables take empty
     (append
         ; test-cases-simple-modules
         test-cases-opaque-types
+        test-cases-let-exp-with-multiple-declarations
     )
 )
