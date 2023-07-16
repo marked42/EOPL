@@ -8,8 +8,11 @@
     (cases type ty
         (int-type () (int-type))
         (bool-type () (bool-type))
-        (proc-type (arg-type result-type)
-            (proc-type (expand-type arg-type tenv) (expand-type result-type tenv))
+        (proc-type (arg-types result-type)
+            (proc-type
+              (map (lambda (arg-type) (expand-type arg-type tenv)) arg-types)
+              (expand-type result-type tenv)
+            )
         )
         (named-type (name)
             (lookup-type-name-in-tenv name tenv)

@@ -47,7 +47,7 @@
 
     (type ("int") int-type)
     (type ("bool") bool-type)
-    (type ("(" type "->" type")") proc-type)
+    (type ("(" (separated-list type "*") "->" type")") proc-type)
 
     (type (identifier) named-type)
     (type ("from" identifier "take" identifier) qualified-type)
