@@ -27,24 +27,53 @@
 
 (define-datatype declaration declaration?
   (var-declaration (var-name symbol?) (ty type?))
+  (opaque-type-declaration (t-name symbol?))
+  (transparent-type-declaration (t-name symbol?) (ty type?))
   )
 
 (define-datatype definition definition?
   (val-definition (var-name symbol?) (exp expression?))
+  (type-definition (var-name symbol?) (ty type?))
   )
 
-(define (decl->name decl)
+(define (var-declaration? decl)
+  (cases declaration decl
+    (var-declaration (var-name ty) #t)
+    (else #f)
+  )
+)
+
+(define (transparent-type-declaration? decl)
+  (cases declaration decl
+    (transparent-type-declaration (t-name ty) #t)
+    (else #f)
+  )
+)
+
+(define (opaque-type-declaration? decl)
+  (cases declaration decl
+    (opaque-type-declaration (t-name) #t)
+    (else #f)
+  )
+)
+
+(define (declaration->name decl)
   (cases declaration decl
     (var-declaration (var-name ty)
                      var-name
                      )
+    (opaque-type-declaration (name) name)
+    (transparent-type-declaration (t-name ty) t-name)
     )
   )
 
-(define (decl->type decl)
+(define (declaration->type decl)
   (cases declaration decl
     (var-declaration (var-name ty)
                      ty
                      )
+    (opaque-type-declaration (name) name)
+    (transparent-type-declaration (t-name ty) ty)
+    (opaque-type-declaration (eopl:error 'declaration->type "Can't take the type of abstract type declaration ~s" decl))
     )
   )
