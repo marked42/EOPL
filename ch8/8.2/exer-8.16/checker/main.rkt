@@ -195,14 +195,18 @@
                   )
                 )
               )
-    (letrec-exp (p-result-type p-name b-typed-var p-body letrec-body)
-                (let* ([b-var (typed-var->var b-typed-var)]
-                       [b-var-type (typed-var->type b-typed-var)]
-                       [tenv-for-letrec-body (extend-tenv* (list p-name) (list (expand-type (proc-type (list b-var-type) p-result-type) tenv)) tenv)])
-                  (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list (expand-type b-var-type tenv-for-letrec-body)) tenv-for-letrec-body))])
-                    (check-equal-type! p-body-type p-result-type p-body)
-                    (type-of letrec-body tenv-for-letrec-body)
+    (letrec-exp (p-result-types p-names b-typed-vars p-bodies letrec-body)
+                (let* ([b-vars (map typed-var->var b-typed-vars)]
+                       [b-var-types (map typed-var->type b-typed-vars)]
+                       [tenv-for-letrec-body (extend-tenv* p-names (map (lambda (b-var-type p-result-type) (expand-type (proc-type (list b-var-type) p-result-type) tenv)) b-var-types p-result-types) tenv)])
+                    (check-body-types
+                      p-result-types
+                      b-vars
+                      b-var-types
+                      p-bodies
+                      tenv-for-letrec-body
                     )
+                    (type-of letrec-body tenv-for-letrec-body)
                   )
                 )
     (qualified-var-exp (m-name var-name)
@@ -210,6 +214,20 @@
                        )
     )
   )
+
+(define (check-body-types p-result-types b-vars b-var-types p-bodies tenv-for-letrec-body)
+  (map
+    (lambda (p-result-type b-var b-var-type p-body)
+      (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list (expand-type b-var-type tenv-for-letrec-body)) tenv-for-letrec-body))])
+        (check-equal-type! p-body-type p-result-type p-body)
+        )
+    )
+    p-result-types
+    b-vars
+    b-var-types
+    p-bodies
+  )
+)
 
 (define (report-rator-not-a-proc-type rator-type rator)
   (eopl:error 'type-of-expression "Rator not a proc type: ~%~s~%had rator type ~s" rator (type-to-external-form rator-type))

@@ -265,11 +265,22 @@ let diff = proc (x: int, y: int) -(x,y)
    )
   )
 
+(define test-cases-letrec-exp-with-multiple-declarartions
+  (list
+   (list "
+letrec int double(x: int) = if zero?(x) then 0 else -((double -(x,1)), -2)
+       int triple(x: int) = if zero?(x) then 0 else -((triple -(x,1)), -3)
+    in (triple (double 6))
+" 36 "letrec-exp with multiple declarations")
+   )
+  )
+
 (test-lang run sloppy->expval
     (append
         ; test-cases-simple-modules
         test-cases-opaque-types
         test-cases-let-exp-with-multiple-declarations
         test-cases-proc-with-multiple-arguments
+        test-cases-letrec-exp-with-multiple-declarartions
     )
 )
