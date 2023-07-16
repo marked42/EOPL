@@ -42,7 +42,7 @@
                         ; procedure env is extend-env-rec itself which contains procedure
                         ; when procedure is called, procedure body is evaluated in this extend-env-rec
                         ; where procedure is visible, which enables recursive call
-                        (proc-val (procedure b-var p-body env))
+                        (proc-val (procedure (list b-var) p-body env))
                         (apply-env saved-env search-var)
                         )
                     )
