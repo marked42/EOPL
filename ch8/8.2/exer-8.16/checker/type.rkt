@@ -5,7 +5,7 @@
 (define-datatype type type?
   (int-type)
   (bool-type)
-  (proc-type (arg-type type?) (result-type type?))
+  (proc-type (arg-types (list-of type?)) (result-type type?))
   (named-type (name symbol?))
   (qualified-type (m-name symbol?) (t-name symbol?))
   )
@@ -14,12 +14,12 @@
   (cases type ty
     (int-type () 'int)
     (bool-type () 'bool)
-    (proc-type (arg-type result-type)
-               (list (type-to-external-form arg-type)
-                     '->
-                     (type-to-external-form result-type)
-                     )
-               )
+    (proc-type (arg-types result-type)
+               (append
+                (map type-to-external-form arg-types)
+                (list '-> (type-to-external-form result-type))
+                )
+    )
     (named-type (name) name)
     (qualified-type (m-name t-name) (list 'from m-name 'take t-name))
     )
