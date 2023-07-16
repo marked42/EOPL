@@ -101,8 +101,8 @@
                  )
             (if (eqv? name1 name2)
                 (and
-                 (<:decl (car declarations1) (car declarations1) tenv)
-                 (<:decls (cdr declarations1) (cdr declarations2) tenv)
+                 (<:decl (car declarations1) (car declarations2) tenv)
+                 (<:decls (cdr declarations1) (cdr declarations2) (extend-tenv-with-declaration (car declarations1) tenv))
                  )
                 (<:decls (cdr declarations1) declarations2 (extend-tenv-with-declaration (car declarations1) tenv))
                 )
