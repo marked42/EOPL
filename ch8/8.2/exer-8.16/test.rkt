@@ -239,6 +239,33 @@ let empty = from tables take empty
                               (((add-binding 3) 600) empty)))
                 in -(((lookup 4) table1), ((lookup 3) table1)) %= 100
       " 100 ' "Exercise 8.15 tables module")
+
+   (list "
+module tables
+    interface [
+        opaque table
+        empty: table
+        add-to-table: (int * int * table -> table)
+        lookup-in-table: (int * table -> int)
+    ]
+    body [
+        type table = (int -> int)
+        empty = proc (x: int) 0
+        add-to-table = proc (x: int, y: int, t: table)
+                            proc (target: int)
+                                if zero?(-(target, x))
+                                then y
+                                else (t target)
+        lookup-in-table = proc (x: int, t: table) (t x)
+    ]
+let empty = from tables take empty
+    in let add-binding = from tables take add-to-table
+        in let lookup = from tables take lookup-in-table
+            in let table1 = (add-binding 3 300
+                             (add-binding 4 400
+                              (add-binding 3 600 empty)))
+                in -((lookup 4 table1), (lookup 3 table1)) %= 100
+      " 100 ' "tables module using multi-argument procedure")
    )
 )
 
