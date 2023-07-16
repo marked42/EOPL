@@ -244,7 +244,7 @@ let empty = from tables take empty
 
 (test-lang run sloppy->expval
            (append
-            ; test-cases-simple-modules
+            test-cases-simple-modules
             test-cases-opaque-types
             )
            )
