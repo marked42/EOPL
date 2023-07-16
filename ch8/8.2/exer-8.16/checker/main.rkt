@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt")
+(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt" "../typed-var.rkt")
 
 (provide (all-defined-out))
 
@@ -173,8 +173,10 @@
                (type-of body (extend-tenv* vars (map (lambda (exp-type) (expand-type exp-type tenv)) exp-types) tenv))
                )
              )
-    (proc-exp (var var-type body)
-              (let* ([expanded-var-type (expand-type var-type tenv)]
+    (proc-exp (typed-var body)
+              (let* ([var (typed-var->var typed-var)]
+                     [var-type (typed-var->type typed-var)]
+                     [expanded-var-type (expand-type var-type tenv)]
                      [result-type (type-of body (extend-tenv* (list var) (list expanded-var-type) tenv))])
                 (proc-type (list expanded-var-type) result-type)
                 )
