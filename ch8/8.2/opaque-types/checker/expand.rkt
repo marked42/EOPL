@@ -68,9 +68,10 @@
     (transparent-type-declaration (name ty)
       (extend-tenv-with-type name (expand-type ty tenv) tenv)
     )
-    ; TODO: seems no use ?
     (opaque-type-declaration (name)
-      (extend-tenv-with-type name (qualified-type (fresh-module-name '%unknown name)) tenv)
+      ; code different from the book
+      (eopl:error 'extend-tenv-with-declaration "expanded iface contains no opaque-type-declaration ~s" decl)
+      ; (extend-tenv-with-type name (qualified-type (fresh-module-name '%unknown name)) tenv)
     )
   )
 )

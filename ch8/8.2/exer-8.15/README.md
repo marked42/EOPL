@@ -17,7 +17,7 @@ module tables
                             proc (target: int)
                                 if zero?(-(target, x))
                                 then y
-                                else (t x)
+                                else (t target)
         lookup-in-table = proc (x: int) proc (t: table) (t x)
     ]
 let empty = from tables take empty
