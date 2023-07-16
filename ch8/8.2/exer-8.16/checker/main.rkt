@@ -195,8 +195,10 @@
                   )
                 )
               )
-    (letrec-exp (p-result-type p-name b-var b-var-type p-body letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv* (list p-name) (list (expand-type (proc-type (list b-var-type) p-result-type) tenv)) tenv)])
+    (letrec-exp (p-result-type p-name b-typed-var p-body letrec-body)
+                (let* ([b-var (typed-var->var b-typed-var)]
+                       [b-var-type (typed-var->type b-typed-var)]
+                       [tenv-for-letrec-body (extend-tenv* (list p-name) (list (expand-type (proc-type (list b-var-type) p-result-type) tenv)) tenv)])
                   (let ([p-body-type (type-of p-body (extend-tenv* (list b-var) (list (expand-type b-var-type tenv-for-letrec-body)) tenv-for-letrec-body))])
                     (check-equal-type! p-body-type p-result-type p-body)
                     (type-of letrec-body tenv-for-letrec-body)
