@@ -107,3 +107,14 @@ module m1
       " 12 "local module definition")
    )
   )
+
+(define test-cases-interface-order
+  (list
+   (list "
+module m1
+  interface [u : int v : int]
+  body [v = 33 u = 44]
+from m1 take u
+      " 44 "allow definition order to be different with interface order")
+   )
+  )
