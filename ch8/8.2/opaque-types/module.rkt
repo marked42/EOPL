@@ -40,22 +40,22 @@
   (cases declaration decl
     (var-declaration (var-name ty) #t)
     (else #f)
+    )
   )
-)
 
 (define (transparent-type-declaration? decl)
   (cases declaration decl
     (transparent-type-declaration (t-name ty) #t)
     (else #f)
+    )
   )
-)
 
 (define (opaque-type-declaration? decl)
   (cases declaration decl
     (opaque-type-declaration (t-name) #t)
     (else #f)
+    )
   )
-)
 
 (define (declaration->name decl)
   (cases declaration decl
