@@ -267,7 +267,7 @@ let empty = from tables take empty
                 in -((lookup 4 table1), (lookup 3 table1)) %= 100
       " 100 ' "tables module using multi-argument procedure")
    )
-)
+  )
 
 (define test-cases-proc-with-multiple-arguments
   (list
@@ -303,11 +303,11 @@ letrec int double(x: int) = if zero?(x) then 0 else -((double -(x,1)), -2)
   )
 
 (test-lang run sloppy->expval
-    (append
-        ; test-cases-simple-modules
-        test-cases-opaque-types
-        test-cases-let-exp-with-multiple-declarations
-        test-cases-proc-with-multiple-arguments
-        test-cases-letrec-exp-with-multiple-declarartions
-    )
-)
+           (append
+            test-cases-simple-modules
+            test-cases-opaque-types
+            test-cases-let-exp-with-multiple-declarations
+            test-cases-proc-with-multiple-arguments
+            test-cases-letrec-exp-with-multiple-declarartions
+            )
+           )
