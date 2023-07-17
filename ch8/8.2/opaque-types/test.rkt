@@ -240,11 +240,11 @@ let empty = from tables take empty
                 in -(((lookup 4) table1), ((lookup 3) table1)) %= 100
       " 100 ' "Exercise 8.15 tables module")
    )
-)
+  )
 
 (test-lang run sloppy->expval
-    (append
-        ; test-cases-simple-modules
-        test-cases-opaque-types
-    )
-)
+           (append
+            ; test-cases-simple-modules
+            test-cases-opaque-types
+            )
+           )

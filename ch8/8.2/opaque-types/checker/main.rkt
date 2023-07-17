@@ -60,11 +60,11 @@
                         )
         (type-definition (var-name ty)
                          (let ([new-env (extend-tenv-with-type var-name (expand-type ty tenv) tenv)])
-                          (cons
+                           (cons
                             (transparent-type-declaration var-name ty)
                             (definitions-to-declarations (cdr definitions) new-env)
-                          )
-                         )
+                            )
+                           )
                          )
         )
       )
@@ -113,33 +113,33 @@
 
 (define (<:decl decl1 decl2 tenv)
   (or
-    (and
-      (var-declaration? decl1)
-      (var-declaration? decl2)
-      (equiv-type? (declaration->type decl1) (declaration->type decl2) tenv)
+   (and
+    (var-declaration? decl1)
+    (var-declaration? decl2)
+    (equiv-type? (declaration->type decl1) (declaration->type decl2) tenv)
     )
-    (and
-      (transparent-type-declaration? decl1)
-      (transparent-type-declaration? decl2)
-      (equiv-type? (declaration->type decl1) (declaration->type decl2) tenv)
+   (and
+    (transparent-type-declaration? decl1)
+    (transparent-type-declaration? decl2)
+    (equiv-type? (declaration->type decl1) (declaration->type decl2) tenv)
     )
-    (and
-      (transparent-type-declaration? decl1)
-      (opaque-type-declaration? decl2)
+   (and
+    (transparent-type-declaration? decl1)
+    (opaque-type-declaration? decl2)
     )
-    (and
-      (opaque-type-declaration? decl1)
-      (opaque-type-declaration? decl2)
+   (and
+    (opaque-type-declaration? decl1)
+    (opaque-type-declaration? decl2)
     )
+   )
   )
-)
 
 (define (equiv-type? ty1 ty2 tenv)
   (equal?
-    (expand-type ty1 tenv)
-    (expand-type ty2 tenv)
+   (expand-type ty1 tenv)
+   (expand-type ty2 tenv)
+   )
   )
-)
 
 (define (type-of exp tenv)
   (cases expression exp
