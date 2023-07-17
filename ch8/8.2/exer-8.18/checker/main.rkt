@@ -14,6 +14,14 @@
     )
   )
 
+(define (extend-tenv-auto-expansion var ty tenv)
+  (extend-tenv var (expand-type ty tenv) tenv)
+  )
+
+(define (extend-tenv-with-type-auto-expansion var ty tenv)
+  (extend-tenv-with-type var (expand-type ty tenv) tenv)
+  )
+
 (define (add-module-definitions-to-tenv defs tenv)
   (if (null? defs)
       tenv
@@ -59,7 +67,7 @@
                           )
                         )
         (type-definition (var-name ty)
-                         (let ([new-env (extend-tenv-with-type var-name (expand-type ty tenv) tenv)])
+                         (let ([new-env (extend-tenv-with-type-auto-expansion var-name ty tenv)])
                            (cons
                             (transparent-type-declaration var-name ty)
                             (definitions-to-declarations (cdr definitions) new-env)
@@ -170,12 +178,12 @@
             )
     (let-exp (var exp1 body)
              (let ([exp1-type (type-of exp1 tenv)])
-               (type-of body (extend-tenv var (expand-type exp1-type tenv) tenv))
+               (type-of body (extend-tenv-auto-expansion var exp1-type tenv))
                )
              )
     (proc-exp (var var-type body)
               (let* ([expanded-var-type (expand-type var-type tenv)]
-                     [result-type (type-of body (extend-tenv var expanded-var-type tenv))])
+                     [result-type (type-of body (extend-tenv-auto-expansion var expanded-var-type tenv))])
                 (proc-type expanded-var-type result-type)
                 )
               )
@@ -194,8 +202,8 @@
                 )
               )
     (letrec-exp (p-result-type p-name b-var b-var-type p-body letrec-body)
-                (let ([tenv-for-letrec-body (extend-tenv p-name (expand-type (proc-type b-var-type p-result-type) tenv) tenv)])
-                  (let ([p-body-type (type-of p-body (extend-tenv b-var (expand-type b-var-type tenv-for-letrec-body) tenv-for-letrec-body))])
+                (let ([tenv-for-letrec-body (extend-tenv-auto-expansion p-name (proc-type b-var-type p-result-type) tenv)])
+                  (let ([p-body-type (type-of p-body (extend-tenv-auto-expansion b-var b-var-type tenv-for-letrec-body))])
                     (check-equal-type! p-body-type p-result-type p-body)
                     (type-of letrec-body tenv-for-letrec-body)
                     )
