@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt")
+(require racket/base "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt")
 
 (provide (all-defined-out))
 
@@ -93,21 +93,26 @@
 (define (<:decls declarations1 declarations2 tenv)
   (cond
     [(null? declarations2) #t]
-    [(null? declarations1) #f]
-    (else (let* ([decl1 (car declarations1)]
-                 [name1 (declaration->name decl1)]
-                 [decl2 (car declarations2)]
-                 [name2 (declaration->name decl2)]
+    ; missing implementation
+    [(ormap (lambda (decl2) (not (findf (lambda (decl1) (eqv? (declaration->name decl1) (declaration->name decl2))) declarations1))) declarations2) #f]
+    [else
+     (let loop ([declarations1 declarations1] [tenv tenv])
+       (if (null? declarations1)
+           #t
+           (let* ([decl1 (car declarations1)]
+                  [name1 (declaration->name decl1)]
+                  [decl2 (findf (lambda (decl2) (eqv? (declaration->name decl2) name1)) declarations2)])
+             (if decl2
+                 (if (<:decl decl1 decl2 tenv)
+                     (loop (cdr declarations1) (extend-tenv-with-declaration decl1 tenv))
+                     #f
+                     )
+                 #t
                  )
-            (if (eqv? name1 name2)
-                (and
-                 (<:decl (car declarations1) (car declarations2) tenv)
-                 (<:decls (cdr declarations1) (cdr declarations2) (extend-tenv-with-declaration (car declarations1) tenv))
-                 )
-                (<:decls (cdr declarations1) declarations2 (extend-tenv-with-declaration (car declarations1) tenv))
-                )
-            )
-          )
+             )
+           )
+       )
+     ]
     )
   )
 
