@@ -5,16 +5,15 @@ finish `from-int-maker` first, then create two modules `inst1-from-int` and `ins
 
 ```proc-modules
 module to-int-maker
-    interface (
-        (ints: [
+    interface
+        ((ints: [
             opaque t
             zero: t
             succ: (t -> t)
             is-zero: (t -> bool)
-        ] => [
+        ]) => [
             to-int: (from ints take t -> int)
         ])
-    )
     body
         module-proc (ints: [
             opaque t
@@ -72,17 +71,16 @@ module inst2-to-int
         (to-int-maker inst2)
 
 module from-int-maker
-    interface (
-        (ints: [
+    interface
+        ((ints: [
             opaque t
             zero: t
             succ: (t -> t)
             pred: (t -> t)
             is-zero: (t -> bool)
-        ] => [
+        ]) => [
             from-int: (int -> from ints take t)
         ])
-    )
     body
       module-proc (ints: [
             opaque t
