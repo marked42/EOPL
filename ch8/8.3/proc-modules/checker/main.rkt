@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt")
+(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt" "renaming.rkt")
 
 (provide (all-defined-out))
 
@@ -39,7 +39,45 @@
     (definitions-module-body (definitions)
       (simple-interface (definitions-to-declarations definitions tenv))
       )
+    (var-module-body (m-name)
+                     (lookup-module-name-in-tenv tenv m-name)
+                     )
+    (proc-module-body (rand-name rand-iface m-body)
+                      (let* ([expanded-iface (expand-iface rand-name rand-iface tenv)]
+                             [new-env (extend-tenv-with-module rand-name expanded-iface tenv)]
+                             [body-iface (interface-of m-body new-env)])
+                        (proc-interface rand-name rand-iface body-iface)
+                        )
+                      )
+    (app-module-body (rator-id rand-id)
+                     (let ([rator-iface (lookup-module-name-in-tenv tenv rator-id)]
+                           [rand-iface (lookup-module-name-in-tenv tenv rand-id)])
+                       (cases interface rator-iface
+                         (simple-interface (decls)
+                                           (report-attempt-to-apply-simple-module rator-id)
+                                           )
+                         (proc-interface (param-name param-iface result-iface)
+                                         (if (<:iface rand-iface param-iface tenv)
+                                             (rename-in-iface result-iface param-name rand-id)
+                                             (report-bad-module-application-error param-iface rand-iface m-body)
+                                             )
+                                         )
+                         )
+                       )
+                     )
     )
+  )
+
+(define (report-attempt-to-apply-simple-module name)
+  (eopl:error 'report-attempt-to-apply-simple-module "Cannot apply simple module ~s" name)
+  )
+
+(define (report-bad-module-application-error param-iface rand-iface m-body)
+  (eopl:pretty-print
+   (list 'param-iface: param-iface
+         'rand-iface: rand-iface
+         'm-body: m-body))
+  (eopl:error 'report-bad-module-application-error)
   )
 
 (define (definitions-to-declarations definitions tenv)
@@ -77,8 +115,31 @@
                         (simple-interface (declarations2)
                                           (<:decls declarations1 declarations2 tenv)
                                           )
+                        (proc-interface (param-name param-iface result-iface) #f)
                         )
                       )
+    (proc-interface (param-name1 param-iface1 result-iface1)
+                    (cases interface iface2
+                      (simple-interface (decls2) #f)
+                      (proc-interface (param-name2 param-iface2 result-iface2)
+                                      (let* ([new-name (fresh-module-name param-name1)]
+                                             [result-iface1 (rename-in-iface result-iface1 param-name1 new-name)]
+                                             [result-iface2 (rename-in-iface result-iface2 param-name2 new-name)])
+                                        (and
+                                         ; parameter type contra-variant
+                                         (<:iface param-iface2 param-iface1 tenv)
+                                         ; result type covariant
+                                         (<:iface result-iface1 result-iface2
+                                                  (extend-tenv-with-module
+                                                   new-name
+                                                   (expand-iface new-name param-iface1 tenv)
+                                                   tenv
+                                                   ))
+                                         )
+                                        )
+                                      )
+                      )
+                    )
     )
   )
 

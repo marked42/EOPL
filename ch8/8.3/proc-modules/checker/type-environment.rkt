@@ -19,7 +19,7 @@
    (name symbol?)
    (ty type?)
    (saved-tenv type-environment?)
-  )
+   )
   )
 
 (define (apply-tenv env search-var)
@@ -40,6 +40,9 @@
       (simple-interface (declarations)
                         (lookup-variable-name-in-declarations var-name declarations)
                         )
+      (proc-interface (param-name param-iface result-iface)
+                      (eopl:error 'lookup-qualified-type-in-tenv "proc-interface ~s" iface)
+                      )
       )
     )
   )
@@ -50,7 +53,7 @@
                  (lookup-module-name-in-tenv saved-tenv m-name)
                  )
     (extend-tenv-with-module (name iface saved-tenv)
-                             (if (equal? name m-name)
+                             (if (eqv? name m-name)
                                  iface
                                  (lookup-module-name-in-tenv saved-tenv m-name)
                                  )
@@ -58,7 +61,7 @@
     (extend-tenv-with-type (name ty saved-tenv)
                            (lookup-module-name-in-tenv saved-tenv m-name)
                            )
-    (empty-tenv () (eopl:error 'lookup-module-name-in-tenv "fail to find module ~s" m-name))
+    (empty-tenv () (eopl:error 'lookup-module-name-in-tenv "fail to find module ~s " m-name))
     )
   )
 
@@ -67,20 +70,19 @@
       #f
       (cases declaration (car declarations)
         (var-declaration (this-var-name ty)
-                         (if (equal? var-name this-var-name)
+                         (if (eqv? var-name this-var-name)
                              ty
                              (lookup-variable-name-in-declarations var-name (cdr declarations))
                              )
                          )
         (opaque-type-declaration (this-var-name)
-                                 ; TODO:
                                  (eopl:error 'lookup-variable-name-in-declarations "can't take type of abstract type declaration ~s" (car declarations))
                                  )
         (transparent-type-declaration (this-var-name ty)
-                                      (if (equal? var-name this-var-name)
-                                        ty
-                                        (lookup-variable-name-in-declarations var-name (cdr declarations))
-                                        )
+                                      (if (eqv? var-name this-var-name)
+                                          ty
+                                          (lookup-variable-name-in-declarations var-name (cdr declarations))
+                                          )
                                       )
         )
       )
@@ -96,10 +98,10 @@
                              )
     (extend-tenv-with-type (t-name ty saved-tenv)
                            (if (eqv? t-name name)
-                            ty
-                            (lookup-type-name-in-tenv name saved-tenv)
+                               ty
+                               (lookup-type-name-in-tenv name saved-tenv)
+                               )
                            )
-                          )
     (empty-tenv () (eopl:error 'lookup-type-name-in-tenv "fail to find type ~s" name))
+    )
   )
-)

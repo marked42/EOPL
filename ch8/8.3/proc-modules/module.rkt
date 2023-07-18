@@ -11,6 +11,7 @@
 
 (define-datatype typed-module typed-module?
   (simple-module (bindings environment?))
+  (proc-module (b-var symbol?) (body module-body?) (saved-env environment?))
   )
 
 (define-datatype module-definition module-definition?
@@ -19,10 +20,14 @@
 
 (define-datatype module-body module-body?
   (definitions-module-body (definitions (list-of definition?)))
+  (proc-module-body (m-name symbol?) (m-type interface?) (m-body module-body?))
+  (var-module-body (m-name symbol?))
+  (app-module-body (rator symbol?) (rand symbol?))
   )
 
 (define-datatype interface interface?
   (simple-interface (declarations (list-of declaration?)))
+  (proc-interface (param-name symbol?) (param-iface interface?) (result-iface interface?))
   )
 
 (define-datatype declaration declaration?
