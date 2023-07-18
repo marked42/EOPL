@@ -844,7 +844,8 @@ module ints1
         type t = int
         zero = 0
         succ = proc(x : t) -(x,-5)
-        pred = proc(x : t) -(x,5) is-zero = proc (x : t) zero?(x)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(x)
     ]
 let z = from ints1 take zero
     in let s = from ints1 take succ
@@ -864,7 +865,8 @@ module ints2
         type t = int
         zero = 0
         succ = proc(x : t) -(x,3)
-        pred = proc(x : t) -(x,-3) is-zero = proc (x : t) zero?(x)
+        pred = proc(x : t) -(x,-3)
+        is-zero = proc (x : t) zero?(x)
     ]
 let z = from ints2 take zero
     in let s = from ints2 take succ
@@ -894,7 +896,7 @@ let z = from ints1 take zero
                                                                then 0
                                                                else -((to-int (p x)), -1)
                     in (to-int (s (s z)))
-      " 2 ' "Example 8.11 to-int implemented using inst1")
+      " 2 ' "Example 8.11 to-int implemented using ints1")
 
    (list "
 module ints2
@@ -919,7 +921,7 @@ let z = from ints2 take zero
                                                                then 0
                                                                else -((to-int (p x)), -1)
                     in (to-int (s (s z)))
-      " 2 ' "Example 8.12 to-int implemented using inst2")
+      " 2 ' "Example 8.12 to-int implemented using ints2")
 
    (list "
 module mybool
@@ -993,5 +995,1109 @@ let empty = from tables take empty
                               (((add-binding 3) 600) empty)))
                 in -(((lookup 4) table1), ((lookup 3) table1)) %= 100
       " 100 ' "Exercise 8.15 tables module")
+   )
+  )
+
+(define test-cases-to-int-maker
+  (list
+   (list "
+module ints1
+    interface [
+        opaque t
+        zero : t
+        pred : (t -> t)
+        succ : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        pred = proc(x : t) -(x,5)
+        succ = proc(x : t) -(x,-5)
+        is-zero = proc (x : t) zero?(x)
+    ]
+module to-int-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            pred: (t -> t)
+            succ: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            to-int: (from ints take t -> int)
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            pred: (t -> t)
+            succ: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            to-int = let z? = from ints take is-zero
+                        in let p = from ints take pred
+                            in letrec int to-int (x: from ints take t) = if (z? x) then 0 else -((to-int (p x)), -1)
+                                in to-int
+        ]
+module ints1-to-int
+    interface [
+        to-int: (from ints1 take t -> int)
+    ]
+    body
+        (to-int-maker ints1)
+let one = (from ints1 take succ from ints1 take zero)
+in (from ints1-to-int take to-int one)
+            " 1 "to-int-maker example 1 create ints1-to-in from ints1 using to-int-maker")
+
+   (list "
+module ints1
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(x)
+    ]
+module ints2
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        succ = proc(x : t) -(x,3)
+        pred = proc(x : t) -(x,-3)
+        is-zero = proc (x : t) zero?(x)
+    ]
+
+module to-int-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            to-int: (from ints take t -> int)
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            to-int = let z? = from ints take is-zero
+                        in let p = from ints take pred
+                            in letrec int to-int (x: from ints take t) = if (z? x) then 0 else -((to-int (p x)), -1)
+                                in to-int
+        ]
+module ints1-to-int
+    interface [
+        to-int: (from ints1 take t -> int)
+    ]
+    body
+        (to-int-maker ints1)
+module ints2-to-int
+    interface [
+        to-int: (from ints2 take t -> int)
+    ]
+    body
+        (to-int-maker ints2)
+let one1 = (from ints1 take succ from ints1 take zero)
+in let one2 = (from ints2 take succ from ints2 take zero)
+in -((from ints1-to-int take to-int one1),(from ints2-to-int take to-int one2))
+               " 0 "to-int-maker example 2: diff of same value from two modules is 0")
+   )
+  )
+
+(define test-cases-from-int-maker
+  (list
+   (list "
+module ints1
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(x)
+    ]
+module ints2
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        succ = proc(x : t) -(x,3)
+        pred = proc(x : t) -(x,-3)
+        is-zero = proc (x : t) zero?(x)
+    ]
+
+module to-int-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            to-int: (from ints take t -> int)
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            to-int = let z? = from ints take is-zero
+                        in let p = from ints take pred
+                            in letrec int to-int (x: from ints take t) = if (z? x) then 0 else -((to-int (p x)), -1)
+                                in to-int
+        ]
+module ints1-to-int
+    interface [
+        to-int: (from ints1 take t -> int)
+    ]
+    body
+        (to-int-maker ints1)
+module ints2-to-int
+    interface [
+        to-int: (from ints2 take t -> int)
+    ]
+    body
+        (to-int-maker ints2)
+
+module from-int-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            from-int: (int -> from ints take t)
+        ])
+    body
+      module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            from-int = let zero = from ints take zero
+                        in let succ = from ints take succ
+                            in letrec from ints take t from-int (x: int) = if zero?(x) then zero else (succ (from-int -(x,1)))
+                                in from-int
+        ]
+module ints1-from-int
+    interface [
+        from-int: (int -> from ints1 take t)
+    ]
+    body
+        (from-int-maker ints1)
+module ints2-from-int
+    interface [
+        from-int: (int -> from ints2 take t)
+    ]
+    body
+        (from-int-maker ints2)
+let three1 = (from ints1-from-int take from-int 3)
+in let three2 = (from ints2-from-int take from-int 3)
+in -((from ints1-to-int take to-int three1), (from ints2-to-int take to-int three2))
+               " 0 "exer 8.19")
+   )
+  )
+
+(define test-cases-sum-prod-maker
+  (list
+   (list "
+module ints1
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(x)
+    ]
+module sum-prod-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            plus: (from ints take t -> (from ints take t -> from ints take t))
+            times: (from ints take t -> (from ints take t -> from ints take t))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+            times = letrec (from ints take t -> from ints take t) times (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then from ints take zero
+                            else ((plus ((times (from ints take pred x)) y)) y)
+                        in times
+        ]
+module ints1-sum-prod
+    interface [
+        plus: (from ints1 take t -> (from ints1 take t -> from ints1 take t))
+        times: (from ints1 take t -> (from ints1 take t -> from ints1 take t))
+    ]
+    body
+        (sum-prod-maker ints1)
+let zero = from ints1 take zero
+in let one = (from ints1 take succ zero)
+in let two = (from ints1 take succ one)
+in ((from ints1-sum-prod take plus one) two)
+" 15 "exer 8.19 ints represents k in 5*k, so (plus one two) is three 15")
+
+   (list "
+module ints1
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(x)
+    ]
+module sum-prod-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            plus: (from ints take t -> (from ints take t -> from ints take t))
+            times: (from ints take t -> (from ints take t -> from ints take t))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+            times = letrec (from ints take t -> from ints take t) times (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then from ints take zero
+                            else ((plus ((times (from ints take pred x)) y)) y)
+                        in times
+        ]
+module ints1-sum-prod
+    interface [
+        plus: (from ints1 take t -> (from ints1 take t -> from ints1 take t))
+        times: (from ints1 take t -> (from ints1 take t -> from ints1 take t))
+    ]
+    body
+        (sum-prod-maker ints1)
+let zero = from ints1 take zero
+in let one = (from ints1 take succ zero)
+in let two = (from ints1 take succ one)
+in ((from ints1-sum-prod take times two) two)
+" 20 "exer 8.19 ints represents k in 5*k, so (times two two) is four 5 * 4 = 20")
+   )
+  )
+
+(define test-cases-double-ints-maker
+  (list
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            diff: (from ints take t -> (from ints take t -> from ints take t))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+        ]
+module ints-double
+    interface [
+      diff: (from ints take t -> (from ints take t -> from ints take t))
+    ]
+    body
+      (double-ints-maker ints)
+let zero = from ints take zero
+in let one = (from ints take succ zero)
+in ((from ints-double take diff one) zero)
+" 8 "double-ints-maker diff 1 - 0 is 1, 5*k + 3 = 8")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            diff: (from ints take t -> (from ints take t -> from ints take t))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+        ]
+module ints-double
+    interface [
+      diff: (from ints take t -> (from ints take t -> from ints take t))
+    ]
+    body
+      (double-ints-maker ints)
+let zero = from ints take zero
+in let one = (from ints take succ zero)
+in ((from ints-double take diff zero) one)
+" -2 "double ints maker diff 1 - 0 is -1, 5*k + 3 = -2")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            diff: (from ints take t -> (from ints take t -> from ints take t))
+            equal: (from ints take t -> (from ints take t -> bool))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+
+            equal = proc (x: from ints take t) proc (y: from ints take t)
+                        if (from ints take is-zero ((diff x) y))
+                        then zero?(0) %= true
+                        else zero?(1) %= false
+        ]
+module ints-double
+    interface [
+      diff: (from ints take t -> (from ints take t -> from ints take t))
+      equal: (from ints take t -> (from ints take t -> bool))
+    ]
+    body
+      (double-ints-maker ints)
+let zero = from ints take zero
+in let one = (from ints take succ zero)
+in ((from ints-double take equal zero) one)
+" #f "double-ints-maker (equal 1 0) = false ")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            diff: (from ints take t -> (from ints take t -> from ints take t))
+            equal: (from ints take t -> (from ints take t -> bool))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+
+            equal = proc (x: from ints take t) proc (y: from ints take t)
+                        if (from ints take is-zero ((diff x) y))
+                        then zero?(0) %= true
+                        else zero?(1) %= false
+        ]
+module ints-double
+    interface [
+      diff: (from ints take t -> (from ints take t -> from ints take t))
+      equal: (from ints take t -> (from ints take t -> bool))
+    ]
+    body
+      (double-ints-maker ints)
+let zero = from ints take zero
+in ((from ints-double take equal zero) zero)
+" #t "double-ints-maker (equal 0 0) = true")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            diff: (from ints take t -> (from ints take t -> from ints take t))
+            equal: (from ints take t -> (from ints take t -> bool))
+            average: (from ints take t -> (from ints take t -> from ints take t))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+
+            equal = proc (x: from ints take t) proc (y: from ints take t)
+                        if (from ints take is-zero ((diff x) y))
+                        then zero?(0) %= true
+                        else zero?(1) %= false
+
+            average = letrec (from ints take t -> from ints take t) average (x: from ints take t) = proc (y: from ints take t)
+                                if ((equal x) y)
+                                then x
+                                else ((average (from ints take succ x)) (from ints take pred y))
+                        in average
+        ]
+module ints-double
+    interface [
+      diff: (from ints take t -> (from ints take t -> from ints take t))
+      equal: (from ints take t -> (from ints take t -> bool))
+      average: (from ints take t -> (from ints take t -> from ints take t))
+    ]
+    body
+      (double-ints-maker ints)
+let zero = from ints take zero
+in let one = (from ints take succ zero)
+in let two = (from ints take succ one)
+in ((from ints-double take average zero) two)
+" 8 "double-ints-maker (average 0 2) = 1, 5*k + 3 = 8")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            diff: (from ints take t -> (from ints take t -> from ints take t))
+            equal: (from ints take t -> (from ints take t -> bool))
+            average: (from ints take t -> (from ints take t -> from ints take t))
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then y
+                            else ((plus (from ints take pred x)) (from ints take succ y))
+                        in plus
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+
+            equal = proc (x: from ints take t) proc (y: from ints take t)
+                        if (from ints take is-zero ((diff x) y))
+                        then zero?(0) %= true
+                        else zero?(1) %= false
+
+            average = letrec (from ints take t -> from ints take t) average (x: from ints take t) = proc (y: from ints take t)
+                                if ((equal x) y)
+                                then x
+                                else ((average (from ints take succ x)) (from ints take pred y))
+                        in average
+        ]
+module ints-double
+    interface [
+      diff: (from ints take t -> (from ints take t -> from ints take t))
+      equal: (from ints take t -> (from ints take t -> bool))
+      average: (from ints take t -> (from ints take t -> from ints take t))
+    ]
+    body
+      (double-ints-maker ints)
+let zero = from ints take zero
+in let one = (from ints take succ zero)
+in let two = (from ints take succ one)
+in ((from ints-double take average zero) two)
+" 8 "double-ints-maker (average 0 2) = 1, 5*k + 3 = 8")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            zero: from ints take t
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+            zero = from ints take zero
+        ]
+module ints-double
+    interface [
+        opaque t
+        zero: from ints take t
+    ]
+    body
+      (double-ints-maker ints)
+from ints-double take zero
+" 3 "double-ints-maker double of zero is still zero")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            zero: from ints take t
+            succ: (from ints take t -> from ints take t)
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+            zero = from ints take zero
+            succ = proc (x: from ints take t) (from ints take succ (from ints take succ x))
+        ]
+module ints-double
+    interface [
+        opaque t
+        zero: from ints take t
+        succ: (from ints take t -> from ints take t)
+    ]
+    body
+      (double-ints-maker ints)
+(from ints-double take succ from ints-double take zero)
+" 13 "double-ints-maker succ of zero is two, 5*k + 3 = 13")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            zero: from ints take t
+            pred: (from ints take t -> from ints take t)
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+            zero = from ints take zero
+            pred = proc (x: from ints take t) (from ints take pred (from ints take pred x))
+        ]
+module ints-double
+    interface [
+        opaque t
+        zero: from ints take t
+        pred: (from ints take t -> from ints take t)
+    ]
+    body
+      (double-ints-maker ints)
+(from ints-double take pred from ints-double take zero)
+" -7 "double-ints-maker pred of zero is minus two, 5*k + 3 = -7")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            zero: from ints take t
+            is-zero: (from ints take t -> bool)
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+            zero = from ints take zero
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+
+            equal = proc (x: from ints take t) proc (y: from ints take t)
+                        if (from ints take is-zero ((diff x) y))
+                        then zero?(0) %= true
+                        else zero?(1) %= false
+
+            average = letrec (from ints take t -> from ints take t) average (x: from ints take t) = proc (y: from ints take t)
+                                if ((equal x) y)
+                                then x
+                                else ((average (from ints take succ x)) (from ints take pred y))
+                        in average
+
+            is-zero = proc (x: from ints take t) (from ints take is-zero ((average zero) x))
+        ]
+module ints-double
+    interface [
+        opaque t
+        zero: from ints take t
+        is-zero: (from ints take t -> bool)
+    ]
+    body
+      (double-ints-maker ints)
+(from ints-double take is-zero from ints-double take zero)
+" #t "double-ints-maker (is-zero zero) is true")
+
+   (list "
+module ints
+    interface [
+        opaque t
+        zero : t
+        succ : (t -> t)
+        pred : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 3
+        succ = proc(x : t) -(x,-5)
+        pred = proc(x : t) -(x,5)
+        is-zero = proc (x : t) zero?(-(x,zero))
+    ]
+module double-ints-maker
+    interface
+        ((ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ]) => [
+            opaque t
+            zero: from ints take t
+            succ: (from ints take t -> from ints take t)
+            is-zero: (from ints take t -> bool)
+        ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            succ: (t -> t)
+            pred: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            type t = from ints take t
+            zero = from ints take zero
+
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
+                                then x
+                                else ((diff (from ints take pred x)) (from ints take pred y))
+                        in diff
+
+            equal = proc (x: from ints take t) proc (y: from ints take t)
+                        if (from ints take is-zero ((diff x) y))
+                        then zero?(0) %= true
+                        else zero?(1) %= false
+
+            average = letrec (from ints take t -> from ints take t) average (x: from ints take t) = proc (y: from ints take t)
+                                if ((equal x) y)
+                                then x
+                                else ((average (from ints take succ x)) (from ints take pred y))
+                        in average
+
+            succ = proc (x: from ints take t) (from ints take succ (from ints take succ x))
+
+            is-zero = proc (x: from ints take t) (from ints take is-zero ((average zero) x))
+        ]
+module ints-double
+    interface [
+        opaque t
+        zero: from ints take t
+        succ: (from ints take t -> from ints take t)
+        is-zero: (from ints take t -> bool)
+    ]
+    body
+      (double-ints-maker ints)
+let one = (from ints-double take succ from ints-double take zero)
+in (from ints-double take is-zero one)
+" #f "double-ints-maker (is-zero one) is false")
+   )
+  )
+
+(define test-cases-proc-modules
+  (append
+   test-cases-to-int-maker
+   test-cases-from-int-maker
+   test-cases-sum-prod-maker
+   test-cases-double-ints-maker
    )
   )

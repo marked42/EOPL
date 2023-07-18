@@ -9,6 +9,7 @@
                      extend-env-rec
                      extend-env-with-module
                      lookup-qualified-var-in-env
+                     lookup-module-name-in-env
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc)]
  ["procedure.rkt" (procedure apply-procedure)]
@@ -58,7 +59,28 @@
     (definitions-module-body (definitions)
       (simple-module (definitions-to-env definitions env))
       )
+    (var-module-body (m-name)
+                     (lookup-module-name-in-env m-name env)
+                     )
+    (proc-module-body (m-name m-type m-body)
+                      (proc-module m-name m-body env)
+                      )
+    (app-module-body (rator rand)
+                     (let ([rator-val (lookup-module-name-in-env rator env)]
+                           [rand-val (lookup-module-name-in-env rand env)])
+                       (cases typed-module rator-val
+                         (proc-module (m-name m-body env)
+                                      (value-of-module-body m-body (extend-env-with-module m-name rand-val env))
+                                      )
+                         (else (report-bad-module-app rator-val))
+                         )
+                       )
+                     )
     )
+  )
+
+(define (report-bad-module-app val)
+  (eopl:error 'value-of-module-body "Expect a proc module, get ~s" val)
   )
 
 (define (definitions-to-env defs env)

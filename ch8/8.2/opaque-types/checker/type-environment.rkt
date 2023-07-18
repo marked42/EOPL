@@ -73,7 +73,6 @@
                              )
                          )
         (opaque-type-declaration (this-var-name)
-                                 ; TODO:
                                  (eopl:error 'lookup-variable-name-in-declarations "can't take type of abstract type declaration ~s" (car declarations))
                                  )
         (transparent-type-declaration (this-var-name ty)

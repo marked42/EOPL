@@ -25,6 +25,7 @@
     (simple-interface (declarations)
                       (simple-interface (expand-declarations m-name declarations tenv))
                       )
+    (proc-interface (param-name param-iface result-iface) iface)
     )
   )
 
@@ -69,9 +70,7 @@
                                   (extend-tenv-with-type name (expand-type ty tenv) tenv)
                                   )
     (opaque-type-declaration (name)
-                             ; code different from the book
-                             (eopl:error 'extend-tenv-with-declaration "expanded iface contains no opaque-type-declaration ~s" decl)
-                             ; (extend-tenv-with-type name (qualified-type (fresh-module-name '%unknown name)) tenv)
+                             (extend-tenv-with-type name (qualified-type (fresh-module-name '%unknown) name) tenv)
                              )
     )
   )
