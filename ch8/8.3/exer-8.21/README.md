@@ -17,21 +17,20 @@ original `is-zero` to determine if `k` is zero.
 
 ```proc-modules
 module double-ints-maker
-    interface (
-        (ints: [
+    interface
+        ((ints: [
             opaque t
             zero: t
             succ: (t -> t)
             pred: (t -> t)
             is-zero: (t -> bool)
-        ] => [
+        ]) => [
             opaque t
             zero: t
             succ: (t -> t)
             pred: (t -> t)
             is-zero: (t -> bool)
         ])
-    )
     body
         module-proc (ints: [
             opaque t

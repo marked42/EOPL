@@ -2,18 +2,17 @@
 
 ```proc-modules
 module sum-prod-maker
-    interface (
-        (ints: [
+    interface
+        ((ints: [
             opaque t
             zero: t
             succ: (t -> t)
             pred: (t -> t)
             is-zero: (t -> bool)
-        ] => [
+        ]) => [
             plus: (from ints take t -> (from ints take t -> from ints take t))
             times: (from ints take t -> (from ints take t -> from ints take t))
         ])
-    )
     body
         module-proc (ints: [
             opaque t

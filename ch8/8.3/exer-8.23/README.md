@@ -24,17 +24,16 @@ let true = from mybool take true
             in ((and true) false)
 
 module table-of
-    interface ((
-        bool: [
+    interface
+        ((bool: [
             opaque t
             false: t
-        ] => [
+        ]) => [
             opaque table
             empty: table
             add-to-table: (int -> (from bool take t -> (table -> table)))
             lookup-in-table: (int -> (table -> from bool take t))
-        ]
-    ))
+        ])
     body
         module-proc (bool: [
             opaque t
