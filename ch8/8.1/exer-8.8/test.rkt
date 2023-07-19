@@ -7,6 +7,6 @@
 (test-lang run sloppy->expval
            (append
             test-cases-simple-modules-common
-            test-cases-interface-order
+            test-cases-interface-ignore-order
             )
            )
