@@ -1,7 +1,7 @@
 # Solution
 
-finish `from-int-maker` first, then create two modules `inst1-from-int` and `inst2-from-int`, generate
-`three1` using `(from inst1-from-int take from-int 3)`, `three2` with `(from inst1-from-int take from-int 3)`
+finish `from-int-maker` first, then create two modules `ints1-from-int` and `ints2-from-int`, generate
+`three1` using `(from ints1-from-int take from-int 3)`, `three2` with `(from ints1-from-int take from-int 3)`
 
 ```proc-modules
 module to-int-maker
@@ -57,18 +57,18 @@ module ints2
         pred = proc(x : t) -(x,-3)
         is-zero = proc (x : t) zero?(x)
     ]
-module inst1-to-int
+module ints1-to-int
     interface [
-        to-int: (from inst1 take t -> int)
+        to-int: (from ints1 take t -> int)
     ]
     body
-        (to-int-maker inst1)
-module inst2-to-int
+        (to-int-maker ints1)
+module ints2-to-int
     interface [
-        to-int: (from inst2 take t -> int)
+        to-int: (from ints2 take t -> int)
     ]
     body
-        (to-int-maker inst2)
+        (to-int-maker ints2)
 
 module from-int-maker
     interface
@@ -95,19 +95,19 @@ module from-int-maker
                             in letrec int from-int (x: int) = if zero?(x) then zero else (succ (from-int -(x,1)))
                                 in from-int
         ]
-module inst1-from-int
+module ints1-from-int
     interface [
-        from-int: (int -> from inst1 take t)
+        from-int: (int -> from ints1 take t)
     ]
     body
-        (from-int-maker inst1)
-module inst2-from-int
+        (from-int-maker ints1)
+module ints2-from-int
     interface [
-        from-int: (int -> from inst2 take t)
+        from-int: (int -> from ints2 take t)
     ]
     body
-        (from-int-maker inst2)
-let three1 = (from inst1-from-int take from-int 3)
-in let three2 = (from inst2-from-int take from-int 3)
-in -((from inst1-to-int take to-int three1), (from inst2-to-int take to-int three2))
+        (from-int-maker ints2)
+let three1 = (from ints1-from-int take from-int 3)
+in let three2 = (from ints2-from-int take from-int 3)
+in -((from ints1-to-int take to-int three1), (from ints2-to-int take to-int three2))
 ```
