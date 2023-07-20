@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt" "renaming.rkt")
+(require racket/base "type.rkt" "type-environment.rkt" "../module.rkt" "../expression.rkt" "expand.rkt" "renaming.rkt")
 
 (provide (all-defined-out))
 
@@ -46,7 +46,7 @@
                       (let* ([expanded-iface (expand-iface rand-name rand-iface tenv)]
                              [new-env (extend-tenv-with-module (list rand-name) (list expanded-iface) tenv)]
                              [body-iface (interface-of m-body new-env)])
-                        (proc-interface rand-name rand-iface body-iface)
+                        (proc-interface (list rand-name) (list rand-iface) body-iface)
                         )
                       )
     (app-module-body (rator-id rand-id)
@@ -56,11 +56,18 @@
                          (simple-interface (decls)
                                            (report-attempt-to-apply-simple-module rator-id)
                                            )
-                         (proc-interface (param-name param-iface result-iface)
-                                         (if (<:iface rand-iface param-iface tenv)
-                                             (rename-in-iface result-iface (list param-name) (list rand-id))
-                                             (report-bad-module-application-error param-iface rand-iface m-body)
-                                             )
+                         (proc-interface (param-names param-ifaces result-iface)
+                                         (let loop ([rand-ifaces (list rand-iface)] [param-ifaces param-ifaces])
+                                          (if (null? rand-ifaces)
+                                            (rename-in-iface result-iface param-names (list rand-id))
+                                            (let ([rand-iface (car rand-ifaces)] [param-iface (car param-ifaces)])
+                                              (if (<:iface rand-iface param-iface tenv)
+                                                (loop (cdr rand-ifaces) (cdr param-ifaces))
+                                                (report-bad-module-application-error param-iface rand-iface m-body)
+                                                )
+                                              )
+                                            )
+                                          )
                                          )
                          )
                        )
@@ -115,24 +122,24 @@
                         (simple-interface (declarations2)
                                           (<:decls declarations1 declarations2 tenv)
                                           )
-                        (proc-interface (param-name param-iface result-iface) #f)
+                        (proc-interface (param-names param-ifaces result-iface) #f)
                         )
                       )
-    (proc-interface (param-name1 param-iface1 result-iface1)
+    (proc-interface (param-names1 param-ifaces1 result-iface1)
                     (cases interface iface2
                       (simple-interface (decls2) #f)
-                      (proc-interface (param-name2 param-iface2 result-iface2)
-                                      (let* ([new-name (fresh-module-name param-name1)]
-                                             [result-iface1 (rename-in-iface result-iface1 (list param-name1) (list new-name))]
-                                             [result-iface2 (rename-in-iface result-iface2 (list param-name2) (list new-name))])
+                      (proc-interface (param-names2 param-ifaces2 result-iface2)
+                                      (let* ([new-names (map fresh-module-name param-names1)]
+                                             [result-iface1 (rename-in-iface result-iface1 param-names1 new-names)]
+                                             [result-iface2 (rename-in-iface result-iface2 param-names2 new-names)])
                                         (and
                                          ; parameter type contra-variant
-                                         (<:iface param-iface2 param-iface1 tenv)
+                                         (<:ifaces param-ifaces2 param-ifaces1 tenv)
                                          ; result type covariant
                                          (<:iface result-iface1 result-iface2
                                                   (extend-tenv-with-module
-                                                   (list new-name)
-                                                   (list (expand-iface new-name param-iface1 tenv))
+                                                   new-names
+                                                   (map (lambda (new-name param-iface1) (expand-iface new-name param-iface1 tenv)) new-names param-ifaces1)
                                                    tenv
                                                    ))
                                          )
@@ -142,6 +149,10 @@
                     )
     )
   )
+
+(define (<:ifaces ifaces1 ifaces2 tenv)
+  (map (lambda (iface1 iface2) (<:iface iface1 iface2 tenv)) ifaces1 ifaces2)
+)
 
 (define (report-module-doesnt-satisfy-iface m-name expected-type actual-type)
   (eopl:pretty-print

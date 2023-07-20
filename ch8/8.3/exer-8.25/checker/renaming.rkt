@@ -9,17 +9,29 @@
     (simple-interface (decls)
                       (simple-interface (rename-in-decls decls old new))
                       )
-    (proc-interface (param-name param-iface result-iface)
+    (proc-interface (param-names param-ifaces result-iface)
                     (proc-interface
-                     param-name
-                     (rename-in-iface param-iface old new)
+                     param-names
+                     (map
+                      (lambda (param-iface) (rename-in-iface param-iface old new))
+                      param-ifaces
+                      )
                      ; param-name shadows old in result-iface
-                     (if (member param-name old)
-                         result-iface
-                         (rename-in-iface result-iface old new)
-                         )
+                     (rename-in-iface-with-shadow result-iface param-names old new)
                      )
                     )
+    )
+  )
+
+(define (rename-in-iface-with-shadow iface names old new)
+  (let loop ([old-names old] [old old] [new new])
+    (if (null? old-names)
+        (rename-in-iface iface old new)
+        (if (member (car old-names) names)
+          (loop (cdr old-names) (cdr old) (cdr new))
+          (loop (cdr old-names) old new)
+          )
+        )
     )
   )
 
