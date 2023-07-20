@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "../module.rkt" "type.rkt")
+(require racket/list "../module.rkt" "type.rkt")
 
 (provide (all-defined-out))
 
@@ -14,7 +14,7 @@
                      param-name
                      (rename-in-iface param-iface old new)
                      ; param-name shadows old in result-iface
-                     (if (eqv? param-name old)
+                     (if (member param-name old)
                          result-iface
                          (rename-in-iface result-iface old new)
                          )
@@ -38,7 +38,7 @@
                                  (cons
                                   (opaque-type-declaration t-name)
                                   ; opaque type name shadows old, no need to replace in rest declarations
-                                  (if (eqv? t-name old)
+                                  (if (member t-name old)
                                       (cdr decls)
                                       (rename-in-decls (cdr decls) old new)
                                       )
@@ -48,7 +48,7 @@
                                       (cons
                                        (transparent-type-declaration t-name (rename-in-type ty old new))
                                        ; transparent type name shadows old, no need to replace in rest declarations
-                                       (if (eqv? t-name old)
+                                       (if (member t-name old)
                                            (cdr decls)
                                            (rename-in-decls (cdr decls) old new)
                                            )
@@ -74,5 +74,7 @@
   )
 
 (define (rename-name name old new)
-  (if (eqv? name old) new old)
+  (let ([index (index-of old name)])
+    (if index (list-ref new index) name)
+    )
   )

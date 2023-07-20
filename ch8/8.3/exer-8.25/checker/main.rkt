@@ -58,7 +58,7 @@
                                            )
                          (proc-interface (param-name param-iface result-iface)
                                          (if (<:iface rand-iface param-iface tenv)
-                                             (rename-in-iface result-iface param-name rand-id)
+                                             (rename-in-iface result-iface (list param-name) (list rand-id))
                                              (report-bad-module-application-error param-iface rand-iface m-body)
                                              )
                                          )
@@ -123,8 +123,8 @@
                       (simple-interface (decls2) #f)
                       (proc-interface (param-name2 param-iface2 result-iface2)
                                       (let* ([new-name (fresh-module-name param-name1)]
-                                             [result-iface1 (rename-in-iface result-iface1 param-name1 new-name)]
-                                             [result-iface2 (rename-in-iface result-iface2 param-name2 new-name)])
+                                             [result-iface1 (rename-in-iface result-iface1 (list param-name1) (list new-name))]
+                                             [result-iface2 (rename-in-iface result-iface2 (list param-name2) (list new-name))])
                                         (and
                                          ; parameter type contra-variant
                                          (<:iface param-iface2 param-iface1 tenv)
