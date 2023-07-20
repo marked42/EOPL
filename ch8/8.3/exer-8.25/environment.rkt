@@ -54,7 +54,7 @@
       (simple-module (bindings)
                      (apply-env bindings var-name)
                      )
-      (proc-module (eopl:error 'lookup-qualified-var-in-env "fail to find module ~s" m-name))
+      (proc-module (b-vars body env) (eopl:error 'lookup-qualified-var-in-env "fail to find module ~s" m-name))
       )
     )
   )

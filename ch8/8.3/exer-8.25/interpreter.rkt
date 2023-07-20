@@ -63,14 +63,14 @@
                      (lookup-module-name-in-env m-name env)
                      )
     (proc-module-body (m-name m-type m-body)
-                      (proc-module m-name m-body env)
+                      (proc-module (list m-name) m-body env)
                       )
     (app-module-body (rator rand)
                      (let ([rator-val (lookup-module-name-in-env rator env)]
                            [rand-val (lookup-module-name-in-env rand env)])
                        (cases typed-module rator-val
-                         (proc-module (m-name m-body env)
-                                      (value-of-module-body m-body (extend-env-with-module (list m-name) (list rand-val) env))
+                         (proc-module (m-names m-body env)
+                                      (value-of-module-body m-body (extend-env-with-module m-names (list rand-val) env))
                                       )
                          (else (report-bad-module-app rator-val))
                          )
