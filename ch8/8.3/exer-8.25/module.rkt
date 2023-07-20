@@ -43,7 +43,7 @@
 
 (define-datatype interface interface?
   (simple-interface (declarations (list-of declaration?)))
-  (proc-interface (param-names (list-of symbol?)) (param-ifaces (list-of interface?)) (result-iface interface?))
+  (proc-interface (params (list-of proc-module-param?)) (result-iface interface?))
   )
 
 (define-datatype declaration declaration?

@@ -48,7 +48,7 @@
                         (let* ([expanded-ifaces (expand-ifaces rand-names rand-ifaces tenv)]
                                [new-env (extend-tenv-with-module rand-names expanded-ifaces tenv)]
                                [body-iface (interface-of m-body new-env)])
-                          (proc-interface rand-names rand-ifaces body-iface)
+                          (proc-interface m-params body-iface)
                           )
                         )
                       )
@@ -59,14 +59,17 @@
                          (simple-interface (decls)
                                            (report-attempt-to-apply-simple-module rator-id)
                                            )
-                         (proc-interface (param-names param-ifaces result-iface)
-                                         (let loop ([rand-ifaces rand-ifaces] [param-ifaces param-ifaces])
-                                          (if (null? rand-ifaces)
-                                            (rename-in-iface result-iface param-names rand-ids)
-                                            (let ([rand-iface (car rand-ifaces)] [param-iface (car param-ifaces)])
-                                              (if (<:iface rand-iface param-iface tenv)
-                                                (loop (cdr rand-ifaces) (cdr param-ifaces))
-                                                (report-bad-module-application-error param-iface rand-iface m-body)
+                         (proc-interface (params result-iface)
+                                         (let ([param-names (map proc-module-param->name params)]
+                                               [param-ifaces (map proc-module-param->type params)])
+                                          (let loop ([rand-ifaces rand-ifaces] [param-ifaces param-ifaces])
+                                            (if (null? rand-ifaces)
+                                              (rename-in-iface result-iface param-names rand-ids)
+                                              (let ([rand-iface (car rand-ifaces)] [param-iface (car param-ifaces)])
+                                                (if (<:iface rand-iface param-iface tenv)
+                                                  (loop (cdr rand-ifaces) (cdr param-ifaces))
+                                                  (report-bad-module-application-error param-iface rand-iface m-body)
+                                                  )
                                                 )
                                               )
                                             )
@@ -125,29 +128,35 @@
                         (simple-interface (declarations2)
                                           (<:decls declarations1 declarations2 tenv)
                                           )
-                        (proc-interface (param-names param-ifaces result-iface) #f)
+                        (proc-interface (params result-iface) #f)
                         )
                       )
-    (proc-interface (param-names1 param-ifaces1 result-iface1)
-                    (cases interface iface2
-                      (simple-interface (decls2) #f)
-                      (proc-interface (param-names2 param-ifaces2 result-iface2)
-                                      (let* ([new-names (map fresh-module-name param-names1)]
-                                             [result-iface1 (rename-in-iface result-iface1 param-names1 new-names)]
-                                             [result-iface2 (rename-in-iface result-iface2 param-names2 new-names)])
-                                        (and
-                                         ; parameter type contra-variant
-                                         (<:ifaces param-ifaces2 param-ifaces1 tenv)
-                                         ; result type covariant
-                                         (<:iface result-iface1 result-iface2
-                                                  (extend-tenv-with-module
-                                                   new-names
-                                                   (map (lambda (new-name param-iface1) (expand-iface new-name param-iface1 tenv)) new-names param-ifaces1)
-                                                   tenv
-                                                   ))
-                                         )
+    (proc-interface (params1 result-iface1)
+                    (let ([param-names1 (map proc-module-param->name params1)]
+                          [param-ifaces1 (map proc-module-param->type params1)])
+                      (cases interface iface2
+                        (simple-interface (decls2) #f)
+                        (proc-interface (params2 result-iface2)
+                                        (let ([param-names2 (map proc-module-param->name params2)]
+                                              [param-ifaces2 (map proc-module-param->type params2)])
+                                          (let* ([new-names (map fresh-module-name param-names1)]
+                                                [result-iface1 (rename-in-iface result-iface1 param-names1 new-names)]
+                                                [result-iface2 (rename-in-iface result-iface2 param-names2 new-names)])
+                                            (and
+                                            ; parameter type contra-variant
+                                            (<:ifaces param-ifaces2 param-ifaces1 tenv)
+                                            ; result type covariant
+                                            (<:iface result-iface1 result-iface2
+                                                      (extend-tenv-with-module
+                                                      new-names
+                                                      (map (lambda (new-name param-iface1) (expand-iface new-name param-iface1 tenv)) new-names param-ifaces1)
+                                                      tenv
+                                                      ))
+                                            )
+                                            )
+                                          )
                                         )
-                                      )
+                          )
                       )
                     )
     )
