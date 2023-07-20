@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "expression.rkt" "module.rkt")
+(require racket/lazy-require racket/list "expression.rkt" "module.rkt")
 (lazy-require
  ["value.rkt" (num-val expval? proc-val)]
  ["procedure.rkt" (procedure)]
@@ -21,8 +21,8 @@
    (saved-env environment?)
    )
   (extend-env-with-module
-   (m-name symbol?)
-   (m-val typed-module?)
+   (m-names (list-of symbol?))
+   (m-vals (list-of typed-module?))
    (saved-env environment?)
    )
   )
@@ -67,11 +67,13 @@
     (extend-env-rec (p-name b-var p-body saved-env)
                     (lookup-module-name-in-env m-name saved-env)
                     )
-    (extend-env-with-module (this-m-name m-val saved-env)
-                            (if (equal? m-name this-m-name)
-                                m-val
-                                (lookup-module-name-in-env m-name saved-env)
-                                )
+    (extend-env-with-module (m-names m-vals saved-env)
+                            (let ([index (index-of m-names m-name)])
+                              (if index
+                                  (list-ref m-vals index)
+                                  (lookup-module-name-in-env m-name saved-env)
+                                  )
+                              )
                             )
     (else (eopl:error 'lookup-module-name-in-env "fail to find module name ~s" m-name))
     )
