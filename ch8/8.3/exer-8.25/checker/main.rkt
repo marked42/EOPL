@@ -23,7 +23,7 @@
                                (if (<:iface actual-interface expected-interface tenv)
                                    ; expand interfaces
                                    (let* ([expanded-iface (expand-iface m-name expected-interface tenv)]
-                                          [new-tenv (extend-tenv-with-module m-name expanded-iface tenv)])
+                                          [new-tenv (extend-tenv-with-module (list m-name) (list expanded-iface) tenv)])
                                      (add-module-definitions-to-tenv (cdr defs) new-tenv)
                                      )
                                    (report-module-doesnt-satisfy-iface m-name expected-interface actual-interface)
@@ -44,7 +44,7 @@
                      )
     (proc-module-body (rand-name rand-iface m-body)
                       (let* ([expanded-iface (expand-iface rand-name rand-iface tenv)]
-                             [new-env (extend-tenv-with-module rand-name expanded-iface tenv)]
+                             [new-env (extend-tenv-with-module (list rand-name) (list expanded-iface) tenv)]
                              [body-iface (interface-of m-body new-env)])
                         (proc-interface rand-name rand-iface body-iface)
                         )
@@ -131,8 +131,8 @@
                                          ; result type covariant
                                          (<:iface result-iface1 result-iface2
                                                   (extend-tenv-with-module
-                                                   new-name
-                                                   (expand-iface new-name param-iface1 tenv)
+                                                   (list new-name)
+                                                   (list (expand-iface new-name param-iface1 tenv))
                                                    tenv
                                                    ))
                                          )

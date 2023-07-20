@@ -1,7 +1,8 @@
 #lang eopl
 
+(require racket/list "type.rkt" "../module.rkt")
+
 (provide (all-defined-out))
-(require "type.rkt" "../module.rkt")
 
 (define-datatype type-environment type-environment?
   (empty-tenv)
@@ -11,8 +12,8 @@
    (saved-tenv type-environment?)
    )
   (extend-tenv-with-module
-   (name symbol?)
-   (interface interface?)
+   (names (list-of symbol?))
+   (ifaces (list-of interface?))
    (saved-tenv type-environment?)
    )
   (extend-tenv-with-type
@@ -52,11 +53,13 @@
     (extend-tenv (var type saved-tenv)
                  (lookup-module-name-in-tenv saved-tenv m-name)
                  )
-    (extend-tenv-with-module (name iface saved-tenv)
-                             (if (eqv? name m-name)
-                                 iface
-                                 (lookup-module-name-in-tenv saved-tenv m-name)
-                                 )
+    (extend-tenv-with-module (names ifaces saved-tenv)
+                             (let ([index (index-of names m-name)])
+                               (if index
+                                   (list-ref ifaces index)
+                                   (lookup-module-name-in-tenv saved-tenv m-name)
+                                   )
+                               )
                              )
     (extend-tenv-with-type (name ty saved-tenv)
                            (lookup-module-name-in-tenv saved-tenv m-name)
@@ -93,7 +96,7 @@
     (extend-tenv (var ty saved-tenv)
                  (lookup-type-name-in-tenv name saved-tenv)
                  )
-    (extend-tenv-with-module (m-name interface saved-tenv)
+    (extend-tenv-with-module (m-names ifaces saved-tenv)
                              (lookup-type-name-in-tenv name saved-tenv)
                              )
     (extend-tenv-with-type (t-name ty saved-tenv)
