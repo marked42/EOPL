@@ -11,7 +11,7 @@
 
 (define-datatype typed-module typed-module?
   (simple-module (bindings environment?))
-  (proc-module (b-var symbol?) (body module-body?) (saved-env environment?))
+  (proc-module (b-vars (list-of symbol?)) (body module-body?) (saved-env environment?))
   )
 
 (define-datatype module-definition module-definition?
