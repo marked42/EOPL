@@ -2093,6 +2093,31 @@ in (from ints-double take is-zero one)
    )
   )
 
+(define test-cases-proc-module-multiple-arguments
+  (list
+   (list "
+module ints1
+    interface [ zero : int ]
+    body [ zero = 3 ]
+module ints2
+    interface [ zero : int ]
+    body [ zero = 6 ]
+
+module zero-maker
+    interface ((ints1: [ zero: int ], ints2: [ zero: int ]) => [ zero: int ])
+    body
+        module-proc (ints1: [ zero: int ], ints2: [ zero: int])
+        [
+          zero = -(from ints1 take zero, -(0, from ints2 take zero))
+        ]
+module compound-zero
+    interface [ zero: int ]
+    body (zero-maker ints1 ints2)
+from compound-zero take zero
+               " 9 "proc module with multiple arguments")
+  )
+)
+
 (define test-cases-proc-modules
   (append
    test-cases-to-int-maker
