@@ -44,8 +44,8 @@
                              (add-module-definitions-to-env
                               (cdr defs)
                               (extend-env-with-module
-                               m-name
-                               (value-of-module-body m-body env)
+                               (list m-name)
+                               (list (value-of-module-body m-body env))
                                env
                                )
                               )
@@ -70,7 +70,7 @@
                            [rand-val (lookup-module-name-in-env rand env)])
                        (cases typed-module rator-val
                          (proc-module (m-name m-body env)
-                                      (value-of-module-body m-body (extend-env-with-module m-name rand-val env))
+                                      (value-of-module-body m-body (extend-env-with-module (list m-name) (list rand-val) env))
                                       )
                          (else (report-bad-module-app rator-val))
                          )
