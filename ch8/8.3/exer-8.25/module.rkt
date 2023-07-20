@@ -22,7 +22,7 @@
   (definitions-module-body (definitions (list-of definition?)))
   (proc-module-body (m-param (list-of proc-module-param?)) (m-body module-body?))
   (var-module-body (m-name symbol?))
-  (app-module-body (rator symbol?) (rand symbol?))
+  (app-module-body (rator symbol?) (rands (list-of symbol?)))
   )
 
 (define-datatype proc-module-param proc-module-param?
