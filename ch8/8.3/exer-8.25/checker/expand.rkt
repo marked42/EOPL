@@ -25,7 +25,7 @@
     (simple-interface (declarations)
                       (simple-interface (expand-declarations m-name declarations tenv))
                       )
-    (proc-interface (param-names param-ifaces result-iface) iface)
+    (proc-interface (params result-iface) iface)
     )
   )
 

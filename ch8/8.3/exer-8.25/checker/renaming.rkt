@@ -9,15 +9,19 @@
     (simple-interface (decls)
                       (simple-interface (rename-in-decls decls old new))
                       )
-    (proc-interface (param-names param-ifaces result-iface)
+    (proc-interface (params result-iface)
                     (proc-interface
-                     param-names
                      (map
-                      (lambda (param-iface) (rename-in-iface param-iface old new))
-                      param-ifaces
+                      (lambda (param)
+                        (typed-proc-module-param
+                          (proc-module-param->name param)
+                          (rename-in-iface (proc-module-param->type param) old new)
+                        )
+                      )
+                      params
                       )
                      ; param-name shadows old in result-iface
-                     (rename-in-iface-with-shadow result-iface param-names old new)
+                     (rename-in-iface-with-shadow result-iface (map proc-module-param->name params) old new)
                      )
                     )
     )
