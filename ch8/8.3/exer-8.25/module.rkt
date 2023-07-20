@@ -20,10 +20,26 @@
 
 (define-datatype module-body module-body?
   (definitions-module-body (definitions (list-of definition?)))
-  (proc-module-body (m-name symbol?) (m-type interface?) (m-body module-body?))
+  (proc-module-body (m-param proc-module-param?) (m-body module-body?))
   (var-module-body (m-name symbol?))
   (app-module-body (rator symbol?) (rand symbol?))
   )
+
+(define-datatype proc-module-param proc-module-param?
+  (typed-proc-module-param (m-name symbol?) (m-type interface?))
+)
+
+(define (proc-module-param->name param)
+  (cases proc-module-param param
+    (typed-proc-module-param (m-name m-type) m-name)
+  )
+)
+
+(define (proc-module-param->type param)
+  (cases proc-module-param param
+    (typed-proc-module-param (m-name m-type) m-type)
+  )
+)
 
 (define-datatype interface interface?
   (simple-interface (declarations (list-of declaration?)))

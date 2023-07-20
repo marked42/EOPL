@@ -42,11 +42,14 @@
     (var-module-body (m-name)
                      (lookup-module-name-in-tenv tenv m-name)
                      )
-    (proc-module-body (rand-name rand-iface m-body)
-                      (let* ([expanded-iface (expand-iface rand-name rand-iface tenv)]
-                             [new-env (extend-tenv-with-module (list rand-name) (list expanded-iface) tenv)]
-                             [body-iface (interface-of m-body new-env)])
-                        (proc-interface (list rand-name) (list rand-iface) body-iface)
+    (proc-module-body (m-param m-body)
+                      (let ([rand-name (proc-module-param->name m-param)]
+                            [rand-iface (proc-module-param->type m-param)])
+                        (let* ([expanded-iface (expand-iface rand-name rand-iface tenv)]
+                              [new-env (extend-tenv-with-module (list rand-name) (list expanded-iface) tenv)]
+                              [body-iface (interface-of m-body new-env)])
+                          (proc-interface (list rand-name) (list rand-iface) body-iface)
+                          )
                         )
                       )
     (app-module-body (rator-id rand-id)
