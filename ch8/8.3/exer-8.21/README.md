@@ -26,10 +26,10 @@ module double-ints-maker
             is-zero: (t -> bool)
         ]) => [
             opaque t
-            zero: t
-            succ: (t -> t)
-            pred: (t -> t)
-            is-zero: (t -> bool)
+            zero: from ints take t
+            succ: (from ints take t -> from ints take t)
+            pred: (from ints take t -> from ints take t)
+            is-zero: (from ints take t -> bool)
         ])
     body
         module-proc (ints: [
@@ -41,29 +41,29 @@ module double-ints-maker
         ])
         [
             type t = from ints take t
+            zero = from ints take zero
 
-            plus = letrec plus = proc (x: from ints take t) proc (y: from ints take t)
-                            if (zero x)
-                            then y
-                            else (succ (plus (pred x) y))
-                        in plus
-            diff = letrec diff = proc (x: from ints take t) proc (y: from ints take t)
-                                if (zero y)
+            diff = letrec (from ints take t -> from ints take t) diff (x: from ints take t) = proc (y: from ints take t)
+                                if (from ints take is-zero y)
                                 then x
-                                else ((diff (pred x)) (pred y))
+                                else ((diff (from ints take pred x)) (from ints take pred y))
                         in diff
+
             equal = proc (x: from ints take t) proc (y: from ints take t)
-                        if (zero ((diff x) y))
+                        if (from ints take is-zero ((diff x) y))
                         then zero?(0) %= true
                         else zero?(1) %= false
-            average = letrec average = proc (x: from ints take t) proc (y: from ints take t)
-                            if ((equal x) y)
-                            then x
-                            else ((average (succ x)) (pred y))
 
-            zero = ((plus from ints take zero) from ints take zero)
-            succ = proc (x: from ints take t) (succ (succ x))
-            pred = proc (x: from ints take t) (pred (pred x))
+            average = letrec (from ints take t -> from ints take t) average (x: from ints take t) = proc (y: from ints take t)
+                                if ((equal x) y)
+                                then x
+                                else ((average (from ints take succ x)) (from ints take pred y))
+                        in average
+
+            succ = proc (x: from ints take t) (from ints take succ (from ints take succ x))
+            pred = proc (x: from ints take t) (from ints take pred (from ints take pred x))
+
             is-zero = proc (x: from ints take t) (from ints take is-zero ((average zero) x))
         ]
+
 ```

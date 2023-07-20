@@ -1,5 +1,7 @@
 # Solution
 
+refer to [sum-prod-maker](../../../base/test.rkt#1256)
+
 ```proc-modules
 module sum-prod-maker
     interface
@@ -22,14 +24,15 @@ module sum-prod-maker
             is-zero: (t -> bool)
         ])
         [
-            plus = letrec plus = proc (x: from ints take t) proc (y: from ints take t)
-                            if (zero x)
+            plus = letrec (from ints take t -> from ints take t) plus (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
                             then y
-                            else (succ (plus (pred x) y))
+                            else ((plus (from ints take pred x)) (from ints take succ y))
                         in plus
-            times = letrec times = proc (x: from ints take t) proc (y: from ints take t)
-                            if (zero x)
-                            then 0
-                            else ((plus ((times (pred x)) y)) y)
+            times = letrec (from ints take t -> from ints take t) times (x: from ints take t) = proc (y: from ints take t)
+                            if (from ints take is-zero x)
+                            then from ints take zero
+                            else ((plus ((times (from ints take pred x)) y)) y)
+                        in times
         ]
 ```
