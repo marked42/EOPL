@@ -29,7 +29,7 @@
     (module-body ("[" (arbno definition) "]") definitions-module-body)
     (module-body ("module-proc" "("(separated-list proc-module-param ",")")" module-body) proc-module-body)
     (module-body (identifier) var-module-body)
-    (module-body ("("identifier identifier")") app-module-body)
+    (module-body ("("identifier (arbno identifier)")") app-module-body)
 
     (proc-module-param (identifier ":" interface) typed-proc-module-param)
 
