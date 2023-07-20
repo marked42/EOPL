@@ -62,8 +62,8 @@
     (var-module-body (m-name)
                      (lookup-module-name-in-env m-name env)
                      )
-    (proc-module-body (m-param m-body)
-                      (proc-module (list (proc-module-param->name m-param)) m-body env)
+    (proc-module-body (m-params m-body)
+                      (proc-module (map proc-module-param->name m-params) m-body env)
                       )
     (app-module-body (rator rand)
                      (let ([rator-val (lookup-module-name-in-env rator env)]

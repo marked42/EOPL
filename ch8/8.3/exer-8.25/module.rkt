@@ -20,7 +20,7 @@
 
 (define-datatype module-body module-body?
   (definitions-module-body (definitions (list-of definition?)))
-  (proc-module-body (m-param proc-module-param?) (m-body module-body?))
+  (proc-module-body (m-param (list-of proc-module-param?)) (m-body module-body?))
   (var-module-body (m-name symbol?))
   (app-module-body (rator symbol?) (rand symbol?))
   )

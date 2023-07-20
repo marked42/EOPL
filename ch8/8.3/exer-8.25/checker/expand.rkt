@@ -29,6 +29,14 @@
     )
   )
 
+(define (expand-ifaces m-names ifaces tenv)
+  (map
+    (lambda (m-name iface) (expand-iface m-name iface tenv))
+    m-names
+    ifaces
+    )
+  )
+
 (define (expand-declarations m-name declarations tenv)
   (if (null? declarations)
       '()
