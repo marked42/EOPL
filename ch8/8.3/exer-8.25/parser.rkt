@@ -27,7 +27,7 @@
     (declaration ("transparent" identifier "=" type) transparent-type-declaration)
 
     (module-body ("[" (arbno definition) "]") definitions-module-body)
-    (module-body ("module-proc" "("proc-module-param")" module-body) proc-module-body)
+    (module-body ("module-proc" "("(separated-list proc-module-param ",")")" module-body) proc-module-body)
     (module-body (identifier) var-module-body)
     (module-body ("("identifier identifier")") app-module-body)
 
