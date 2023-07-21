@@ -14,10 +14,10 @@
                      (map
                       (lambda (param)
                         (typed-proc-module-param
-                          (proc-module-param->name param)
-                          (rename-in-iface (proc-module-param->type param) old new)
+                         (proc-module-param->name param)
+                         (rename-in-iface (proc-module-param->type param) old new)
+                         )
                         )
-                      )
                       params
                       )
                      ; param-name shadows old in result-iface
@@ -32,9 +32,9 @@
     (if (null? old-names)
         (rename-in-iface iface old new)
         (if (member (car old-names) names)
-          (loop (cdr old-names) (cdr old) (cdr new))
-          (loop (cdr old-names) old new)
-          )
+            (loop (cdr old-names) (cdr old) (cdr new))
+            (loop (cdr old-names) old new)
+            )
         )
     )
   )
