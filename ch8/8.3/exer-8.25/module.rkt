@@ -27,19 +27,19 @@
 
 (define-datatype proc-module-param proc-module-param?
   (typed-proc-module-param (m-name symbol?) (m-type interface?))
-)
+  )
 
 (define (proc-module-param->name param)
   (cases proc-module-param param
     (typed-proc-module-param (m-name m-type) m-name)
+    )
   )
-)
 
 (define (proc-module-param->type param)
   (cases proc-module-param param
     (typed-proc-module-param (m-name m-type) m-type)
+    )
   )
-)
 
 (define-datatype interface interface?
   (simple-interface (declarations (list-of declaration?)))
