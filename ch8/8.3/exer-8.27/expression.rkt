@@ -5,6 +5,8 @@
 
 (define-datatype program program?
   (a-program
+   (names (list-of symbol?))
+   (ifaces (list-of interface?))
    (m-defs (list-of module-definition?))
    (body expression?)
    )
