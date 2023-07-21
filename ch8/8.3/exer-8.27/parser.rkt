@@ -15,7 +15,7 @@
     ))
 
 (define the-grammar
-  '((program ((arbno module-definition) expression) a-program)
+  '((program ((arbno "interface" identifier "=" interface) (arbno module-definition) expression) a-program)
 
     (module-definition ("module" identifier "interface" interface "body" module-body) a-module-definition)
 

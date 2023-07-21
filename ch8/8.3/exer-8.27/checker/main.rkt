@@ -6,13 +6,26 @@
 
 (define (type-of-program pgm)
   (cases program pgm
-    (a-program (m-defs body)
-               (let ([tenv (add-module-definitions-to-tenv m-defs (empty-tenv))])
+    (a-program (names ifaces m-defs body)
+      (let ([tenv (add-interfaces-to-tenv names ifaces (empty-tenv))])
+               (let ([tenv (add-module-definitions-to-tenv m-defs tenv)])
                  (type-of body tenv)
                  )
+      )
                )
     )
   )
+
+(define (add-interfaces-to-tenv names ifaces tenv)
+  (if (null? names)
+    tenv
+    (add-interfaces-to-tenv
+      (cdr names)
+      (cdr ifaces)
+      (extend-tenv-with-interface (car names) (car ifaces) tenv)
+    )
+  )
+)
 
 (define (add-module-definitions-to-tenv defs tenv)
   (if (null? defs)
