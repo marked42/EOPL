@@ -66,8 +66,8 @@
                       (proc-module m-name m-body env)
                       )
     (app-module-body (rator rand)
-                     (let ([rator-val (lookup-module-name-in-env rator env)]
-                           [rand-val (lookup-module-name-in-env rand env)])
+                     (let ([rator-val (value-of-module-body rator env)]
+                           [rand-val (value-of-module-body rand env)])
                        (cases typed-module rator-val
                          (proc-module (m-name m-body env)
                                       (value-of-module-body m-body (extend-env-with-module m-name rand-val env))

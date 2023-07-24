@@ -2172,6 +2172,78 @@ in (from ints1-to-int take to-int one)
    )
   )
 
+(define test-cases-application-module-body
+  (list
+   (list "
+   module ints1
+       interface [
+           opaque t
+           zero : t
+           pred : (t -> t)
+           succ : (t -> t)
+           is-zero : (t -> bool)
+       ]
+       body [
+           type t = int
+           zero = 0
+           pred = proc(x : t) -(x,5)
+           succ = proc(x : t) -(x,-5)
+           is-zero = proc (x : t) zero?(x)
+       ]
+   module ints1-to-int
+       interface [
+           to-int: (from ints1 take t -> int)
+       ]
+       body
+           (module-proc (ints: [
+               opaque t
+               zero: t
+               pred: (t -> t)
+               succ: (t -> t)
+               is-zero: (t -> bool)
+           ])
+           [
+               to-int = let z? = from ints take is-zero
+                           in let p = from ints take pred
+                               in letrec int to-int (x: from ints take t) = if (z? x) then 0 else -((to-int (p x)), -1)
+                                   in to-int
+           ]
+           ints1)
+   let one = (from ints1 take succ from ints1 take zero)
+   in (from ints1-to-int take to-int one)
+               " 1 "application module-body supports non-identifier operator")
+
+   (list "
+module ints1-to-int
+    interface [
+        to-int: (int -> int)
+    ]
+    body
+        (module-proc (ints: [
+            opaque t
+            zero: t
+            pred: (t -> t)
+            succ: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            to-int = let z? = from ints take is-zero
+                        in let p = from ints take pred
+                            in letrec int to-int (x: from ints take t) = if (z? x) then 0 else -((to-int (p x)), -1)
+                                in to-int
+        ]
+        [
+        type t = int
+        zero = 0
+        pred = proc(x : t) -(x,5)
+        succ = proc(x : t) -(x,-5)
+        is-zero = proc (x : t) zero?(x)
+    ])
+1
+            " 1 "application module-body supports non-identifier operand")
+   )
+  )
+
 (define test-cases-proc-modules
   (append
    test-cases-to-int-maker
