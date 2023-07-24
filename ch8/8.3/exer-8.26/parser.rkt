@@ -29,7 +29,7 @@
     (module-body ("[" (arbno definition) "]") definitions-module-body)
     (module-body ("module-proc" "("identifier ":" interface")" module-body) proc-module-body)
     (module-body (identifier) var-module-body)
-    (module-body ("("identifier identifier")") app-module-body)
+    (module-body ("("module-body module-body")") app-module-body)
 
     (definition (identifier "=" expression) val-definition)
     (definition ("type" identifier "=" type) type-definition)

@@ -22,7 +22,7 @@
   (definitions-module-body (definitions (list-of definition?)))
   (proc-module-body (m-name symbol?) (m-type interface?) (m-body module-body?))
   (var-module-body (m-name symbol?))
-  (app-module-body (rator symbol?) (rand symbol?))
+  (app-module-body (rator module-body?) (rand module-body?))
   )
 
 (define-datatype interface interface?
