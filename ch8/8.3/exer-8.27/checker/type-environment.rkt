@@ -45,7 +45,7 @@
       (simple-interface (declarations)
                         (lookup-variable-name-in-declarations var-name declarations)
                         )
-      (proc-interface (param-name param-iface result-iface)
+      (proc-interface (param-name param result-iface)
                       (eopl:error 'lookup-qualified-type-in-tenv "proc-interface ~s" iface)
                       )
       )

@@ -9,16 +9,26 @@
     (simple-interface (decls)
                       (simple-interface (rename-in-decls decls old new))
                       )
-    (proc-interface (param-name param-iface result-iface)
-                    (proc-interface
-                     param-name
-                     (rename-in-iface param-iface old new)
-                     ; param-name shadows old in result-iface
-                     (if (eqv? param-name old)
-                         result-iface
-                         (rename-in-iface result-iface old new)
-                         )
-                     )
+    (proc-interface (param-name param result-iface)
+                    (cases interface-param param
+                      (bare-interface-param (iface)
+                                            (proc-interface
+                                             param-name
+                                             (bare-interface-param
+                                              (rename-in-iface iface old new)
+                                              )
+                                             ; param-name shadows old in result-iface
+                                             (if (eqv? param-name old)
+                                                 result-iface
+                                                 (rename-in-iface result-iface old new)
+                                                 )
+                                             )
+                                            )
+                      ; invalid state, better get rid of this case by using precise model
+                      (named-interface-param (interface-name)
+                                             (eopl:error 'rename-in-iface "Expect bare-interface-param, get ~s" param)
+                                             )
+                      )
                     )
     )
   )

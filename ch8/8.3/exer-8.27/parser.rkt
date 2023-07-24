@@ -20,7 +20,10 @@
     (module-definition ("module" identifier "interface" interface "body" module-body) a-module-definition)
 
     (interface ("[" (arbno declaration)"]") simple-interface)
-    (interface ("(" "(" identifier ":" interface ")" "=>" interface ")") proc-interface)
+    (interface ("(" "(" identifier ":" interface-param ")" "=>" interface ")") proc-interface)
+
+    (interface-param (interface) bare-interface-param)
+    (interface-param (identifier) named-interface-param)
 
     (declaration (identifier ":" type) var-declaration)
     (declaration ("opaque" identifier) opaque-type-declaration)

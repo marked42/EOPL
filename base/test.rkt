@@ -2115,8 +2115,62 @@ module compound-zero
     body (zero-maker ints1 ints2)
 from compound-zero take zero
                " 9 "proc module with multiple arguments")
+   )
   )
-)
+
+(define test-cases-declared-interface
+  (list
+   (list "
+interface int-interface = [
+  opaque t
+  zero: t
+  pred: (t -> t)
+  succ: (t -> t)
+  is-zero: (t -> bool)
+]
+module ints1
+    interface [
+        opaque t
+        zero : t
+        pred : (t -> t)
+        succ : (t -> t)
+        is-zero : (t -> bool)
+    ]
+    body [
+        type t = int
+        zero = 0
+        pred = proc(x : t) -(x,5)
+        succ = proc(x : t) -(x,-5)
+        is-zero = proc (x : t) zero?(x)
+    ]
+module to-int-maker
+    interface
+        ((ints: int-interface) => [ to-int: (from ints take t -> int) ])
+    body
+        module-proc (ints: [
+            opaque t
+            zero: t
+            pred: (t -> t)
+            succ: (t -> t)
+            is-zero: (t -> bool)
+        ])
+        [
+            to-int = let z? = from ints take is-zero
+                        in let p = from ints take pred
+                            in letrec int to-int (x: from ints take t) = if (z? x) then 0 else -((to-int (p x)), -1)
+                                in to-int
+        ]
+module ints1-to-int
+    interface [
+        to-int: (from ints1 take t -> int)
+    ]
+    body
+        (to-int-maker ints1)
+let one = (from ints1 take succ from ints1 take zero)
+in (from ints1-to-int take to-int one)
+            " 1 "to-int-maker use declared interface in-interface as parameter type")
+   )
+  )
 
 (define test-cases-proc-modules
   (append
