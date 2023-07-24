@@ -5,6 +5,7 @@
  ["environment.rkt" (environment?)]
  ["expression.rkt" (expression?)]
  ["checker/type.rkt" (type?)]
+ ["checker/type-environment.rkt" (lookup-interface-name-in-tenv)]
  )
 
 (provide (all-defined-out))
@@ -27,7 +28,19 @@
 
 (define-datatype interface interface?
   (simple-interface (declarations (list-of declaration?)))
-  (proc-interface (param-name symbol?) (param-iface interface?) (result-iface interface?))
+  (proc-interface (name symbol?) (param interface-param?) (result-iface interface?))
+  )
+
+(define-datatype interface-param interface-param?
+  (bare-interface-param (iface interface?))
+  (named-interface-param (interface-name symbol?))
+  )
+
+(define (interface-param->iface param tenv)
+  (cases interface-param param
+    (bare-interface-param (iface) iface)
+    (named-interface-param (interface-name) (lookup-interface-name-in-tenv interface-name tenv))
+    )
   )
 
 (define-datatype declaration declaration?

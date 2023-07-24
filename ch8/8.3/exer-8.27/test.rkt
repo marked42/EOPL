@@ -9,5 +9,6 @@
             test-cases-simple-modules
             test-cases-opaque-types
             test-cases-proc-modules
+            test-cases-declared-interface
             )
            )
