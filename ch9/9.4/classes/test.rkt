@@ -8,5 +8,7 @@
            (append
             test-cases-implicit-refs-lang
             test-cases-let-exp-with-multiple-declarations
+            test-cases-sum-exp
+            test-cases-list-v2
             test-cases-proc-exp-with-multiple-arguments)
            )
