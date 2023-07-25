@@ -29,6 +29,12 @@
    )
   )
 
+(define test-cases-sum-exp
+  (list
+   (list "+(1, 2)" 3 "sum-exp")
+   )
+  )
+
 (define test-cases-zero?-exp
   (list
    (list "zero?(0)" #t "zero?-exp")
