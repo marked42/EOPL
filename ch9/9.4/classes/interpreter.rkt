@@ -59,10 +59,9 @@
                   )
               )
             )
-    (let-exp (var exp1 body)
-             (let ([val (value-of-exp exp1 env)])
-               ; new stuff
-               (value-of-exp body (extend-env* (list var) (list (newref val)) env))
+    (let-exp (vars exps body)
+             (let ([vals (value-of-exps exps env)])
+               (value-of-exp body (extend-env* vars (map newref vals) env))
                )
              )
     (proc-exp (vars body)

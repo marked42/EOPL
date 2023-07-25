@@ -7,5 +7,6 @@
 (test-lang run sloppy->expval
            (append
             test-cases-implicit-refs-lang
+            test-cases-let-exp-with-multiple-declarations
             test-cases-proc-exp-with-multiple-arguments)
            )
