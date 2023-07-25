@@ -20,8 +20,14 @@
 
   (begin-exp (exp1 expression?) (exps (list-of expression?)))
 
-  ; new stuff
   (assign-exp (var symbol?) (exp1 expression?))
+
+  (cons-exp (exp1 expression?) (exp2 expression?))
+  (car-exp (exp1 expression?))
+  (cdr-exp (exp1 expression?))
+  (emptylist-exp)
+  (null?-exp (exp1 expression?))
+  (list-exp (exps (list-of expression?)))
   )
 
 (define-datatype program program?
