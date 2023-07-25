@@ -45,8 +45,7 @@
     (extend-env-rec* (p-names b-vars p-bodies saved-env)
                      (let ([index (index-of p-names search-var)])
                        (if index
-                           ; new stuff
-                           (newref (proc-val (procedure (list-ref b-vars index) (list-ref p-bodies index) env)))
+                           (newref (proc-val (procedure (list (list-ref b-vars index)) (list-ref p-bodies index) env)))
                            (apply-env saved-env search-var)
                            )
                        )
