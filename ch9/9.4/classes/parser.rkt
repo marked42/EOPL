@@ -14,9 +14,13 @@
     ))
 
 (define the-grammar
-  '((program (expression) a-program)
+  '((program ((arbno class-decl) expression) a-program)
     (expression (number) const-exp)
     (expression (identifier) var-exp)
+
+    (class-decl ("class" identifier "extends" identifier (arbno "field" identifier) (arbno method-decl)) a-class-decl)
+
+    (method-decl ("method" identifier "("(separated-list identifier ",")")" expression) a-method-decl)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)
     (expression ("+" "(" expression "," expression ")") sum-exp)
@@ -41,6 +45,11 @@
     (expression ("emptylist") emptylist-exp)
     (expression ("null?" "(" expression ")") null?-exp)
     (expression ("list" "("(separated-list expression ",")")") list-exp)
+
+    (expression ("new" identifier "("(separated-list expression ",")")") new-object-exp)
+    (expression ("send" expression identifier "("(separated-list expression ",")")") method-call-exp)
+    (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
+    (expression ("self") self-exp)
     )
   )
 

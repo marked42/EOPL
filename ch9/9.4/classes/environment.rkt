@@ -5,6 +5,7 @@
  ["value.rkt" (num-val expval? proc-val)]
  ["store.rkt" (reference? newref)]
  ["procedure.rkt" (procedure)]
+ ["object.rkt" (object?)]
  )
 (provide (all-defined-out))
 
@@ -19,6 +20,11 @@
    (p-names (list-of symbol?))
    (b-vars (list-of symbol?))
    (p-bodies (list-of expression?))
+   (saved-env environment?)
+   )
+  (extend-env-with-self-and-super
+   (self object?)
+   (super-name symbol?)
    (saved-env environment?)
    )
   )
@@ -50,6 +56,12 @@
                            )
                        )
                      )
+    (extend-env-with-self-and-super (self super-name saved-env)
+                                    (case search-var
+                                      ((%self) self)
+                                      ((%super) super-name)
+                                      (else (apply-env saved-env search-var)))
+                                    )
     (else (report-no-binding-found search-var))
     )
   )

@@ -10,7 +10,10 @@
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
- ["store.rkt" (initialize-store! newref deref setref!)]
+ ["store.rkt" (initialize-store! newref deref setref! show-store)]
+ ["class.rkt" (initialize-class-env! find-method)]
+ ["method.rkt" (apply-method)]
+ ["object.rkt" (object->class-name new-object)]
  )
 
 (provide (all-defined-out))
@@ -23,7 +26,10 @@
   ; new stuff
   (initialize-store!)
   (cases program prog
-    (a-program (exp1) (value-of-exp exp1 (init-env)))
+    (a-program (class-decls exp1)
+               (initialize-class-env! class-decls)
+               (value-of-exp exp1 (init-env))
+               )
     )
   )
 
@@ -142,6 +148,39 @@
                   )
                 )
               )
+    (new-object-exp (class-name rands)
+                    (let ([args (value-of-exps rands env)] [obj (new-object class-name)])
+                      (apply-method
+                       ; constructor method
+                       (find-method class-name 'initialize)
+                       obj
+                       args
+                       )
+                       ; return newly created obj
+                       obj
+                      )
+                    )
+    (method-call-exp (obj-exp method-name rands)
+                     (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
+                       (apply-method
+                        (find-method (object->class-name obj) method-name)
+                        obj
+                        args
+                        )
+                       )
+                     )
+    (super-call-exp (method-name rands)
+                    ; use surrounding self
+                    (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
+                      (apply-method
+                       ; find method in super class
+                       (find-method (apply-env env '%super) method-name)
+                       obj
+                       args
+                       )
+                      )
+                    )
+    (self-exp () (apply-env env '%self))
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
