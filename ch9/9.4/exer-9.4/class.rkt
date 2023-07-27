@@ -99,18 +99,18 @@
          ) m-decls)
   )
 
-(define (find-method c-name m-name)
+(define (find-method a-class m-name)
   ; static dispatch by assq
-  (let* ([m-env (class->method-env (lookup-class c-name))] [maybe-pair (assq m-name m-env)])
+  (let* ([m-env (class->method-env a-class)] [maybe-pair (assq m-name m-env)])
     (if (pair? maybe-pair)
         (cadr maybe-pair)
-        (report-method-not-found m-name c-name)
+        (report-method-not-found m-name a-class)
         )
     )
   )
 
-(define (report-method-not-found m-name c-name)
-  (eopl:error 'find-method "Method ~s not found on class ~s" m-name c-name)
+(define (report-method-not-found m-name a-class)
+  (eopl:error 'find-method "Method ~s not found on class ~s" m-name a-class)
   )
 
 (define (append-filed-names super-fields new-fields)

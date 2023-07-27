@@ -4,30 +4,30 @@
 
 (lazy-require
  ["store.rkt" (reference? newref)]
- ["class.rkt" (class->field-names lookup-class)]
+ ["class.rkt" (class->field-names lookup-class class?)]
  )
 
 (provide (all-defined-out))
 
 (define-datatype object object?
-    (an-object (class-name symbol?) (fields (list-of reference?)))
+    (an-object (a-class class?) (fields (list-of reference?)))
 )
 
-(define (object->class-name obj)
+(define (object->class obj)
     (cases object obj
-        (an-object (class-name fields) class-name)
+        (an-object (a-class fields) a-class)
     )
 )
 
 (define (object->fields obj)
     (cases object obj
-        (an-object (class-name fields) fields)
+        (an-object (a-class fields) fields)
     )
 )
 
 (define (new-object class-name)
     (an-object
-       class-name
+       (lookup-class class-name)
        (map
         (lambda (field-name) (newref (list 'uninitialized field-name)))
         (class->field-names (lookup-class class-name))
