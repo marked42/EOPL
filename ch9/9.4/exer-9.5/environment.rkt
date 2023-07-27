@@ -22,9 +22,9 @@
    (p-bodies (list-of expression?))
    (saved-env environment?)
    )
-  (extend-env-with-self-and-super
+  (extend-env-with-self-and-host
    (self object?)
-   (super-name symbol?)
+   (host-name symbol?)
    (saved-env environment?)
    )
   )
@@ -56,10 +56,10 @@
                            )
                        )
                      )
-    (extend-env-with-self-and-super (self super-name saved-env)
+    (extend-env-with-self-and-host (self host-name saved-env)
                                     (case search-var
                                       ((%self) self)
-                                      ((%super) super-name)
+                                      ((%host) host-name)
                                       (else (apply-env saved-env search-var)))
                                     )
     (else (report-no-binding-found search-var))
