@@ -2488,3 +2488,40 @@ let o1 = new bogus-oddeven()
             " 0 "sub class bogus-oddeven override even to return wrong answer")
    )
   )
+
+(define test-cases-instanceof
+  (list
+   (list "
+class c1 extends object
+  method initialize() 1
+
+class c2 extends object
+  method initialize() 2
+
+let o1 = new c1()
+  in instanceof o1 c1
+            " #t "object is instanceof of its class")
+
+   (list "
+class c1 extends object
+  method initialize() 1
+
+class c2 extends c1
+  method initialize() 2
+
+let o2 = new c2()
+  in instanceof o2 c1
+            " #t "object is instanceof of its ancestor class")
+
+   (list "
+class c1 extends object
+  method initialize() 1
+
+class c2 extends object
+  method initialize() 2
+
+let o2 = new c2()
+  in instanceof o2 c1
+            " #f "object is nont instanceof of unrelated class")
+   )
+  )

@@ -11,7 +11,7 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
- ["class.rkt" (initialize-class-env! find-method)]
+ ["class.rkt" (initialize-class-env! find-method is-subclass)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
  )
@@ -181,6 +181,11 @@
                       )
                     )
     (self-exp () (apply-env env '%self))
+    (instanceof-exp (obj-exp class-name)
+                    (let ([obj (value-of-exp obj-exp env)])
+                      (bool-val (is-subclass (object->class-name obj) class-name))
+                      )
+                    )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
