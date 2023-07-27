@@ -2460,5 +2460,31 @@ class c3 extends c2
 let o3 = new c3()
   in send o3 m3()
             " 33 "Figure 9.6 Example illustrating interaction of super call with self, send o3 m3() -> c2 m3 -> c1 m1 -> c3 m2")
+   )
   )
-)
+
+
+(define test-cases-bogus-odd-even
+  (list
+   (list "
+class oddeven extends object
+  method initialize ()
+    1
+  method even (n)
+    if zero?(n)
+    then 1
+    else send self odd(-(n,1))
+  method odd (n)
+    if zero?(n)
+    then 0 else
+    send self even(-(n,1))
+
+class bogus-oddeven extends oddeven
+    method even()
+        0
+
+let o1 = new bogus-oddeven()
+  in send o1 odd(13)
+            " 0 "sub class bogus-oddeven override even to return wrong answer")
+   )
+  )
