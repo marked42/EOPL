@@ -33,7 +33,7 @@
     (expression ("proc" "(" (separated-list identifier ",") ")" expression) proc-exp)
     (expression ("("expression (arbno expression)")" ) call-exp)
 
-    (expression ("letrec" (arbno identifier "(" identifier ")" "=" expression) "in" expression) letrec-exp)
+    (expression ("letrec" (arbno identifier "("(separated-list identifier ",") ")" "=" expression) "in" expression) letrec-exp)
 
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
 
