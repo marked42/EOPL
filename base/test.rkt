@@ -2489,6 +2489,213 @@ let o1 = new bogus-oddeven()
    )
   )
 
+(define test-cases-exer-9.1
+  (list
+   (list "
+class queue extends object
+    field lst
+
+    method initialize()
+        set lst = emptylist
+
+    method empty?()
+        null?(lst)
+
+    method enqueue(item)
+        set lst = cons(item, lst)
+
+    method dequeue()
+        letrec reverse_helper (q, reversed_q) = if send q empty?()
+                                                then reversed_q
+                                                else (reverse_helper cdr(q) cons(car(q), reversed_q))
+            in (reverse_helper cdr((reverse_helper lst emptylist)) emptylist)
+
+    method getlist()
+        lst
+
+let q = new queue()
+    in send q getlist()
+            " '() "Exer 9.1 1 empty queue")
+
+   (list "
+class queue extends object
+    field lst
+
+    method initialize()
+        set lst = emptylist
+
+    method empty?()
+        null?(lst)
+
+    method enqueue(item)
+        set lst = cons(item, lst)
+
+    method dequeue()
+        letrec reverse_helper (q, reversed_q) = if send q empty?()
+                                                then reversed_q
+                                                else (reverse_helper cdr(q) cons(car(q), reversed_q))
+            in (reverse_helper cdr((reverse_helper lst emptylist)) emptylist)
+
+    method getlist()
+        lst
+
+let q = new queue()
+    in begin
+      send q enqueue(1);
+      send q enqueue(2);
+      send q enqueue(3);
+      send q getlist()
+    end
+            " '(3 2 1) "Exer 9.1 1 enqueue")
+
+   (list "
+class queue extends object
+    field lst
+
+    method initialize()
+        set lst = emptylist
+
+    method empty?()
+        null?(lst)
+
+    method enqueue(item)
+        set lst = cons(item, lst)
+
+    method dequeue()
+        letrec reverse_helper (q, reversed_q) = if null?(q)
+                                                then reversed_q
+                                                else (reverse_helper cdr(q) cons(car(q), reversed_q))
+            in set lst = (reverse_helper cdr((reverse_helper lst emptylist)) emptylist)
+
+    method getlist()
+        lst
+
+let q = new queue()
+    in begin
+      send q enqueue(1);
+      send q enqueue(2);
+      send q enqueue(3);
+      send q dequeue();
+      send q getlist()
+    end
+            " '(3 2) "Exer 9.1 1 dequeue")
+
+   (list "
+class queue extends object
+    field counter
+    field lst
+
+    method initialize()
+      begin
+        set counter = 0;
+        set lst = emptylist
+      end
+
+    method counter()
+      counter
+
+    method increment()
+      set counter = +(counter, 1)
+
+    method empty?()
+        null?(lst)
+
+    method enqueue(item)
+      begin
+        set lst = cons(item, lst);
+        send self increment()
+      end
+
+    method dequeue()
+        letrec reverse_helper (q, reversed_q) = if null?(q)
+                                                then reversed_q
+                                                else (reverse_helper cdr(q) cons(car(q), reversed_q))
+            in begin
+              set lst = (reverse_helper cdr((reverse_helper lst emptylist)) emptylist);
+              send self increment()
+            end
+
+    method getlist()
+        lst
+
+let q = new queue()
+    in begin
+      send q enqueue(1);
+      send q enqueue(2);
+      send q enqueue(3);
+      send q dequeue();
+      send q getlist();
+      send q counter()
+    end
+            " 4 "Exer 9.1 2 enqueue 3 times, dequeue 1 time, total 4 times")
+
+   (list "
+class counter extends object
+  field count
+
+  method initialize()
+    set count = 0
+
+  method value()
+    count
+
+  method increment()
+    set count = +(count, 1)
+
+class queue extends object
+    field counter
+    field lst
+
+    method initialize(c)
+      begin
+        set counter = c;
+        set lst = emptylist
+      end
+
+    method counter()
+      send counter value()
+
+    method empty?()
+        null?(lst)
+
+    method enqueue(item)
+      begin
+        set lst = cons(item, lst);
+        send counter increment()
+      end
+
+    method dequeue()
+        letrec reverse_helper (q, reversed_q) = if null?(q)
+                                                then reversed_q
+                                                else (reverse_helper cdr(q) cons(car(q), reversed_q))
+            in begin
+              set lst = (reverse_helper cdr((reverse_helper lst emptylist)) emptylist);
+              send counter increment()
+            end
+
+    method getlist()
+        lst
+
+let c = new counter()
+  in let q1 = new queue(c)
+         q2 = new queue(c)
+    in begin
+      send q1 enqueue(1);
+      send q1 enqueue(2);
+      send q1 enqueue(3);
+      send q1 dequeue();
+
+      send q2 enqueue(1);
+      send q2 enqueue(2);
+      send q2 enqueue(3);
+      send q2 dequeue();
+
+      send c value()
+    end
+            " 8 "Exer 9.1 2 q1 has 4 operations, q2 has 4 operations, total 8 operations recorded in counter c")
+   )
+  )
+
 (define test-cases-instanceof
   (list
    (list "
