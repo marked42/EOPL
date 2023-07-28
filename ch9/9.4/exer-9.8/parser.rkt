@@ -50,6 +50,9 @@
     (expression ("send" expression identifier "("(separated-list expression ",")")") method-call-exp)
     (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
     (expression ("self") self-exp)
+
+    (expression ("fieldref" expression identifier) fieldref-exp)
+    (expression ("fieldset" expression identifier "=" expression) fieldset-exp)
     )
   )
 
