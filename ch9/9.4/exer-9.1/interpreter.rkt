@@ -89,8 +89,8 @@
                   )
                 )
               )
-    (letrec-exp (p-names b-vars p-bodies body)
-                (let ((new-env (extend-env-rec* p-names b-vars p-bodies env)))
+    (letrec-exp (p-names b-vars-list p-bodies body)
+                (let ((new-env (extend-env-rec* p-names b-vars-list p-bodies env)))
                   (value-of-exp body new-env)
                   )
                 )
@@ -156,8 +156,8 @@
                        obj
                        args
                        )
-                       ; return newly created obj
-                       obj
+                      ; return newly created obj
+                      obj
                       )
                     )
     (method-call-exp (obj-exp method-name rands)
