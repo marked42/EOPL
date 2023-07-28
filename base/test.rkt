@@ -2628,3 +2628,61 @@ let o2 = new c2()
             " (list 4 5) "fieldset expression")
    )
   )
+
+(define test-cases-super-field-ref-set
+  (list
+   (list "
+class c1 extends object
+  field x
+  field y
+  method initialize()
+    begin
+      set x = 1;
+      set y = 2
+    end
+
+
+class c2 extends c1
+  field x
+  field y
+  method initialize()
+    begin
+      super initialize();
+      set x = 3;
+      set y = 4
+    end
+
+let o = new c2()
+  in list(superfieldref o x, superfieldref o y, fieldref o x, fieldref o y)
+            " '(1 2 3 4) "superfieldref gets super field of a object")
+
+   (list "
+class c1 extends object
+  field x
+  field y
+  method initialize()
+    begin
+      set x = 1;
+      set y = 2
+    end
+
+
+class c2 extends c1
+  field x
+  field y
+  method initialize()
+    begin
+      super initialize();
+      set x = 3;
+      set y = 4
+    end
+
+let o = new c2()
+  in begin
+    superfieldset o x = 5;
+    superfieldset o y = 6;
+    list(superfieldref o x, superfieldref o y)
+  end
+            " '(5 6) "superfieldset sets super field of a object")
+   )
+  )

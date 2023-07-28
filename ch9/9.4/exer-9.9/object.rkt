@@ -4,7 +4,7 @@
 
 (lazy-require
  ["store.rkt" (reference? newref)]
- ["class.rkt" (class->field-names lookup-class)]
+ ["class.rkt" (class->field-names lookup-class class->super-name)]
  )
 
 (provide (all-defined-out))
@@ -36,12 +36,25 @@
   )
 
 (define (object->field obj field-name)
-  (let* ([obj-class (lookup-class (object->class-name obj))]
-         [field-names (class->field-names obj-class)]
+  (let* ([host-class (lookup-class (object->class-name obj))]
+         [field-names (class->field-names host-class)]
          [index (index-of field-names field-name)])
     (if index
         (list-ref (object->fields obj) index)
         (eopl:error 'object->field "Field ~s not found on object ~s" field-name obj)
+        )
+    )
+  )
+
+(define (object->super-field obj super-field-name)
+  (let* ([host-class (lookup-class (object->class-name obj))]
+         [super-name (class->super-name host-class)]
+         [super-class (lookup-class super-name)]
+         [super-field-names (class->field-names super-class)]
+         [index (index-of super-field-names super-field-name)])
+    (if index
+        (list-ref (object->fields obj) index)
+        (eopl:error 'object->super-field "Super field ~s not found on object ~s" super-field-name obj)
         )
     )
   )

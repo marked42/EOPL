@@ -53,6 +53,9 @@
 
     (expression ("fieldref" expression identifier) fieldref-exp)
     (expression ("fieldset" expression identifier "=" expression) fieldset-exp)
+
+    (expression ("superfieldref" expression identifier) superfieldref-exp)
+    (expression ("superfieldset" expression identifier "=" expression) superfieldset-exp)
     )
   )
 
