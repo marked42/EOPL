@@ -13,5 +13,6 @@
             test-cases-proc-exp-with-multiple-arguments
             test-cases-classes
             test-cases-fieldref-fieldset
+            test-cases-super-field-ref-set
             )
            )

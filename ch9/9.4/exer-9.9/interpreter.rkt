@@ -13,7 +13,7 @@
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method)]
- ["object.rkt" (object->class-name new-object object->field)]
+ ["object.rkt" (object->class-name new-object object->field object->super-field)]
  )
 
 (provide (all-defined-out))
@@ -191,6 +191,16 @@
                     (setref! field (value-of-exp exp1 env))
                     )
                   )
+    (superfieldref-exp (obj-exp super-field-name)
+                       (let* ([obj (value-of-exp obj-exp env)] [field (object->super-field obj super-field-name)])
+                         (deref field)
+                         )
+                       )
+    (superfieldset-exp (obj-exp super-field-name exp1)
+                       (let* ([obj (value-of-exp obj-exp env)] [field (object->super-field obj super-field-name)])
+                         (setref! field (value-of-exp exp1 env))
+                         )
+                       )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

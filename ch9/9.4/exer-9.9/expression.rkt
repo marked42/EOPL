@@ -45,6 +45,8 @@
   (self-exp)
   (fieldref-exp (obj-exp expression?) (field-name symbol?))
   (fieldset-exp (obj-exp expression?) (field-name symbol?) (value expression?))
+  (superfieldref-exp (obj-exp expression?) (super-field-name symbol?))
+  (superfieldset-exp (obj-exp expression?) (super-field-name symbol?) (value expression?))
   )
 
 (define-datatype class-decl class-decl?
