@@ -2974,3 +2974,94 @@ let o = new c2()
    test-cases-named-class-field-ref/set
    )
   )
+
+(define test-cases-exer-method-visibility
+  (list
+   (list "
+class c1 extends object
+  public method initialize() 0
+  method m1 () 1
+
+let o1 = new c1()
+  in send o1 m1()
+            " 1 "public method m1 which can be used outside class c1")
+
+   (list "
+class c1 extends object
+  method initialize() 0
+  private method m1 () 1
+
+let o1 = new c1()
+  in send o1 m1()
+            " 'error "private method m1 cannot be called outside.")
+
+   (list "
+class c1 extends object
+  method initialize() 0
+  private method m1 () 1
+  method m2() send self m1()
+
+let o1 = new c1()
+  in send o1 m2()
+            " 1 "private method m1 can be called inside host class c1 method m2")
+
+   (list "
+class c1 extends object
+  method initialize() 0
+  protected method m1 () 1
+
+let o1 = new c1()
+  in send o1 m1()
+            " 'error "protected method m1 cannot be called in global env")
+
+   (list "
+class c1 extends object
+  method initialize() 0
+  protected method m1 () 1
+  method m2() send self m1()
+
+let o1 = new c1()
+  in send o1 m2()
+            " 1 "protected method m1 can be called inside host class c1 method m2")
+
+   (list "
+class c1 extends object
+  method initialize() 0
+  protected method m1 () 1
+
+class c2 extends c1
+  method m3() send self m1()
+
+let o2 = new c2()
+  in send o2 m3()
+            " 1 "protected method m1 can be called in subclass c2 method m3")
+
+   (list "
+class c1 extends object
+  protected method initialize() 0
+
+let o1 = new c1()
+  in 1
+            " 'error "class m1 with protected method initialize cannot be instantiated")
+
+   (list "
+class c1 extends object
+  private method initialize() 0
+
+let o1 = new c1()
+  in 1
+            " 'error "class m1 with private method initialize cannot be instantiated")
+
+   (list "
+class c1 extends object
+  method initialize() 0
+  private method m1 () 1
+
+class c2 extends c1
+  method m2() super m1()
+
+let o2 = new c2()
+  in send o2 m2()
+            " 'error "private super method m1 cannot be called in c2 m2")
+   )
+  )

@@ -17,6 +17,8 @@
    (saved-env environment?)
    )
   (extend-env-method*
+   (class-name symbol?)
+   (method-name symbol?)
    (vars (list-of symbol?))
    (vals (list-of reference?))
    (saved-env environment?)
@@ -55,13 +57,13 @@
         (apply-env saved-env search-var)
         )
     )
-)
+  )
 
 (define (apply-env env search-var)
   (cases environment env
     (extend-env* (vars vals saved-env) (apply-extend-env* search-var vars vals saved-env))
     (extend-env-proc* (vars vals saved-env) (apply-extend-env* search-var vars vals saved-env))
-    (extend-env-method* (vars vals saved-env) (apply-extend-env* search-var vars vals saved-env))
+    (extend-env-method* (class-name method-name vars vals saved-env) (apply-extend-env* search-var vars vals saved-env))
     (extend-env-rec* (p-names b-vars p-bodies saved-env)
                      (let ([index (index-of p-names search-var)])
                        (if index
@@ -82,4 +84,17 @@
 
 (define (report-no-binding-found var)
   (eopl:error 'apply-env "No binding for ~s" var)
+  )
+
+(define (find-caller-class-method env)
+  (cases environment env
+    (extend-env* (vars vals saved-env) (find-caller-class-method saved-env))
+    (extend-env-proc* (vars vals saved-env) #f)
+    (extend-env-method* (class-name method-name vars vals saved-env) (cons class-name method-name))
+    (extend-env-rec* (p-names b-vars p-bodies saved-env) #f)
+    (extend-env-with-self-and-super (self super-name saved-env)
+                                    (find-caller-class-method saved-env)
+                                    )
+    (else #f)
+    )
   )

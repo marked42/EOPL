@@ -93,7 +93,7 @@
   (map (lambda (m-decl)
          (cases method-decl m-decl
            (a-method-decl (modifier method-name vars body)
-                          (list method-name (a-method vars body super-name field-names))
+                          (list method-name (a-method modifier vars body super-name field-names))
                           )
            )
          ) m-decls)
@@ -140,4 +140,16 @@
 
 (define (maybe pred)
   (lambda (v) (or (not v) (pred v)))
+  )
+
+(define (is-sub-class class-a class-b)
+  (if (eqv? class-a class-b)
+      #t
+      (let ([super-class-name (class->super-name (lookup-class class-a))])
+        (if super-class-name
+            (is-sub-class super-class-name class-b)
+            #f
+            )
+        )
+      )
   )
