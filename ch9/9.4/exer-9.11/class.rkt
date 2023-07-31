@@ -92,7 +92,7 @@
 (define (method-decls->method-env m-decls super-name field-names)
   (map (lambda (m-decl)
          (cases method-decl m-decl
-           (a-method-decl (method-name vars body)
+           (a-method-decl (modifier method-name vars body)
                           (list method-name (a-method vars body super-name field-names))
                           )
            )

@@ -1,5 +1,7 @@
 #lang eopl
 
+(require "modifier.rkt")
+
 (provide (all-defined-out))
 
 (define-datatype expression expression?
@@ -56,6 +58,7 @@
 
 (define-datatype method-decl method-decl?
   (a-method-decl
+   (modifier method-modifier?)
    (method-name symbol?)
    (vars (list-of symbol?))
    (body expression?)
