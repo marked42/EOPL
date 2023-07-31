@@ -14,6 +14,7 @@
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
+ ["modifier.rkt" (check-method-call-visibility)]
  )
 
 (provide (all-defined-out))
@@ -150,20 +151,28 @@
               )
     (new-object-exp (class-name rands)
                     (let ([args (value-of-exps rands env)] [obj (new-object class-name)])
+                      (check-method-call-visibility class-name 'initialize env)
                       (apply-method
+                       class-name
+                       'initialize
                        ; constructor method
                        (find-method class-name 'initialize)
                        obj
                        args
                        )
-                       ; return newly created obj
-                       obj
+                      ; return newly created obj
+                      obj
                       )
                     )
     (method-call-exp (obj-exp method-name rands)
-                     (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
+                     (let* ([args (value-of-exps rands env)]
+                            [obj (value-of-exp obj-exp env)]
+                            [obj-class-name (object->class-name obj)])
+                       (check-method-call-visibility obj-class-name method-name env)
                        (apply-method
-                        (find-method (object->class-name obj) method-name)
+                        obj-class-name
+                        method-name
+                        (find-method obj-class-name method-name)
                         obj
                         args
                         )
@@ -172,8 +181,11 @@
     (super-call-exp (method-name rands)
                     ; use surrounding self
                     (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
+                      (check-method-call-visibility (apply-env env '%super) method-name env)
                       (apply-method
                        ; find method in super class
+                       (apply-env env '%super)
+                       method-name
                        (find-method (apply-env env '%super) method-name)
                        obj
                        args
