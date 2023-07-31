@@ -156,8 +156,8 @@
                        obj
                        args
                        )
-                       ; return newly created obj
-                       obj
+                      ; return newly created obj
+                      obj
                       )
                     )
     (method-call-exp (obj-exp method-name rands)
@@ -181,6 +181,16 @@
                       )
                     )
     (self-exp () (apply-env env '%self))
+
+    (named-method-call-exp (class-name obj-exp method-name rands)
+                           (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
+                             (apply-method
+                              (find-method class-name method-name)
+                              obj
+                              args
+                              )
+                             )
+                           )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

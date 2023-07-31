@@ -43,6 +43,12 @@
    (rands (list-of expression?))
    )
   (self-exp)
+  (named-method-call-exp
+   (class-name symbol?)
+   (obj-exp expression?)
+   (method-name symbol?)
+   (rands (list-of expression?))
+   )
   )
 
 (define-datatype class-decl class-decl?
