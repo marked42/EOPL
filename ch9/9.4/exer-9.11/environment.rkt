@@ -11,6 +11,16 @@
 
 (define-datatype environment environment?
   (empty-env)
+  (extend-env-proc*
+   (vars (list-of symbol?))
+   (vals (list-of reference?))
+   (saved-env environment?)
+   )
+  (extend-env-method*
+   (vars (list-of symbol?))
+   (vals (list-of reference?))
+   (saved-env environment?)
+   )
   (extend-env*
    (vars (list-of symbol?))
    (vals (list-of reference?))
@@ -38,16 +48,20 @@
    )
   )
 
+(define (apply-extend-env* search-var vars vals saved-env)
+  (let ([index (index-of vars search-var)])
+    (if index
+        (list-ref vals index)
+        (apply-env saved-env search-var)
+        )
+    )
+)
+
 (define (apply-env env search-var)
   (cases environment env
-    (extend-env* (vars vals saved-env)
-                 (let ([index (index-of vars search-var)])
-                   (if index
-                       (list-ref vals index)
-                       (apply-env saved-env search-var)
-                       )
-                   )
-                 )
+    (extend-env* (vars vals saved-env) (apply-extend-env* search-var vars vals saved-env))
+    (extend-env-proc* (vars vals saved-env) (apply-extend-env* search-var vars vals saved-env))
+    (extend-env-method* (vars vals saved-env) (apply-extend-env* search-var vars vals saved-env))
     (extend-env-rec* (p-names b-vars p-bodies saved-env)
                      (let ([index (index-of p-names search-var)])
                        (if index

@@ -20,7 +20,7 @@
 (define (apply-procedure proc1 args)
   (cases proc proc1
     (procedure (vars body saved-env)
-               (value-of-exp body (extend-env* vars (map newref args) saved-env))
+               (value-of-exp body (extend-env-proc* vars (map newref args) saved-env))
                )
     )
   )
