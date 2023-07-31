@@ -68,18 +68,15 @@
 (define (initialize-class-decl! c-decl)
   (cases class-decl c-decl
     (a-class-decl (c-name s-name f-names m-decls)
-                  (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
-                         [f-names (append-filed-names super-class-f-names f-names)])
-                    (add-to-class-env!
-                     c-name
-                     (a-class s-name f-names
-                              (merge-method-envs
-                               (class->method-env (lookup-class s-name))
-                               (method-decls->method-env m-decls s-name f-names)
-                               )
-                              )
-                     )
-                    )
+                  (add-to-class-env!
+                   c-name
+                   (a-class s-name f-names
+                            (merge-method-envs
+                             (class->method-env (lookup-class s-name))
+                             (method-decls->method-env m-decls s-name f-names)
+                             )
+                            )
+                   )
                   )
     )
   )
