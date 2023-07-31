@@ -2893,3 +2893,25 @@ let o = new c2()
             " '(5 6) "superfieldset sets super field of a object")
    )
   )
+
+(define test-cases-named-method-call
+  (list
+   (list "
+class c1 extends object
+  method initialize () 1
+  method m1 () 11
+
+class c2 extends c1
+  method m1 () 22
+
+let o1 = new c2()
+  in list(send o1 m1(), named-send c2 o1 m1(), named-send c1 o1 m1())
+            " '(22 22 11) "named method call")
+   )
+  )
+
+(define test-cases-exer-9.10
+  (append
+   test-cases-named-method-call
+   )
+  )
