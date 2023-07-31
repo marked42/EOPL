@@ -2910,8 +2910,67 @@ let o1 = new c2()
    )
   )
 
+(define test-cases-named-class-field-ref/set
+  (list
+   (list "
+class c1 extends object
+  field x
+  field y
+  method initialize()
+    begin
+      set x = 1;
+      set y = 2
+    end
+
+
+class c2 extends c1
+  field x
+  field y
+  method initialize()
+    begin
+      super initialize();
+      set x = 3;
+      set y = 4
+    end
+
+let o = new c2()
+  in list(named-fieldref c1 o x, named-fieldref c1 o y, named-fieldref c2 o x, named-fieldref c2 o y)
+            " '(1 2 3 4) "named-fieldref gets named class field of an object")
+
+   (list "
+class c1 extends object
+  field x
+  field y
+  method initialize()
+    begin
+      set x = 1;
+      set y = 2
+    end
+
+
+class c2 extends c1
+  field x
+  field y
+  method initialize()
+    begin
+      super initialize();
+      set x = 3;
+      set y = 4
+    end
+
+let o = new c2()
+  in begin
+    named-fieldset c1 o x = 5;
+    named-fieldset c1 o y = 6;
+    list(named-fieldref c1 o x, named-fieldref c1 o y)
+  end
+               " '(5 6) "named-fieldset sets named class field of an object")
+   )
+  )
+
 (define test-cases-exer-9.10
   (append
    test-cases-named-method-call
+   test-cases-named-class-field-ref/set
    )
   )

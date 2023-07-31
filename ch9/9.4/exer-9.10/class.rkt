@@ -21,6 +21,15 @@
    )
   )
 
+(define (find-super-class-name name)
+  (let ([maybe-pair (assq name the-class-env)])
+    (if maybe-pair
+        (class->super-name (second maybe-pair))
+        #f
+        )
+    )
+  )
+
 (define (class->field-names c)
   (cases class c
     (a-class (super-name field-names method-env) field-names)

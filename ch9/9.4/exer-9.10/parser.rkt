@@ -52,6 +52,8 @@
     (expression ("self") self-exp)
 
     (expression ("named-send" identifier expression identifier "("(separated-list expression ",")")") named-method-call-exp)
+    (expression ("named-fieldref" identifier expression identifier) named-fieldref-exp)
+    (expression ("named-fieldset" identifier expression identifier "=" expression) named-fieldset-exp)
     )
   )
 
