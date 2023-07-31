@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "expression.rkt")
+(require "expression.rkt" "modifier.rkt")
 (provide (all-defined-out))
 
 (define the-lexical-spec
@@ -20,7 +20,12 @@
 
     (class-decl ("class" identifier "extends" identifier (arbno "field" identifier) (arbno method-decl)) a-class-decl)
 
-    (method-decl ("method" identifier "("(separated-list identifier ",")")" expression) a-method-decl)
+    (method-decl (method-modifier "method" identifier "("(separated-list identifier ",")")" expression) a-method-decl)
+
+    (method-modifier () public-modifier)
+    (method-modifier ("public") public-modifier)
+    (method-modifier ("protected") protected-modifier)
+    (method-modifier ("private") private-modifier)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)
     (expression ("+" "(" expression "," expression ")") sum-exp)
