@@ -193,6 +193,13 @@
                       )
                     )
     (self-exp () (apply-env env '%self))
+
+    (fieldref-exp (var) (deref (apply-env env var)))
+    (fieldset-exp (var exp1)
+                  (let ([val1 (value-of-exp exp1 env)])
+                    (setref! (apply-env env var) val1)
+                    )
+                  )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

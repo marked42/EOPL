@@ -3065,3 +3065,27 @@ let o2 = new c2()
             " 'error "private super method m1 cannot be called in c2 m2")
    )
   )
+
+(define test-cases-exer-field-visibility
+  (list
+   (list "
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      fieldset x = initx;
+      fieldset y = inity
+    end
+  method move (dx, dy)
+    begin
+      fieldset x = +(fieldref x,dx);
+      fieldset y = +(fieldref y,dy)
+    end
+  method get-location ()
+    list(x,y)
+let p = new point(3, 4)
+  in send p get-location()
+            " '(3 4) "fieldref and fieldset")
+  )
+)
