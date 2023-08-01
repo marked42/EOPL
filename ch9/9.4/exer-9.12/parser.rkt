@@ -20,12 +20,12 @@
 
     (class-decl ("class" identifier "extends" identifier (arbno "field" identifier) (arbno method-decl)) a-class-decl)
 
-    (method-decl (method-modifier "method" identifier "("(separated-list identifier ",")")" expression) a-method-decl)
+    (method-decl (visibility-modifier "method" identifier "("(separated-list identifier ",")")" expression) a-method-decl)
 
-    (method-modifier () public-modifier)
-    (method-modifier ("public") public-modifier)
-    (method-modifier ("protected") protected-modifier)
-    (method-modifier ("private") private-modifier)
+    (visibility-modifier () public-modifier)
+    (visibility-modifier ("public") public-modifier)
+    (visibility-modifier ("protected") protected-modifier)
+    (visibility-modifier ("private") private-modifier)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)
     (expression ("+" "(" expression "," expression ")") sum-exp)

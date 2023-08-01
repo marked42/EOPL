@@ -9,7 +9,7 @@
 
 (provide (all-defined-out))
 
-(define-datatype method-modifier method-modifier?
+(define-datatype visibility-modifier visibility-modifier?
   (public-modifier)
   (private-modifier)
   (protected-modifier)
@@ -19,7 +19,7 @@
   (let* ([method (find-method class-name method-name)]
          [caller-class-method (find-caller-class-method env)]
          [modifier (method->modifier method)])
-    (cases method-modifier modifier
+    (cases visibility-modifier modifier
       (public-modifier () #t)
       (protected-modifier ()
                           (if (not caller-class-method)

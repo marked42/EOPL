@@ -58,7 +58,7 @@
 
 (define-datatype method-decl method-decl?
   (a-method-decl
-   (modifier method-modifier?)
+   (modifier visibility-modifier?)
    (method-name symbol?)
    (vars (list-of symbol?))
    (body expression?)
