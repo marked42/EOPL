@@ -7,14 +7,14 @@
  ["store.rkt" (newref)]
  ["object.rkt" (object->fields lookup-class)]
  ["interpreter.rkt" (value-of-exp)]
- ["modifier.rkt" (method-modifier?)]
+ ["modifier.rkt" (visibility-modifier?)]
  )
 
 (provide (all-defined-out))
 
 (define-datatype method method?
   (a-method
-   (modifier? method-modifier?)
+   (modifier? visibility-modifier?)
    (vars (list-of symbol?))
    (body expression?)
    (super-name symbol?)
