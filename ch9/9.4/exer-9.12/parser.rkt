@@ -22,6 +22,9 @@
 
     (method-decl (visibility-modifier "method" identifier "("(separated-list identifier ",")")" expression) a-method-decl)
 
+    (expression ("fieldref" identifier) fieldref-exp)
+    (expression ("fieldset" identifier "=" expression) fieldset-exp)
+
     (visibility-modifier () public-modifier)
     (visibility-modifier ("public") public-modifier)
     (visibility-modifier ("protected") protected-modifier)

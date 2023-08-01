@@ -13,5 +13,6 @@
             test-cases-proc-exp-with-multiple-arguments
             test-cases-classes
             test-cases-exer-method-visibility
+            test-cases-exer-field-visibility
             )
            )

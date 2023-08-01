@@ -45,6 +45,9 @@
    (rands (list-of expression?))
    )
   (self-exp)
+
+  (fieldref-exp (var symbol?))
+  (fieldset-exp (var symbol?) (exp1 expression?))
   )
 
 (define-datatype class-decl class-decl?
