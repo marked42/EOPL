@@ -3,7 +3,7 @@
 (require racket/lazy-require racket/list "expression.rkt")
 
 (lazy-require
- ["method.rkt" (a-method method?)]
+ ["method.rkt" (a-method method? is-final-method)]
  )
 
 (provide (all-defined-out))
@@ -75,7 +75,7 @@
                      (a-class s-name f-names
                               (merge-method-envs
                                (class->method-env (lookup-class s-name))
-                               (method-decls->method-env m-decls s-name f-names)
+                               (method-decls->method-env m-decls c-name s-name f-names)
                                )
                               )
                      )
@@ -89,15 +89,30 @@
   (append new-m-env super-m-env)
   )
 
-(define (method-decls->method-env m-decls super-name field-names)
+(define (method-decls->method-env m-decls c-name super-name field-names)
   (map (lambda (m-decl)
          (cases method-decl m-decl
-           (a-method-decl (method-name vars body)
-                          (list method-name (a-method vars body super-name field-names))
+           (a-method-decl (final method-name vars body)
+                          (let ([super-method (find-method-without-throw super-name method-name)])
+                            (if (and super-method (is-final-method super-method))
+                              (eopl:error 'method-decls->method-env "Class method ~s.~s cannot override final method ~s.~s" c-name method-name super-name method-name)
+                              (list method-name (a-method final vars body super-name field-names))
+                              )
+                            )
                           )
            )
          ) m-decls)
   )
+
+(define (find-method-without-throw c-name m-name)
+  ; static dispatch by assq
+  (let* ([m-env (class->method-env (lookup-class c-name))] [maybe-pair (assq m-name m-env)])
+    (if (pair? maybe-pair)
+        (cadr maybe-pair)
+        #f
+        )
+    )
+)
 
 (define (find-method c-name m-name)
   ; static dispatch by assq

@@ -1,5 +1,10 @@
 #lang eopl
 
+(require racket/lazy-require)
+(lazy-require
+ ["final.rkt" (final-modifier?)]
+)
+
 (provide (all-defined-out))
 
 (define-datatype expression expression?
@@ -56,6 +61,7 @@
 
 (define-datatype method-decl method-decl?
   (a-method-decl
+   (final final-modifier?)
    (method-name symbol?)
    (vars (list-of symbol?))
    (body expression?)
