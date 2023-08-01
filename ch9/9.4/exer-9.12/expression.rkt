@@ -54,6 +54,7 @@
   (a-class-decl
    (class-name symbol?)
    (super-parent symbol?)
+   (field-modifiers (list-of field-modifier?))
    (field-names (list-of symbol?))
    (method-decls (list-of method-decl?))
    )

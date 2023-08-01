@@ -18,7 +18,12 @@
     (expression (number) const-exp)
     (expression (identifier) var-exp)
 
-    (class-decl ("class" identifier "extends" identifier (arbno "field" identifier) (arbno method-decl)) a-class-decl)
+    (class-decl ("class" identifier "extends" identifier (arbno field-modifier identifier) (arbno method-decl)) a-class-decl)
+
+    (field-modifier ("field") public-field)
+    (field-modifier ("public-field") public-field)
+    (field-modifier ("protected-field") protected-field)
+    (field-modifier ("private-field") private-field)
 
     (method-decl (visibility-modifier "method" identifier "("(separated-list identifier ",")")" expression) a-method-decl)
 

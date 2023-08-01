@@ -4,6 +4,7 @@
 
 (lazy-require
  ["method.rkt" (a-method method?)]
+ ["modifier.rkt" (field-modifier?)]
  )
 
 (provide (all-defined-out))
@@ -16,26 +17,40 @@
 (define-datatype class class?
   (a-class
    (super-name (maybe symbol?))
+   (field-offset number?)
+   (field-modifiers (list-of field-modifier?))
    (field-names (list-of symbol?))
    (method-env method-environment?)
    )
   )
 
+(define (class->field-offset c)
+  (cases class c
+    (a-class (super-name field-offset field-modifiers field-names method-env) field-offset)
+    )
+  )
+
+(define (class->field-modifiers c)
+  (cases class c
+    (a-class (super-name field-offset field-modifiers field-names method-env) field-modifiers)
+    )
+  )
+
 (define (class->field-names c)
   (cases class c
-    (a-class (super-name field-names method-env) field-names)
+    (a-class (super-name field-offset field-modifiers field-names method-env) field-names)
     )
   )
 
 (define (class->super-name c)
   (cases class c
-    (a-class (super-name field-names method-env) super-name)
+    (a-class (super-name field-offset field-modifiers field-names method-env) super-name)
     )
   )
 
 (define (class->method-env c)
   (cases class c
-    (a-class (super-name field-names method-env) method-env)
+    (a-class (super-name field-offset field-modifiers field-names method-env) method-env)
     )
   )
 
@@ -61,18 +76,20 @@
   )
 
 (define (initialize-class-env! c-decls)
-  (set! the-class-env (list (list 'object (a-class #f '() '()))))
+  (set! the-class-env (list (list 'object (a-class #f 0 '() '() '()))))
   (for-each initialize-class-decl! c-decls)
   )
 
 (define (initialize-class-decl! c-decl)
   (cases class-decl c-decl
-    (a-class-decl (c-name s-name f-names m-decls)
-                  (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
+    (a-class-decl (c-name s-name f-modifiers f-names m-decls)
+                  (let* ([super-class-f-modifiers (class->field-modifiers (lookup-class s-name))]
+                         [f-modifiers (append super-class-f-modifiers f-modifiers)]
+                         [super-class-f-names (class->field-names (lookup-class s-name))]
                          [f-names (append-filed-names super-class-f-names f-names)])
                     (add-to-class-env!
                      c-name
-                     (a-class s-name f-names
+                     (a-class s-name (length super-class-f-modifiers) f-modifiers f-names
                               (merge-method-envs
                                (class->method-env (lookup-class s-name))
                                (method-decls->method-env m-decls s-name f-names)
@@ -98,6 +115,29 @@
            )
          ) m-decls)
   )
+
+(define (find-field-class-modifier-pair c-name f-name)
+  (let ([class (lookup-class c-name)])
+    (if class
+      (let* ([f-modifiers (class->field-modifiers class)]
+             [f-names (class->field-names class)]
+             [f-offset (class->field-offset class)]
+             [super-name (class->super-name class)]
+             [index (index-of f-names f-name)])
+        (if index
+          ; index must be no less than field offset to find correct class field
+          ; refer to test private field x/y cannot be accessed in subclass
+          (if (>= index f-offset)
+            (cons c-name (list-ref f-modifiers index))
+            (find-field-class-modifier-pair super-name f-name)
+          )
+          (eopl:error 'find-field-class-modifier-pair "Class field ~s.~s not found!" c-name f-name)
+        )
+      )
+      (eopl:error 'find-field-class-modifier-pair "Class ~s not found" c-name)
+    )
+  )
+)
 
 (define (find-method c-name m-name)
   ; static dispatch by assq

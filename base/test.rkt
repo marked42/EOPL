@@ -3068,10 +3068,98 @@ let o2 = new c2()
 
 (define test-cases-exer-field-visibility
   (list
+;    (list "
+; class point extends object
+;   field x
+;   field y
+;   method initialize (initx, inity)
+;     begin
+;       fieldset x = initx;
+;       fieldset y = inity
+;     end
+;   method move (dx, dy)
+;     begin
+;       fieldset x = +(fieldref x,dx);
+;       fieldset y = +(fieldref y,dy)
+;     end
+;   method get-location ()
+;     list(x,y)
+; let p = new point(3, 4)
+;   in send p get-location()
+;             " '(3 4) "fieldref and fieldset")
+
+;    (list "
+; class point extends object
+;   public-field x
+;   public-field y
+;   method initialize (initx, inity)
+;     begin
+;       fieldset x = initx;
+;       fieldset y = inity
+;     end
+;   method move (dx, dy)
+;     begin
+;       fieldset x = +(fieldref x,dx);
+;       fieldset y = +(fieldref y,dy)
+;     end
+;   method get-location ()
+;     list(x,y)
+
+; class colorpoint extends point
+;   field color
+;   method initialize (initx, inity, initcolor)
+;     begin
+;       fieldset x = initx;
+;       fieldset y = inity;
+;       set color = initcolor
+;     end
+;   method set-color (c)
+;     set color = c
+;   method get-color ()
+;     color
+
+; let p = new colorpoint(3, 4, 77)
+;   in list(send p get-location(), send p get-color())
+;             " '((3 4) 77) "public field x/y can be accessed in subclass")
+
+;    (list "
+; class point extends object
+;   protected-field x
+;   protected-field y
+;   method initialize (initx, inity)
+;     begin
+;       fieldset x = initx;
+;       fieldset y = inity
+;     end
+;   method move (dx, dy)
+;     begin
+;       fieldset x = +(fieldref x,dx);
+;       fieldset y = +(fieldref y,dy)
+;     end
+;   method get-location ()
+;     list(x,y)
+
+; class colorpoint extends point
+;   field color
+;   method initialize (initx, inity, initcolor)
+;     begin
+;       fieldset x = initx;
+;       fieldset y = inity;
+;       set color = initcolor
+;     end
+;   method set-color (c)
+;     set color = c
+;   method get-color ()
+;     color
+
+; let p = new colorpoint(3, 4, 77)
+;   in list(send p get-location(), send p get-color())
+;             " '((3 4) 77) "protected field x/y can be accessed in subclass")
+
    (list "
 class point extends object
-  field x
-  field y
+  private-field x
+  private-field y
   method initialize (initx, inity)
     begin
       fieldset x = initx;
@@ -3084,8 +3172,22 @@ class point extends object
     end
   method get-location ()
     list(x,y)
-let p = new point(3, 4)
-  in send p get-location()
-            " '(3 4) "fieldref and fieldset")
+
+class colorpoint extends point
+  field color
+  method initialize (initx, inity, initcolor)
+    begin
+      fieldset x = initx;
+      fieldset y = inity;
+      set color = initcolor
+    end
+  method set-color (c)
+    set color = c
+  method get-color ()
+    color
+
+let p = new colorpoint(3, 4, 77)
+  in list(send p get-location(), send p get-color())
+            " 'error "private field x/y cannot be accessed in subclass")
   )
 )

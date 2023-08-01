@@ -14,7 +14,7 @@
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
- ["modifier.rkt" (check-method-call-visibility)]
+ ["modifier.rkt" (check-method-call-visibility check-field-visibility)]
  )
 
 (provide (all-defined-out))
@@ -194,10 +194,18 @@
                     )
     (self-exp () (apply-env env '%self))
 
-    (fieldref-exp (var) (deref (apply-env env var)))
+    (fieldref-exp (var)
+                  (let* ([self (apply-env env '%self)])
+                    (check-field-visibility self var env)
+                    (deref (apply-env env var))
+                    )
+                  )
     (fieldset-exp (var exp1)
-                  (let ([val1 (value-of-exp exp1 env)])
-                    (setref! (apply-env env var) val1)
+                  (let* ([self (apply-env env '%self)])
+                    (check-field-visibility self var env)
+                    (let ([val1 (value-of-exp exp1 env)])
+                      (setref! (apply-env env var) val1)
+                      )
                     )
                   )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
