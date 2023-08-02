@@ -4,6 +4,7 @@
 
 (lazy-require
  ["method.rkt" (a-method method?)]
+ ["overloading.rkt" (mangle-method-name)]
  )
 
 (provide (all-defined-out))
@@ -93,7 +94,7 @@
   (map (lambda (m-decl)
          (cases method-decl m-decl
            (a-method-decl (method-name vars body)
-                          (list method-name (a-method vars body super-name field-names))
+                          (list (mangle-method-name method-name (length vars)) (a-method vars body super-name field-names))
                           )
            )
          ) m-decls)

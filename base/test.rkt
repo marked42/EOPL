@@ -3267,3 +3267,28 @@ let o1 = new c1()
             " 'error "static class field must be constant, only num-exp is allowed now.")
    )
   )
+
+(define test-cases-exer-method-overloading
+  (list
+   (list "
+class c1 extends object
+  field x
+  method initialize()
+    begin
+      set x = 0
+    end
+
+  method initialize(val)
+    begin
+      set x = val
+    end
+
+  method get-x() x
+
+let o1 = new c1()
+    o2 = new c1(42)
+  in list(send o1 get-x(), send o2 get-x())
+            " '(0 42) "'initialize' method overloading")
+
+   )
+  )
