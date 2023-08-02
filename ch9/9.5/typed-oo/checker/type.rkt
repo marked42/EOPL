@@ -74,9 +74,9 @@
     ; list-type is covariant
     (list-type (element-type1)
                (cases type ty2
-                (list-type (element-type2) (is-subtype? element-type1 element-type2))
-                (else #f)
-                )
+                 (list-type (element-type2) (is-subtype? element-type1 element-type2))
+                 (else #f)
+                 )
                )
     (else (equal? ty1 ty2))
     )
