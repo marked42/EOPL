@@ -14,6 +14,7 @@
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
+ ["overloading.rkt" (mangle-method-name)]
  )
 
 (provide (all-defined-out))
@@ -152,7 +153,7 @@
                     (let ([args (value-of-exps rands env)] [obj (new-object class-name)])
                       (apply-method
                        ; constructor method
-                       (find-method class-name 'initialize)
+                       (find-method class-name (mangle-method-name 'initialize (length args)))
                        obj
                        args
                        )
@@ -163,7 +164,7 @@
     (method-call-exp (obj-exp method-name rands)
                      (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
                        (apply-method
-                        (find-method (object->class-name obj) method-name)
+                        (find-method (object->class-name obj) (mangle-method-name method-name (length args)))
                         obj
                         args
                         )
@@ -174,7 +175,7 @@
                     (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
                       (apply-method
                        ; find method in super class
-                       (find-method (apply-env env '%super) method-name)
+                       (find-method (apply-env env '%super) (mangle-method-name method-name (length args)))
                        obj
                        args
                        )
