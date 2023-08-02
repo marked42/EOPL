@@ -83,7 +83,7 @@
   (eopl:error 'find-method "Method ~s not found on class ~s" m-name c-name)
   )
 
-(define (append-filed-names super-fields new-fields)
+(define (append-field-names super-fields new-fields)
   (if (null? super-fields)
       new-fields
       (let ([first-super-field (car super-fields)] [rest-super-fields (cdr super-fields)])
@@ -92,7 +92,7 @@
              (fresh-identifier first-super-field)
              first-super-field
              )
-         (append-filed-names rest-super-fields new-fields)
+         (append-field-names rest-super-fields new-fields)
          )
         )
       )
@@ -115,7 +115,7 @@
 (define (create-a-class c-name s-name f-names m-decls env)
   (let* ([super-class (lookup-class s-name env)]
          [super-class-f-names (class->field-names super-class)]
-         [f-names (append-filed-names super-class-f-names f-names)])
+         [f-names (append-field-names super-class-f-names f-names)])
     (a-class s-name f-names
              (merge-method-envs
               (class->method-env super-class)

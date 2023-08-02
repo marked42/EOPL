@@ -110,7 +110,7 @@
   (eopl:error 'find-method "Method ~s not found on class ~s" m-name c-name)
   )
 
-(define (append-filed-names super-fields new-fields)
+(define (append-field-names super-fields new-fields)
   (if (null? super-fields)
       new-fields
       (let ([first-super-field (car super-fields)] [rest-super-fields (cdr super-fields)])
@@ -119,7 +119,7 @@
              (fresh-identifier first-super-field)
              first-super-field
              )
-         (append-filed-names rest-super-fields new-fields)
+         (append-field-names rest-super-fields new-fields)
          )
         )
       )
