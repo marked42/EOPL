@@ -50,6 +50,8 @@
     (expression ("send" expression identifier "("(separated-list expression ",")")") method-call-exp)
     (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
     (expression ("self") self-exp)
+
+    (expression ("letclass" identifier "extends" identifier "=" (arbno "field" identifier) (arbno method-decl) "in" expression) letclass-exp)
     )
   )
 
