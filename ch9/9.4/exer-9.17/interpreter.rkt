@@ -11,7 +11,7 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
- ["class.rkt" (initialize-class-env! find-method)]
+ ["class.rkt" (initialize-class-env find-method)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
  )
@@ -23,12 +23,12 @@
   )
 
 (define (value-of-program prog)
-  ; new stuff
   (initialize-store!)
   (cases program prog
     (a-program (class-decls exp1)
-               (initialize-class-env! class-decls)
-               (value-of-exp exp1 (init-env))
+               (let ([class-env (initialize-class-env class-decls (init-env))])
+                 (value-of-exp exp1 class-env)
+                 )
                )
     )
   )
@@ -149,12 +149,13 @@
                 )
               )
     (new-object-exp (class-name rands)
-                    (let ([args (value-of-exps rands env)] [obj (new-object class-name)])
+                    (let ([args (value-of-exps rands env)] [obj (new-object class-name env)])
                       (apply-method
                        ; constructor method
-                       (find-method class-name 'initialize)
+                       (find-method class-name 'initialize env)
                        obj
                        args
+                       env
                        )
                       ; return newly created obj
                       obj
@@ -163,9 +164,10 @@
     (method-call-exp (obj-exp method-name rands)
                      (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
                        (apply-method
-                        (find-method (object->class-name obj) method-name)
+                        (find-method (object->class-name obj) method-name env)
                         obj
                         args
+                        env
                         )
                        )
                      )
@@ -174,9 +176,10 @@
                     (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
                       (apply-method
                        ; find method in super class
-                       (find-method (apply-env env '%super) method-name)
+                       (find-method (apply-env env '%super) method-name env)
                        obj
                        args
+                       env
                        )
                       )
                     )

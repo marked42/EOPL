@@ -5,7 +5,7 @@
 (lazy-require
  ["environment.rkt" (extend-env* extend-env-with-self-and-super empty-env)]
  ["store.rkt" (newref)]
- ["object.rkt" (object->fields lookup-class)]
+ ["object.rkt" (object->fields)]
  ["interpreter.rkt" (value-of-exp)]
  )
 
@@ -20,14 +20,14 @@
    )
   )
 
-(define (apply-method m self args)
+(define (apply-method m self args env)
   (cases method m
     (a-method (vars body super-name field-names)
               (value-of-exp body
                             (extend-env* vars (map newref args)
                                          (extend-env-with-self-and-super self super-name
                                                                          (extend-env* field-names (object->fields self)
-                                                                                      (empty-env)
+                                                                                      env
                                                                                       )
                                                                          )
                                          )
