@@ -5,6 +5,7 @@
  ["environment.rkt" (
                      init-env
                      apply-env
+                     has-var-env
                      extend-env*
                      extend-env-rec*
                      )]
@@ -163,7 +164,12 @@
     (method-call-exp (obj-exp method-name rands)
                      (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
                        (apply-method
-                        (find-method (object->class-name obj) method-name)
+                        (find-method
+                         (if (has-var-env env '%host)
+                             (apply-env env '%host)
+                             (object->class-name obj)
+                             )
+                         method-name)
                         obj
                         args
                         )
