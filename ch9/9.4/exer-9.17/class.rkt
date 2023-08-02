@@ -4,6 +4,7 @@
 
 (lazy-require
  ["method.rkt" (a-method method?)]
+ ["environment.rkt" (extend-env-with-class-decl lookup-class)]
  )
 
 (provide (all-defined-out))
@@ -39,49 +40,18 @@
     )
   )
 
-(define the-class-env '())
-
-(define (add-to-class-env! class-name class)
-  (set! the-class-env
-        (cons (list class-name class) the-class-env)
-        )
-  )
-
-(define (lookup-class name)
-  (let ([maybe-pair (assq name the-class-env)])
-    (if maybe-pair
-        (second maybe-pair)
-        (report-unknown-class-name name)
-        )
-    )
-  )
-
 (define (report-unknown-class-name name)
   (eopl:error 'lookup-class "Unknown class name ~s" name)
   )
 
-(define (initialize-class-env! c-decls)
-  (set! the-class-env (list (list 'object (a-class #f '() '()))))
-  (for-each initialize-class-decl! c-decls)
-  )
-
-(define (initialize-class-decl! c-decl)
-  (cases class-decl c-decl
-    (a-class-decl (c-name s-name f-names m-decls)
-                  (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
-                         [f-names (append-filed-names super-class-f-names f-names)])
-                    (add-to-class-env!
-                     c-name
-                     (a-class s-name f-names
-                              (merge-method-envs
-                               (class->method-env (lookup-class s-name))
-                               (method-decls->method-env m-decls s-name f-names)
-                               )
-                              )
-                     )
-                    )
-                  )
-    )
+(define (initialize-class-env c-decls env)
+  (if (null? c-decls)
+      env
+      (initialize-class-env
+       (cdr c-decls)
+       (extend-env-with-class-decl (car c-decls) env)
+       )
+      )
   )
 
 ; static dispatch
@@ -99,9 +69,9 @@
          ) m-decls)
   )
 
-(define (find-method c-name m-name)
+(define (find-method c-name m-name env)
   ; static dispatch by assq
-  (let* ([m-env (class->method-env (lookup-class c-name))] [maybe-pair (assq m-name m-env)])
+  (let* ([m-env (class->method-env (lookup-class c-name env))] [maybe-pair (assq m-name m-env)])
     (if (pair? maybe-pair)
         (cadr maybe-pair)
         (report-method-not-found m-name c-name)
@@ -140,4 +110,17 @@
 
 (define (maybe pred)
   (lambda (v) (or (not v) (pred v)))
+  )
+
+(define (create-a-class c-name s-name f-names m-decls env)
+  (let* ([super-class (lookup-class s-name env)]
+         [super-class-f-names (class->field-names super-class)]
+         [f-names (append-filed-names super-class-f-names f-names)])
+    (a-class s-name f-names
+             (merge-method-envs
+              (class->method-env super-class)
+              (method-decls->method-env m-decls s-name f-names)
+              )
+             )
+    )
   )
