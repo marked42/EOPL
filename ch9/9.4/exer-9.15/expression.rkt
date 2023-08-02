@@ -49,6 +49,8 @@
   (a-class-decl
    (class-name symbol?)
    (super-parent symbol?)
+   (static-field-names (list-of symbol?))
+   (static-field-initializers (list-of expression?))
    (field-names (list-of symbol?))
    (method-decls (list-of method-decl?))
    )

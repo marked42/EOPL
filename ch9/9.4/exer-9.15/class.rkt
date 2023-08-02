@@ -4,6 +4,8 @@
 
 (lazy-require
  ["method.rkt" (a-method method?)]
+ ["store.rkt" (reference? newref)]
+ ["interpreter.rkt" (value-of-const-exp)]
  )
 
 (provide (all-defined-out))
@@ -65,17 +67,25 @@
   (for-each initialize-class-decl! c-decls)
   )
 
+(define (evaluate-class-static-fields static-field-names static-field-initializers)
+  (map (lambda (name initializer)
+         (cons name (newref (value-of-const-exp initializer)))
+         ) static-field-names static-field-initializers)
+  )
+
 (define (initialize-class-decl! c-decl)
   (cases class-decl c-decl
-    (a-class-decl (c-name s-name f-names m-decls)
+    (a-class-decl (c-name s-name static-field-names static-field-initializers f-names m-decls)
                   (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
+                         [class-static-fields (evaluate-class-static-fields static-field-names static-field-initializers)]
                          [f-names (append-filed-names super-class-f-names f-names)])
                     (add-to-class-env!
                      c-name
-                     (a-class s-name f-names
+                     (a-class s-name
+                              f-names
                               (merge-method-envs
                                (class->method-env (lookup-class s-name))
-                               (method-decls->method-env m-decls s-name f-names)
+                               (method-decls->method-env m-decls s-name f-names class-static-fields)
                                )
                               )
                      )
@@ -89,11 +99,11 @@
   (append new-m-env super-m-env)
   )
 
-(define (method-decls->method-env m-decls super-name field-names)
+(define (method-decls->method-env m-decls super-name field-names class-static-fields)
   (map (lambda (m-decl)
          (cases method-decl m-decl
            (a-method-decl (method-name vars body)
-                          (list method-name (a-method vars body super-name field-names))
+                          (list method-name (a-method vars body super-name field-names class-static-fields))
                           )
            )
          ) m-decls)
