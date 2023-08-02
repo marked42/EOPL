@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require racket/list "expression.rkt")
+(require racket/base racket/lazy-require racket/list "expression.rkt")
 
 (lazy-require
  ["method.rkt" (a-method method?)]
@@ -8,11 +8,8 @@
 
 (provide (all-defined-out))
 
-(define method-environment? (list-of (lambda (p) (and
-                                                  (pair? p)
-                                                  (symbol? (car p))
-                                                  (method? (cadr p))
-                                                  ))))
+(define method-environment? hash?)
+
 (define-datatype class class?
   (a-class
    (super-name (maybe symbol?))
@@ -61,7 +58,7 @@
   )
 
 (define (initialize-class-env! c-decls)
-  (set! the-class-env (list (list 'object (a-class #f '() '()))))
+  (set! the-class-env (list (list 'object (a-class #f '() (hash)))))
   (for-each initialize-class-decl! c-decls)
   )
 
@@ -84,12 +81,6 @@
     )
   )
 
-(define (find-super-method-index super-m-env name)
-  (index-where
-   super-m-env
-   (lambda (super-method) (eqv? (car super-method) name)))
-  )
-
 ; static dispatch
 (define (merge-method-envs super-m-env new-m-env)
   (let loop ([super-m-env super-m-env] [new-m-env new-m-env])
@@ -97,13 +88,9 @@
         super-m-env
         (let* ([first-method (car new-m-env)]
                [first-method-name (car first-method)]
-               [super-method-index (find-super-method-index super-m-env first-method-name)]
                [rest-methods (cdr new-m-env)])
           (loop
-           (if super-method-index
-               (list-set super-m-env super-method-index first-method)
-               (append super-m-env (list first-method))
-               )
+           (hash-set super-m-env first-method-name (cadr first-method))
            rest-methods)
           )
         )
@@ -121,10 +108,10 @@
   )
 
 (define (find-method c-name m-name)
-  ; static dispatch by assq
-  (let* ([m-env (class->method-env (lookup-class c-name))] [maybe-pair (assq m-name m-env)])
-    (if (pair? maybe-pair)
-        (cadr maybe-pair)
+  ; static dispatch
+  (let* ([m-env (class->method-env (lookup-class c-name))])
+    (if (hash-has-key? m-env m-name)
+        (hash-ref m-env m-name)
         (report-method-not-found m-name c-name)
         )
     )
