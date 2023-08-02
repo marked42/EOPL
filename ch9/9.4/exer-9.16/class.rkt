@@ -70,7 +70,7 @@
   (cases class-decl c-decl
     (a-class-decl (c-name s-name f-names m-decls)
                   (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
-                         [f-names (append-filed-names super-class-f-names f-names)])
+                         [f-names (append-field-names super-class-f-names f-names)])
                     (add-to-class-env!
                      c-name
                      (a-class s-name f-names
@@ -114,7 +114,7 @@
   (eopl:error 'find-method "Method ~s not found on class ~s" m-name c-name)
   )
 
-(define (append-filed-names super-fields new-fields)
+(define (append-field-names super-fields new-fields)
   (if (null? super-fields)
       new-fields
       (let ([first-super-field (car super-fields)] [rest-super-fields (cdr super-fields)])
@@ -123,7 +123,7 @@
              (fresh-identifier first-super-field)
              first-super-field
              )
-         (append-filed-names rest-super-fields new-fields)
+         (append-field-names rest-super-fields new-fields)
          )
         )
       )

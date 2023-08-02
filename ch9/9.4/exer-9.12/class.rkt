@@ -86,7 +86,7 @@
                   (let* ([super-class-f-modifiers (class->field-modifiers (lookup-class s-name))]
                          [f-modifiers (append super-class-f-modifiers f-modifiers)]
                          [super-class-f-names (class->field-names (lookup-class s-name))]
-                         [f-names (append-filed-names super-class-f-names f-names)])
+                         [f-names (append-field-names super-class-f-names f-names)])
                     (add-to-class-env!
                      c-name
                      (a-class s-name (length super-class-f-modifiers) f-modifiers f-names
@@ -119,25 +119,25 @@
 (define (find-field-class-modifier-pair c-name f-name)
   (let ([class (lookup-class c-name)])
     (if class
-      (let* ([f-modifiers (class->field-modifiers class)]
-             [f-names (class->field-names class)]
-             [f-offset (class->field-offset class)]
-             [super-name (class->super-name class)]
-             [index (index-of f-names f-name)])
-        (if index
-          ; index must be no less than field offset to find correct class field
-          ; refer to test private field x/y cannot be accessed in subclass
-          (if (>= index f-offset)
-            (cons c-name (list-ref f-modifiers index))
-            (find-field-class-modifier-pair super-name f-name)
+        (let* ([f-modifiers (class->field-modifiers class)]
+               [f-names (class->field-names class)]
+               [f-offset (class->field-offset class)]
+               [super-name (class->super-name class)]
+               [index (index-of f-names f-name)])
+          (if index
+              ; index must be no less than field offset to find correct class field
+              ; refer to test private field x/y cannot be accessed in subclass
+              (if (>= index f-offset)
+                  (cons c-name (list-ref f-modifiers index))
+                  (find-field-class-modifier-pair super-name f-name)
+                  )
+              (eopl:error 'find-field-class-modifier-pair "Class field ~s.~s not found!" c-name f-name)
+              )
           )
-          (eopl:error 'find-field-class-modifier-pair "Class field ~s.~s not found!" c-name f-name)
+        (eopl:error 'find-field-class-modifier-pair "Class ~s not found" c-name)
         )
-      )
-      (eopl:error 'find-field-class-modifier-pair "Class ~s not found" c-name)
     )
   )
-)
 
 (define (find-method c-name m-name)
   ; static dispatch by assq
@@ -153,7 +153,7 @@
   (eopl:error 'find-method "Method ~s not found on class ~s" m-name c-name)
   )
 
-(define (append-filed-names super-fields new-fields)
+(define (append-field-names super-fields new-fields)
   (if (null? super-fields)
       new-fields
       (let ([first-super-field (car super-fields)] [rest-super-fields (cdr super-fields)])
@@ -162,7 +162,7 @@
              (fresh-identifier first-super-field)
              first-super-field
              )
-         (append-filed-names rest-super-fields new-fields)
+         (append-field-names rest-super-fields new-fields)
          )
         )
       )
