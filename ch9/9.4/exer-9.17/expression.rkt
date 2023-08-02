@@ -43,6 +43,13 @@
    (rands (list-of expression?))
    )
   (self-exp)
+  (letclass-exp
+   (class-name symbol?)
+   (super-parent symbol?)
+   (field-names (list-of symbol?))
+   (method-decls (list-of method-decl?))
+   (body expression?)
+   )
   )
 
 (define-datatype class-decl class-decl?

@@ -3320,5 +3320,31 @@ let o1 = new interior-node(
                new leaf-node(5))
   in send o1 sum()
             " 12 "local class environment")
+
+   (list "
+letclass interior-node extends object =
+  field left
+  field right
+  method initialize (l, r)
+    begin
+      set left = l;
+      set right = r
+    end
+  method sum ()
+    +(send left sum(),send right sum())
+
+  in letclass leaf-node extends object =
+    field value
+    method initialize (v)
+      set value = v
+    method sum ()
+      value
+    in let o1 = new interior-node(
+               new interior-node(
+                new leaf-node(3),
+                new leaf-node(4)),
+               new leaf-node(5))
+      in send o1 sum()
+            " 12 "letclass expression")
    )
   )

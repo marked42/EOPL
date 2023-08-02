@@ -5,6 +5,7 @@
  ["environment.rkt" (
                      init-env
                      apply-env
+                     extend-env-with-class-components
                      extend-env*
                      extend-env-rec*
                      )]
@@ -184,6 +185,12 @@
                       )
                     )
     (self-exp () (apply-env env '%self))
+
+    (letclass-exp (class-name super-name field-names method-decls body)
+                  (let ([new-env (extend-env-with-class-components class-name super-name field-names method-decls env)])
+                    (value-of-exp body new-env)
+                    )
+                  )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
