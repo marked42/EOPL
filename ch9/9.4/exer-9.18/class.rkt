@@ -84,9 +84,30 @@
     )
   )
 
+(define (find-super-method-index super-m-env name)
+  (index-where
+   super-m-env
+   (lambda (super-method) (eqv? (car super-method) name)))
+  )
+
 ; static dispatch
 (define (merge-method-envs super-m-env new-m-env)
-  (append new-m-env super-m-env)
+  (let loop ([super-m-env super-m-env] [new-m-env new-m-env])
+    (if (null? new-m-env)
+        super-m-env
+        (let* ([first-method (car new-m-env)]
+               [first-method-name (car first-method)]
+               [super-method-index (find-super-method-index super-m-env first-method-name)]
+               [rest-methods (cdr new-m-env)])
+          (loop
+           (if super-method-index
+               (list-set super-m-env super-method-index first-method)
+               (append super-m-env (list first-method))
+               )
+           rest-methods)
+          )
+        )
+    )
   )
 
 (define (method-decls->method-env m-decls super-name field-names)
