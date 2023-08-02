@@ -33,6 +33,13 @@
     )
   )
 
+(define (value-of-const-exp exp)
+  (cases expression exp
+    (const-exp (num) (num-val num))
+    (else (eopl:error 'value-of-const-exp "Evaluate only const expression, get ~s" exp))
+    )
+  )
+
 (define (value-of-exp exp env)
   (cases expression exp
     (const-exp (num) (num-val num))

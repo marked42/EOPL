@@ -3231,3 +3231,39 @@ let o2 = new c2()
             " 2 "m1() calls host class c1.m2() instead of c2.m2")
    )
   )
+
+(define test-cases-exer-static-class-field
+  (list
+   (list "
+class c1 extends object
+  static next-serial-number = 1
+  field my-serial-number
+  method get-serial-number() my-serial-number
+  method initialize()
+    begin
+      set my-serial-number = next-serial-number;
+      set next-serial-number = +(next-serial-number, 1)
+    end
+
+let o1 = new c1()
+    o2 = new c1()
+  in list(send o1 get-serial-number(), send o2 get-serial-number())
+            " '(1 2) "static class field")
+
+   (list "
+class c1 extends object
+  static next-serial-number = a
+  field my-serial-number
+  method get-serial-number() my-serial-number
+  method initialize()
+    begin
+      set my-serial-number = next-serial-number;
+      set next-serial-number = +(next-serial-number, 1)
+    end
+
+let o1 = new c1()
+    o2 = new c1()
+  in list(send o1 get-serial-number(), send o2 get-serial-number())
+            " 'error "static class field must be constant, only num-exp is allowed now.")
+   )
+  )
