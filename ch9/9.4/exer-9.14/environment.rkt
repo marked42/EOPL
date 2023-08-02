@@ -24,6 +24,7 @@
    )
   (extend-env-with-self-and-super
    (self object?)
+   (host-name symbol?)
    (super-name symbol?)
    (saved-env environment?)
    )
@@ -56,13 +57,43 @@
                            )
                        )
                      )
-    (extend-env-with-self-and-super (self super-name saved-env)
+    (extend-env-with-self-and-super (self host-name super-name saved-env)
                                     (case search-var
                                       ((%self) self)
+                                      ((%host) host-name)
                                       ((%super) super-name)
                                       (else (apply-env saved-env search-var)))
                                     )
     (else (report-no-binding-found search-var))
+    )
+  )
+
+(define (has-var-env env search-var)
+  (cases environment env
+    (extend-env* (vars vals saved-env)
+                 (let ([index (index-of vars search-var)])
+                   (if index
+                       #t
+                       (has-var-env saved-env search-var)
+                       )
+                   )
+                 )
+    (extend-env-rec* (p-names b-vars p-bodies saved-env)
+                     (let ([index (index-of p-names search-var)])
+                       (if index
+                           #t
+                           (has-var-env saved-env search-var)
+                           )
+                       )
+                     )
+    (extend-env-with-self-and-super (self host-name super-name saved-env)
+                                    (case search-var
+                                      ((%self) self)
+                                      ((%host) host-name)
+                                      ((%super) super-name)
+                                      (else (has-var-env saved-env search-var)))
+                                    )
+    (else #f)
     )
   )
 

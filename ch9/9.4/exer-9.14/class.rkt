@@ -75,7 +75,7 @@
                      (a-class s-name f-names
                               (merge-method-envs
                                (class->method-env (lookup-class s-name))
-                               (method-decls->method-env m-decls s-name f-names)
+                               (method-decls->method-env m-decls c-name s-name f-names)
                                )
                               )
                      )
@@ -89,11 +89,11 @@
   (append new-m-env super-m-env)
   )
 
-(define (method-decls->method-env m-decls super-name field-names)
+(define (method-decls->method-env m-decls c-name super-name field-names)
   (map (lambda (m-decl)
          (cases method-decl m-decl
            (a-method-decl (method-name vars body)
-                          (list method-name (a-method vars body super-name field-names))
+                          (list method-name (a-method c-name vars body super-name field-names))
                           )
            )
          ) m-decls)

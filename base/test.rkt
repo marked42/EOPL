@@ -3189,8 +3189,8 @@ class colorpoint extends point
 let p = new colorpoint(3, 4, 77)
   in list(send p get-location(), send p get-color())
             " 'error "private field x/y cannot be accessed in subclass")
+   )
   )
-)
 
 (define test-cases-exer-final-method
   (list
@@ -3212,5 +3212,22 @@ class bogus-oddeven extends oddeven
 
 1
             " 'error "final method cannot be overridden")
+   )
   )
-)
+
+(define test-cases-exer-9.14
+  (list
+   (list "
+class c1 extends object
+  method initialize() 0
+  method m1() send self m2()
+  method m2() 2
+
+class c2 extends c1
+  method m2() 20
+
+let o2 = new c2()
+  in send o2 m1()
+            " 2 "m1() calls host class c1.m2() instead of c2.m2")
+   )
+  )
