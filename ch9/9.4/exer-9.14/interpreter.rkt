@@ -156,8 +156,8 @@
                        obj
                        args
                        )
-                       ; return newly created obj
-                       obj
+                      ; return newly created obj
+                      obj
                       )
                     )
     (method-call-exp (obj-exp method-name rands)
