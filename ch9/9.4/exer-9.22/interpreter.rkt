@@ -14,6 +14,7 @@
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
+ ["translator.rkt" (translation-of-program mangle-method-name)]
  )
 
 (provide (all-defined-out))
@@ -25,11 +26,13 @@
 (define (value-of-program prog)
   ; new stuff
   (initialize-store!)
-  (cases program prog
-    (a-program (class-decls exp1)
-               (initialize-class-env! class-decls)
-               (value-of-exp exp1 (init-env))
-               )
+  (let ([translated-prog (translation-of-program prog)])
+    (cases program translated-prog
+      (a-program (class-decls exp1)
+                (initialize-class-env! class-decls)
+                (value-of-exp exp1 (init-env))
+                )
+      )
     )
   )
 
@@ -152,7 +155,7 @@
                     (let ([args (value-of-exps rands env)] [obj (new-object class-name)])
                       (apply-method
                        ; constructor method
-                       (find-method class-name 'initialize)
+                       (find-method class-name (mangle-method-name 'initialize (length rands)))
                        obj
                        args
                        )
