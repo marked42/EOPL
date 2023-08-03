@@ -11,7 +11,7 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
- ["class.rkt" (initialize-class-env! find-method)]
+ ["class.rkt" (initialize-class-env! find-method find-method-by-index)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
  )
@@ -169,12 +169,24 @@
                         )
                        )
                      )
+    ; TODO: comment
     (super-call-exp (method-name rands)
                     ; use surrounding self
                     (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
                       (apply-method
                        ; find method in super class
                        (find-method (apply-env env '%super) method-name)
+                       obj
+                       args
+                       )
+                      )
+                    )
+    (lexical-super-call-exp (index rands)
+                    ; use surrounding self
+                    (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
+                      (apply-method
+                       ; find method in super class
+                       (find-method-by-index index)
                        obj
                        args
                        )

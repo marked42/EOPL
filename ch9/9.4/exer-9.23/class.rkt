@@ -100,12 +100,17 @@
   )
 
 (define (find-method c-name m-name)
-  ; static dispatch by assq
   (let* ([m-env (class->method-env (lookup-class c-name))] [maybe-pair (assq m-name m-env)])
     (if (pair? maybe-pair)
         (cadr maybe-pair)
         (report-method-not-found m-name c-name)
         )
+    )
+  )
+
+(define (find-method-by-index c-name index)
+  (let* ([m-env (class->method-env (lookup-class c-name))])
+    (cadr (list-ref m-env index))
     )
   )
 
