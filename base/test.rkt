@@ -3581,3 +3581,25 @@ in let o1 = (make-oddeven)
             " 1 "object language without class")
    )
   )
+
+(define test-cases-exer-9.28
+  (append
+   test-cases-exer-9.27
+   (list
+    (list "
+let make-base = proc()
+                  newobject
+                    index = proc () 42
+                  endnewobject
+  in let base-object = (make-base)
+      in let make-oddeven = proc ()
+                          newobject inherits base-object
+                            even = proc (n) if zero?(n) then 1 else (getmethod(self, odd) -(n,1))
+                            odd  = proc (n) if zero?(n) then 0 else (getmethod(self, even) -(n,1))
+                          endnewobject
+        in let o1 = (make-oddeven)
+          in (getmethod(o1, index))
+            " 42 "support object inheritance throught keyword 'inherits'")
+    )
+   )
+  )

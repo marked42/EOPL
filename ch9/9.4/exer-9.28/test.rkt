@@ -12,6 +12,6 @@
             test-cases-list-v2
             test-cases-proc-exp-with-multiple-arguments
             test-cases-classes
-            test-cases-exer-9.27
+            test-cases-exer-9.28
             )
            )
