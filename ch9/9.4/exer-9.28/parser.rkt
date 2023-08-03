@@ -1,6 +1,12 @@
 #lang eopl
 
+(require racket/lazy-require)
 (require "expression.rkt")
+
+(lazy-require
+ ["prototype.rkt" (empty-prototype single-prototype)]
+ )
+
 (provide (all-defined-out))
 
 (define the-lexical-spec
@@ -51,7 +57,11 @@
     (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
     (expression ("self") self-exp)
 
-    (expression ("newobject" (arbno identifier "=" "proc" "("(separated-list identifier ",")")" expression) "endnewobject") newobject-exp)
+    (expression ("newobject" prototype (arbno identifier "=" "proc" "("(separated-list identifier ",")")" expression) "endnewobject") newobject-exp)
+
+    (prototype () empty-prototype)
+    (prototype ("inherits" identifier) single-prototype)
+
     (expression ("getmethod" "("expression "," identifier")") getmethod-exp)
     )
   )
