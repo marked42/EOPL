@@ -13,5 +13,6 @@
             test-cases-proc-exp-with-multiple-arguments
             test-cases-classes
             test-cases-exer-9.25
+            test-cases-instanceof
             )
            )

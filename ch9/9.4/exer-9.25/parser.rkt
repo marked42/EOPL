@@ -51,6 +51,8 @@
     (expression ("send" expression identifier "("(separated-list expression ",")")") method-call-exp)
     (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
     (expression ("self") self-exp)
+
+    (expression ("instanceof" expression identifier) instanceof-exp)
     )
   )
 

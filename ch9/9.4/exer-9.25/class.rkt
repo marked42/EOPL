@@ -141,3 +141,15 @@
 (define (maybe pred)
   (lambda (v) (or (not v) (pred v)))
   )
+
+(define (get-parent-class class-name)
+  (class->super-name (lookup-class class-name))
+  )
+
+(define (is-subclass class1 class2)
+  (cond
+    [(not class1) #f]
+    [(eqv? class1 class2) #t]
+    [else (is-subclass (get-parent-class class1) class2)]
+    )
+  )

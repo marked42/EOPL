@@ -44,6 +44,7 @@
    (rands (list-of expression?))
    )
   (self-exp)
+  (instanceof-exp (obj-exp expression?) (class-name symbol?))
   )
 
 (define-datatype class-decl class-decl?
