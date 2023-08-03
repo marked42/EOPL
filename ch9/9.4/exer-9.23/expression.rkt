@@ -42,6 +42,10 @@
    (method-name symbol?)
    (rands (list-of expression?))
    )
+  (lexical-super-call-exp
+   (index number?)
+   (rands (list-of expression?))
+   )
   (self-exp)
   )
 
