@@ -10,10 +10,11 @@
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
- ["store.rkt" (initialize-store! newref deref setref! show-store)]
+ ["store.rkt" (initialize-store! newref deref setref! show-store reference?)]
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
+ ["prototype.rkt" (newobject get-object-method)]
  )
 
 (provide (all-defined-out))
@@ -181,6 +182,23 @@
                       )
                     )
     (self-exp () (apply-env env '%self))
+    (newobject-exp (method-names vars-list bodies)
+                   (newobject
+                    method-names
+                    (map (lambda (vars body) (procedure vars body env)) vars-list bodies)
+                    )
+                   )
+    (getmethod-exp (obj-exp method-name)
+                   (let ([obj (value-of-exp obj-exp env)])
+                     (get-object-method
+                      ; self returns a reference, deref it to get an object
+                      (if (reference? obj)
+                          (deref obj)
+                          obj
+                          )
+                      method-name)
+                     )
+                   )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )

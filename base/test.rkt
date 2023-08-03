@@ -3567,3 +3567,17 @@ let similarpoint = proc (pt1, pt2)
             " #t "use a procedure instead of method to avoid binary method problem")
    )
   )
+
+(define test-cases-exer-9.27
+  (list
+   (list "
+let make-oddeven = proc ()
+                    newobject
+                      even = proc (n) if zero?(n) then 1 else (getmethod(self, odd) -(n,1))
+                      odd  = proc (n) if zero?(n) then 0 else (getmethod(self, even) -(n,1))
+                    endnewobject
+in let o1 = (make-oddeven)
+  in (getmethod(o1, odd) 13)
+            " 1 "object language without class")
+   )
+  )
