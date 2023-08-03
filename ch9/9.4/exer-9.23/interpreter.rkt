@@ -14,6 +14,7 @@
  ["class.rkt" (initialize-class-env! find-method find-method-by-index)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
+ ["translator/main.rkt" (translation-of-program)]
  )
 
 (provide (all-defined-out))
@@ -25,11 +26,14 @@
 (define (value-of-program prog)
   ; new stuff
   (initialize-store!)
-  (cases program prog
-    (a-program (class-decls exp1)
-               (initialize-class-env! class-decls)
-               (value-of-exp exp1 (init-env))
-               )
+  (let ([translated-prog (translation-of-program prog)])
+    ; (eopl:pretty-print translated-prog)
+    (cases program translated-prog
+      (a-program (class-decls exp1)
+                 (initialize-class-env! class-decls)
+                 (value-of-exp exp1 (init-env))
+                 )
+      )
     )
   )
 
@@ -169,29 +173,20 @@
                         )
                        )
                      )
-    ; TODO: comment
     (super-call-exp (method-name rands)
-                    ; use surrounding self
-                    (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
-                      (apply-method
-                       ; find method in super class
-                       (find-method (apply-env env '%super) method-name)
-                       obj
-                       args
-                       )
-                      )
+                    (eopl:error 'value-of-exp "Super call should be translated, not supported directly.")
                     )
-    (lexical-super-call-exp (index rands)
-                    ; use surrounding self
-                    (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
-                      (apply-method
-                       ; find method in super class
-                       (find-method-by-index index)
-                       obj
-                       args
-                       )
-                      )
-                    )
+    (lexical-super-call-exp (c-name index rands)
+                            ; use surrounding self
+                            (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
+                              (apply-method
+                               ; find method in super class
+                               (find-method-by-index c-name index)
+                               obj
+                               args
+                               )
+                              )
+                            )
     (self-exp () (apply-env env '%self))
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
