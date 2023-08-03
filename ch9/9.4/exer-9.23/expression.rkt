@@ -43,6 +43,7 @@
    (rands (list-of expression?))
    )
   (lexical-super-call-exp
+   (c-name symbol?)
    (index number?)
    (rands (list-of expression?))
    )
