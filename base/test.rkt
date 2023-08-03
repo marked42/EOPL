@@ -3489,5 +3489,81 @@ let c1 = new colorpoint(1, 2, 255)
     c2 = new point(1, 2)
   in send c1 similarpoints (c2)
             " 'error "similarpoints(colorpoint, point) is error, point treated as colorpoint, method getcolor not found")
+
+   (list "
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      set x = initx;
+      set y = inity
+    end
+  method getx() x
+  method gety() y
+  method similarpoints(pt)
+    if equal?(send pt getx(), x)
+    then equal?(send pt gety(), y)
+    else zero?(1)
+
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+  method similarpoints(pt)
+    if super similarpoints(pt)
+    then
+      if instanceof pt colorpoint
+      then equal?(send pt getcolor(), color)
+      else zero?(0)
+    else zero?(1)
+let c1 = new colorpoint(1, 2, 255)
+    c2 = new point(1, 2)
+  in send c1 similarpoints (c2)
+            " #t "use instanceof operator to check is second argument pt is also colorpoint")
+
+   (list "
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      set x = initx;
+      set y = inity
+    end
+  method getx() x
+  method gety() y
+
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+
+let similarpoint = proc (pt1, pt2)
+                      if equal?(send pt1 getx(), send pt2 getx())
+                      then equal?(send pt1 gety(), send pt2 gety())
+                      else zero?(1)
+  in let similarcolorpoint = proc (cpt1, cpt2)
+                              if (similarpoint cpt1 cpt2)
+                              then if instanceof cpt1 colorpoint
+                                   then if instanceof cpt2 colorpoint
+                                        then equal?(send cpt1 getcolor(), send cpt2 getcolor())
+                                        else zero?(0)
+                                   else zero?(0)
+                              else zero?(1)
+    in let c1 = new colorpoint(1, 2, 255)
+           c2 = new point(1, 2)
+          in (similarcolorpoint c1 c2)
+            " #t "use a procedure instead of method to avoid binary method problem")
    )
   )
