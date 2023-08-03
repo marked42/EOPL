@@ -4,6 +4,7 @@
 
 (lazy-require
  ["method.rkt" (a-method method?)]
+ ["maybe.rkt" (maybe)]
  )
 
 (provide (all-defined-out))
@@ -136,8 +137,4 @@
     (symbol->string field)
     "%"             ; this can't appear in an input identifier
     (number->string sn)))
-  )
-
-(define (maybe pred)
-  (lambda (v) (or (not v) (pred v)))
   )
