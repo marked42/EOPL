@@ -3348,3 +3348,146 @@ letclass interior-node extends object =
             " 12 "letclass expression")
    )
   )
+
+(define test-cases-exer-9.25
+  (list
+   (list "equal?(1, 1)" #t "equal?(1, 1) is true")
+   (list "equal?(0, 1)" #f "equal?(1, 0) is false")
+
+   (list "
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      set x = initx;
+      set y = inity
+    end
+  method getx() x
+  method gety() y
+  method similarpoints(pt)
+    if equal?(send pt getx(), x)
+    then equal?(send pt gety(), y)
+    else zero?(1)
+
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+  method similarpoints(pt)
+    if super similarpoints(pt)
+    then equal?(send pt getcolor(), color)
+    else zero?(1)
+let c1 = new point(1, 2)
+    c2 = new point(1, 2)
+  in send c1 similarpoints (c2)
+            " #t "similarpoints(point, point) is true")
+
+   (list "
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      set x = initx;
+      set y = inity
+    end
+  method getx() x
+  method gety() y
+  method similarpoints(pt)
+    if equal?(send pt getx(), x)
+    then equal?(send pt gety(), y)
+    else zero?(1)
+
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+  method similarpoints(pt)
+    if super similarpoints(pt)
+    then equal?(send pt getcolor(), color)
+    else zero?(1)
+let c1 = new point(1, 2)
+    c2 = new colorpoint(1, 2, 255)
+  in send c1 similarpoints (c2)
+            " #t "similarpoints(point, colorpoint) is true")
+
+   (list "
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      set x = initx;
+      set y = inity
+    end
+  method getx() x
+  method gety() y
+  method similarpoints(pt)
+    if equal?(send pt getx(), x)
+    then equal?(send pt gety(), y)
+    else zero?(1)
+
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+  method similarpoints(pt)
+    if super similarpoints(pt)
+    then equal?(send pt getcolor(), color)
+    else zero?(1)
+let c1 = new colorpoint(1, 2, 255)
+    c2 = new colorpoint(1, 2, 255)
+  in send c1 similarpoints (c2)
+            " #t "similarpoints(colorpoint, colorpoint) is true")
+
+   (list "
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      set x = initx;
+      set y = inity
+    end
+  method getx() x
+  method gety() y
+  method similarpoints(pt)
+    if equal?(send pt getx(), x)
+    then equal?(send pt gety(), y)
+    else zero?(1)
+
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+  method similarpoints(pt)
+    if super similarpoints(pt)
+    then equal?(send pt getcolor(), color)
+    else zero?(1)
+let c1 = new colorpoint(1, 2, 255)
+    c2 = new point(1, 2)
+  in send c1 similarpoints (c2)
+            " 'error "similarpoints(colorpoint, point) is error, point treated as colorpoint, method getcolor not found")
+   )
+  )
