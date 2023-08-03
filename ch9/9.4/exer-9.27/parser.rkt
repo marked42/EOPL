@@ -50,6 +50,9 @@
     (expression ("send" expression identifier "("(separated-list expression ",")")") method-call-exp)
     (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
     (expression ("self") self-exp)
+
+    (expression ("newobject" (arbno identifier "=" "proc" "("(separated-list identifier ",")")" expression) "endnewobject") newobject-exp)
+    (expression ("getmethod" "("expression "," identifier")") getmethod-exp)
     )
   )
 

@@ -43,6 +43,9 @@
    (rands (list-of expression?))
    )
   (self-exp)
+
+  (newobject-exp (method-names (list-of symbol?)) (vars-list (list-of (list-of symbol?))) (bodies (list-of expression?)))
+  (getmethod-exp (obj-exp expression?) (method-name symbol?))
   )
 
 (define-datatype class-decl class-decl?
