@@ -11,9 +11,10 @@
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
- ["class.rkt" (initialize-class-env! find-method)]
+ ["class.rkt" (initialize-class-env! find-method find-method-by-index)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object find-object-field)]
+ ["translator/main.rkt" (translation-of-program)]
  )
 
 (provide (all-defined-out))
@@ -25,11 +26,13 @@
 (define (value-of-program prog)
   ; new stuff
   (initialize-store!)
-  (cases program prog
-    (a-program (class-decls exp1)
-               (initialize-class-env! class-decls)
-               (value-of-exp exp1 (init-env))
-               )
+  (let ([translated-prog (translation-of-program prog)])
+    (cases program translated-prog
+      (a-program (class-decls exp1)
+                 (initialize-class-env! class-decls)
+                 (value-of-exp exp1 (init-env))
+                 )
+      )
     )
   )
 
@@ -191,6 +194,17 @@
                               )
                              )
                            )
+    (lexical-named-method-call-exp (class-name obj-exp method-index rands)
+                                   (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
+                                     (apply-method
+                                      ; constant time method searching
+                                      (find-method-by-index class-name method-index)
+                                      obj
+                                      args
+                                      )
+                                     )
+                                   )
+
     (named-fieldref-exp (class-name obj-exp field-name)
                         (let* ([obj (value-of-exp obj-exp env)] [field (find-object-field class-name obj field-name)])
                           (deref field)

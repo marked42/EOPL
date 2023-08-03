@@ -49,6 +49,12 @@
    (method-name symbol?)
    (rands (list-of expression?))
    )
+  (lexical-named-method-call-exp
+   (class-name symbol?)
+   (obj-exp expression?)
+   (method-index number?)
+   (rands (list-of expression?))
+   )
   (named-fieldref-exp (class-name symbol?) (obj-exp expression?) (field-name symbol?))
   (named-fieldset-exp (class-name symbol?) (obj-exp expression?) (field-name symbol?) (value expression?))
   )

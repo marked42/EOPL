@@ -118,6 +118,12 @@
     )
   )
 
+(define (find-method-by-index c-name index)
+  (let* ([m-env (class->method-env (lookup-class c-name))])
+    (cadr (list-ref m-env index))
+    )
+  )
+
 (define (report-method-not-found m-name c-name)
   (eopl:error 'find-method "Method ~s not found on class ~s" m-name c-name)
   )
