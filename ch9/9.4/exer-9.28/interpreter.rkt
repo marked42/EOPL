@@ -14,7 +14,7 @@
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
- ["prototype.rkt" (newobject get-object-method)]
+ ["prototype.rkt" (newobject get-object-method prototype-decl->name)]
  )
 
 (provide (all-defined-out))
@@ -182,11 +182,17 @@
                       )
                     )
     (self-exp () (apply-env env '%self))
-    (newobject-exp (method-names vars-list bodies)
-                   (newobject
-                    method-names
-                    (map (lambda (vars body) (procedure vars body env)) vars-list bodies)
-                    )
+    (newobject-exp (prototype-decl method-names vars-list bodies)
+                   (let ([prototype-name (prototype-decl->name prototype-decl)])
+                     (newobject
+                      method-names
+                      (map (lambda (vars body) (procedure vars body env)) vars-list bodies)
+                      (if prototype-name
+                          (deref (apply-env env prototype-name))
+                          #f
+                          )
+                      )
+                     )
                    )
     (getmethod-exp (obj-exp method-name)
                    (let ([obj (value-of-exp obj-exp env)])

@@ -1,5 +1,10 @@
 #lang eopl
 
+(require racket/lazy-require)
+(lazy-require
+ ["prototype.rkt" (prototype-decl?)]
+ )
+
 (provide (all-defined-out))
 
 (define-datatype expression expression?
@@ -44,7 +49,7 @@
    )
   (self-exp)
 
-  (newobject-exp (method-names (list-of symbol?)) (vars-list (list-of (list-of symbol?))) (bodies (list-of expression?)))
+  (newobject-exp (prototype prototype-decl?) (method-names (list-of symbol?)) (vars-list (list-of (list-of symbol?))) (bodies (list-of expression?)))
   (getmethod-exp (obj-exp expression?) (method-name symbol?))
   )
 
