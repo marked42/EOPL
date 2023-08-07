@@ -141,3 +141,15 @@
 (define (maybe pred)
   (lambda (v) (or (not v) (pred v)))
   )
+
+(define (is-subclass? class1 class2)
+  (if (eqv? class1 class2)
+      #t
+      (let ([super-name (class->super-name (lookup-class class1))])
+        (if super-name
+            (is-subclass? class1 class2)
+            #f
+            )
+        )
+      )
+  )
