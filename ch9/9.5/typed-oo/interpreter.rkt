@@ -14,6 +14,7 @@
  ["class.rkt" (initialize-class-env! find-method is-subclass?)]
  ["method.rkt" (apply-method)]
  ["object.rkt" (object->class-name new-object)]
+ ["checker/main.rkt" (type-of-program)]
  )
 
 (provide (all-defined-out))
@@ -23,6 +24,7 @@
   )
 
 (define (value-of-program prog)
+  (type-of-program prog)
   ; new stuff
   (initialize-store!)
   (cases program prog
@@ -79,7 +81,7 @@
                (value-of-exp body (extend-env* vars (map newref vals) env))
                )
              )
-    (proc-exp (vars body)
+    (proc-exp (vars types body)
               (proc-val (procedure vars body env))
               )
     (call-exp (rator rands)
@@ -89,8 +91,8 @@
                   )
                 )
               )
-    (letrec-exp (p-names b-vars p-bodies body)
-                (let ((new-env (extend-env-rec* p-names (map list b-vars) p-bodies env)))
+    (letrec-exp (p-result-types p-names b-vars-list b-var-types-list p-bodies body)
+                (let ((new-env (extend-env-rec* p-names b-vars-list p-bodies env)))
                   (value-of-exp body new-env)
                   )
                 )
