@@ -10,6 +10,11 @@
    (types (list-of type?))
    (tenv type-environment?)
    )
+  (extend-tenv-with-self-and-super
+    (self type?)
+    (super-name symbol?)
+    (tenv type-environment?)
+    )
   )
 
 (define (init-tenv)
@@ -30,6 +35,11 @@
                         )
                     )
                   )
-    (else (eopl:error "Unbound variable ~s" search-var))
+    (extend-tenv-with-self-and-super (self-name super-name saved-env)
+              (case search-var
+                ((%self) self-name)
+                ((%super) super-name)
+                (else (apply-tenv saved-env search-var))))
+    (else (eopl:error "No type found for ~s" search-var))
     )
   )

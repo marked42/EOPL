@@ -1,12 +1,19 @@
 #lang eopl
 
-(require "type.rkt" "../expression.rkt" "type-environment.rkt")
+(require racket/lazy-require racket/list "type.rkt" "../expression.rkt" "type-environment.rkt" "static-class.rkt")
+(lazy-require
+ ["type.rkt" (type->class-name check-is-subtype! class-type?)]
+ )
 
 (provide (all-defined-out))
 
 (define (type-of-program pgm)
   (cases program pgm
-    (a-program (class-decls exp1) (type-of exp1 (init-tenv)))
+    (a-program (class-decls exp1)
+               (initialize-static-class-env! class-decls)
+               (for-each check-class-decl! class-decls)
+               (type-of exp1 (init-tenv))
+               )
     )
   )
 
@@ -21,6 +28,13 @@
                 (int-type)
                 )
               )
+    (sum-exp (exp1 exp2)
+             (let ([ty1 (type-of exp1 tenv)] [ty2 (type-of exp2 tenv)])
+               (check-equal-type! ty1 (int-type) exp1)
+               (check-equal-type! ty2 (int-type) exp2)
+               (int-type)
+               )
+             )
     (zero?-exp (exp1)
                (let ([ty1 (type-of exp1 tenv)])
                  (check-equal-type! ty1 (int-type) exp1)
@@ -50,15 +64,7 @@
     (call-exp (rator rands)
               (let ([rator-type (type-of rator tenv)]
                     [rand-types (type-of-exps rands tenv)])
-                (cases type rator-type
-                  (proc-type (arg-type result-type)
-                             (begin
-                               (check-equal-type! arg-type rand-types rands)
-                               result-type
-                               )
-                             )
-                  (else (report-rator-not-a-proc-type rator-type rator))
-                  )
+                (type-of-call rator-type rand-types rands exp)
                 )
               )
     (letrec-exp (p-result-types p-names b-vars-list b-var-types-list p-bodies letrec-body)
@@ -67,6 +73,86 @@
                   (type-of letrec-body tenv-for-letrec-body)
                   )
                 )
+    (begin-exp (exp1 exps)
+               (type-of (last (cons exp1 exps)) tenv)
+               )
+    (assign-exp (var exp1)
+                (let ([ty1 (type-of exp1 tenv)] [var-type (apply-tenv tenv var)])
+                  (check-is-subtype! ty1 var-type exp)
+                  (void-type)
+                  )
+                )
+    (list-exp (exps)
+              (if (null? exps)
+                  (eopl:error 'type-of "list-exp ~s receives 0 arguments, should have 1 at least." exp)
+                  (let ([type1 (type-of (car exps) tenv)])
+                    ; requires every element type to be same
+                    (for-each (lambda (exp) (check-equal-type! (type-of exp tenv) type1 exp)) (cdr exps))
+                    (list-type type1)
+                    )
+                  )
+              )
+
+    (new-object-exp (class-name rands)
+                    (let ([arg-types (type-of-exps rands tenv)] [c (lookup-static-class class-name)])
+                      (cases static-class c
+                        (an-interface (method-tenv)
+                                      (report-cant-instantiate-interface class-name)
+                                      )
+                        (a-static-class (super-name i-names field-names field-types method-tenv)
+                                        (type-of-call
+                                         (find-method-type class-name 'initialize)
+                                         arg-types
+                                         rands
+                                         exp
+                                         )
+                                        (class-type class-name)
+                                        )
+                        )
+                      )
+                    )
+    (method-call-exp (obj-exp method-name rands)
+                     (let ([arg-types (type-of-exps rands tenv)] [obj-type (type-of obj-exp tenv)])
+                       (type-of-call
+                        (find-method-type (type->class-name obj-type) method-name)
+                        arg-types
+                        rands
+                        exp
+                        )
+                       )
+                     )
+    (super-call-exp (method-name rands)
+                    (let ([arg-types (type-of-exps rands tenv)])
+                      (type-of-call
+                       (find-method-type (apply-tenv tenv '%super) method-name)
+                       arg-types
+                       rands
+                       exp
+                       )
+                      )
+                    )
+
+    (self-exp () (apply-tenv tenv '%self))
+
+    (cast-exp (obj-exp class-name)
+              (let ([obj-type (type-of obj-exp tenv)])
+                ; TODO: not checking obj-type is subtype of class
+                (if (class-type? obj-type)
+                    (class-type class-name)
+                    (report-bad-type-to-cast obj-type exp)
+                    )
+                )
+              )
+    (instanceof-exp (obj-exp class-name)
+                    (let ([obj-type (type-of obj-exp tenv)])
+                      ; TODO: not checking obj-type is subtype of class
+                      (if (class-type? obj-type)
+                          (bool-type)
+                          (report-bad-type-to-instanceof obj-type exp)
+                          )
+                      )
+                    )
+
     (else (eopl:error 'type-of "Not checking OO now."))
     )
   )
@@ -95,4 +181,56 @@
    b-var-types-list
    p-bodies
    )
+  )
+
+(define (type-of-call rator-type rand-types rands exp)
+  (cases type rator-type
+    (proc-type (arg-types result-type)
+               (if (not (= (length arg-types) (length rand-types)))
+                   (report-wrong-number-of-arguments
+                    (map type-to-external-form arg-types)
+                    (map type-to-external-form rand-types)
+                    exp
+                    )
+                   (for-each check-is-subtype! rand-types arg-types rands)
+                   )
+               result-type
+               )
+    (else (report-rator-not-of-proc-type (type-to-external-form rator-type) exp))
+    )
+  )
+
+(define (report-wrong-number-of-arguments arg-types rand-types exp)
+  (eopl:error 'type-of-call
+              "These are not the same: ~s and ~s in ~s"
+              (map type-to-external-form arg-types)
+              (map type-to-external-form rand-types)
+              exp)
+  )
+
+(define (report-rator-not-of-proc-type rator-type exp)
+  (eopl:error 'type-of-call
+              "rator ~s is not of proc-type ~s"
+              exp
+              rator-type)
+  )
+
+(define (report-cant-instantiate-interface class-name)
+  (eopl:error 'type-of-new-obj-exp "Can't instantiate interface ~s" class-name)
+  )
+
+(define (report-bad-type-to-cast type exp)
+  (eopl:error 'bad-type-to-case
+              "can't cast non-object; ~s had type ~s"
+              exp
+              (type-to-external-form type)
+              )
+  )
+
+(define (report-bad-type-to-instanceof type exp)
+  (eopl:error 'bad-type-to-case
+              "can't apply instanceof to non-object; ~s had type ~s"
+              exp
+              (type-to-external-form type)
+              )
   )
