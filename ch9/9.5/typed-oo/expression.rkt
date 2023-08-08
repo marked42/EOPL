@@ -63,16 +63,30 @@
   (a-class-decl
    (class-name symbol?)
    (super-parent symbol?)
+   (interface-names (list-of symbol?))
+   (field-types (list-of type?))
    (field-names (list-of symbol?))
+   (method-decls (list-of method-decl?))
+   )
+  (an-interface-decl
+   (name symbol?)
    (method-decls (list-of method-decl?))
    )
   )
 
 (define-datatype method-decl method-decl?
   (a-method-decl
+   (res-type type?)
    (method-name symbol?)
    (vars (list-of symbol?))
+   (var-types (list-of type?))
    (body expression?)
+   )
+  (an-abstract-method-decl
+   (res-type type?)
+   (method-name symbol?)
+   (vars (list-of symbol?))
+   (var-types (list-of type?))
    )
   )
 

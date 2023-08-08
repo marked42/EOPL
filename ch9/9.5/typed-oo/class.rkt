@@ -67,7 +67,7 @@
 
 (define (initialize-class-decl! c-decl)
   (cases class-decl c-decl
-    (a-class-decl (c-name s-name f-names m-decls)
+    (a-class-decl (c-name s-name interface-names f-types f-names m-decls)
                   (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
                          [f-names (append-field-names super-class-f-names f-names)])
                     (add-to-class-env!
@@ -81,6 +81,10 @@
                      )
                     )
                   )
+    (an-interface-decl (name abstract-m-decls)
+                       ; TODO:
+                       1
+                       )
     )
   )
 
@@ -92,9 +96,13 @@
 (define (method-decls->method-env m-decls super-name field-names)
   (map (lambda (m-decl)
          (cases method-decl m-decl
-           (a-method-decl (method-name vars body)
+           (a-method-decl (result-type method-name vars var-types body)
                           (list method-name (a-method vars body super-name field-names))
                           )
+           (an-abstract-method-decl (result-type method-name vars var-types)
+                                    ;  TODO:
+                                    1
+                                    )
            )
          ) m-decls)
   )
