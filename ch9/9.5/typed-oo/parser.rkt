@@ -57,7 +57,10 @@
 
     (type ("int") int-type)
     (type ("bool") bool-type)
-    (type ("(" (separated-list type "*")"->" type")") proc-type)
+    (type ("void") void-type)
+    (type ("listof" type) list-type)
+    (type (identifier) class-type)
+    (type ("(" (separated-list type "*") "->" type")") proc-type)
     )
   )
 
