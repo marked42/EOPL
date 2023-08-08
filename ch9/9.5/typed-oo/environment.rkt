@@ -18,7 +18,7 @@
    )
   (extend-env-rec*
    (p-names (list-of symbol?))
-   (b-vars (list-of symbol?))
+   (b-vars-list (list-of (list-of symbol?)))
    (p-bodies (list-of expression?))
    (saved-env environment?)
    )
@@ -48,10 +48,10 @@
                        )
                    )
                  )
-    (extend-env-rec* (p-names b-vars p-bodies saved-env)
+    (extend-env-rec* (p-names b-vars-list p-bodies saved-env)
                      (let ([index (index-of p-names search-var)])
                        (if index
-                           (newref (proc-val (procedure (list (list-ref b-vars index)) (list-ref p-bodies index) env)))
+                           (newref (proc-val (procedure (list-ref b-vars-list index) (list-ref p-bodies index) env)))
                            (apply-env saved-env search-var)
                            )
                        )

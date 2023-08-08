@@ -90,7 +90,7 @@
                 )
               )
     (letrec-exp (p-names b-vars p-bodies body)
-                (let ((new-env (extend-env-rec* p-names b-vars p-bodies env)))
+                (let ((new-env (extend-env-rec* p-names (map list b-vars) p-bodies env)))
                   (value-of-exp body new-env)
                   )
                 )
