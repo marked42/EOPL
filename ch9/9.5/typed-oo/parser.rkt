@@ -1,6 +1,7 @@
 #lang eopl
 
 (require "expression.rkt")
+(require "checker/type.rkt")
 (provide (all-defined-out))
 
 (define the-lexical-spec
@@ -30,10 +31,10 @@
 
     (expression ("let" (arbno identifier "=" expression) "in" expression) let-exp)
 
-    (expression ("proc" "(" (separated-list identifier ",") ")" expression) proc-exp)
+    (expression ("proc" "(" (separated-list identifier ":" type ",") ")" expression) proc-exp)
     (expression ("("expression (arbno expression)")" ) call-exp)
 
-    (expression ("letrec" (arbno identifier "(" identifier ")" "=" expression) "in" expression) letrec-exp)
+    (expression ("letrec" (arbno type identifier "(" (separated-list identifier ":" type ",") ")" "=" expression) "in" expression) letrec-exp)
 
     (expression ("begin" expression (arbno ";" expression) "end") begin-exp)
 
@@ -53,6 +54,10 @@
 
     (expression ("cast" expression identifier) cast-exp)
     (expression ("instanceof" expression identifier) instanceof-exp)
+
+    (type ("int") int-type)
+    (type ("bool") bool-type)
+    (type ("(" (separated-list type "*")"->" type")") proc-type)
     )
   )
 
