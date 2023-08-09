@@ -233,6 +233,7 @@
                                (check-is-subtype!
                                 (proc-type var-types res-type)
                                 maybe-super-type
+                                m-decl
                                 )
                                ; pass check for non-overriden method
                                #t
