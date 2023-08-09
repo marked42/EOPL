@@ -87,7 +87,7 @@
 (define (check-is-subtype! ty1 ty2 rand)
   (if (is-subtype? ty1 ty2)
       #t
-      (report-subtype-failure (type-to-external-form ty1) (type-to-external-form ty2))
+      (report-subtype-failure (type-to-external-form ty1) (type-to-external-form ty2) rand)
       )
   )
 
