@@ -3,6 +3,7 @@
 (require racket/lazy-require "expression.rkt")
 (lazy-require
  ["procedure.rkt" (proc?)]
+ ["object.rkt" (object?)]
  )
 
 (provide (all-defined-out))
@@ -16,8 +17,12 @@
   (bool-val (bool boolean?))
   (proc-val (proc1 proc?))
   (null-val)
-  (cell-val (first expval?) (second expval?))
+  (cell-val (first (or-pred expval? object?)) (second (or-pred expval? object?)))
   )
+
+(define (or-pred pred1 pred2)
+  (lambda (val) (or (pred1 val) (pred2 val)))
+)
 
 (define (expval->num val)
   (cases expval val
