@@ -3666,3 +3666,103 @@ let o1 = new interior-node(
             " '(12 100) "Figure 9.12 A sample program in TYPED-OO")
    )
   )
+
+(define test-cases-9.30
+  (list
+   (list "
+interface summable
+  method int sum()
+
+class summable_list extends object implements summable
+  field summable head
+  field summable_list tail
+
+  method void initialize(l: summable, r: summable_list)
+    begin
+      set head = l;
+      set tail = r
+    end
+
+  method int sum()
+    +(send head sum(), send tail sum())
+
+class empty_summable_list extends summable_list
+  % override parent constructor
+  % not checking constructor type
+  method int initialize() 1
+  method int sum() 0
+
+class summable_node extends object implements summable
+  field int value
+  method void initialize(val: int)
+    set value = val
+  method int sum() value
+
+let l1 = new empty_summable_list()
+  in let l2 = new summable_node(4)
+    in let l3 = new summable_list(l2, l1)
+      in let l4 = new summable_list(l2, l3)
+        in list(send l1 sum(), send l2 sum(), send l3 sum(), send l4 sum())
+            " '(0 4 4 8) "summable list")
+
+   (list "
+interface summable
+  method int sum()
+
+class summable_binary_tree extends object implements summable
+  field summable head
+  field summable tail
+
+  method void initialize(l: summable, r: summable)
+    begin
+      set head = l;
+      set tail = r
+    end
+
+  method int sum()
+    +(send head sum(), send tail sum())
+
+class summable_node extends object implements summable
+  field int value
+  method void initialize(val: int)
+    set value = val
+  method int sum() value
+
+let t1 = new summable_node(1)
+  in let t2 = new summable_node(2)
+    in let t3 = new summable_binary_tree(t1, t2)
+      in let t4 = new summable_binary_tree(t2, t3)
+        in list(send t1 sum(), send t2 sum(), send t3 sum(), send t4 sum())
+            " '(1 2 3 5) "summable binary tree")
+
+   (list "
+interface summable
+  method int sum()
+
+class summable_general_tree extends object implements summable
+  field listof summable children
+
+  method void initialize(c: listof summable)
+    set children = c
+
+  method int sum()
+    letrec int get-sum (c: listof summable) = if null?(c)
+                                              then 0
+                                              else +(send car(c) sum(), (get-sum cdr(c)))
+      in (get-sum children)
+
+class summable_node extends object implements summable
+  field int value
+  method void initialize(val: int)
+    set value = val
+  method int sum() value
+
+let n1 = new summable_node(1)
+  in let n2 = new summable_node(2)
+    in let n3 = new summable_node(3)
+      in let l1 = list(n1, n2, n3)
+        in let tree = new summable_general_tree(l1)
+          in list(send n1 sum(), send n2 sum(), send n3 sum(), send tree sum())
+            " '(1 2 3 6) "summable general tree")
+  )
+)
