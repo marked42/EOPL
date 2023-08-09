@@ -6,7 +6,8 @@
 
 (test-lang run sloppy->expval
            (append
-            ; test-cases-checked-lang
+            test-cases-checked-lang
+            test-cases-typed-list
             test-cases-typed-oo
             )
            )

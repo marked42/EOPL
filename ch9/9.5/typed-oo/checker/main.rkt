@@ -2,7 +2,7 @@
 
 (require racket/lazy-require racket/list "type.rkt" "../expression.rkt" "type-environment.rkt" "static-class.rkt")
 (lazy-require
- ["type.rkt" (type->class-name check-is-subtype! class-type?)]
+ ["type.rkt" (type->class-name check-is-subtype! class-type? list-type->element-type list-type?)]
  )
 
 (provide (all-defined-out))
@@ -82,17 +82,46 @@
                   (void-type)
                   )
                 )
-    (list-exp (exps)
-              (if (null? exps)
-                  (eopl:error 'type-of "list-exp ~s receives 0 arguments, should have 1 at least." exp)
-                  (let ([type1 (type-of (car exps) tenv)])
-                    ; requires every element type to be same
-                    (for-each (lambda (exp) (check-equal-type! (type-of exp tenv) type1 exp)) (cdr exps))
-                    (list-type type1)
-                    )
-                  )
+    ; list
+    (emptylist-exp (element-type)
+                   (list-type element-type)
+                   )
+    (null?-exp (exp1)
+               (let ([exp1-type (type-of exp1 tenv)])
+                 (cases type exp1-type
+                   (list-type (element-type) (bool-type))
+                   (else (eopl:error 'type-of "null? requires exp1 to be list type, get ~s" exp1-type))
+                   )
+                 )
+               )
+    (cons-exp (exp1 exp2)
+              (let ([type1 (type-of exp1 tenv)] [type2 (type-of exp2 tenv)])
+                (check-equal-type! (list-type type1) type2 exp)
+                type2
+                )
+              )
+    (car-exp (exp1)
+             (let ([ty1 (type-of exp1 tenv)])
+              (list-type->element-type ty1)
+              )
+             )
+    (cdr-exp (exp1)
+             (let ([ty1 (type-of exp1 tenv)])
+              (if (list-type? ty1)
+                ty1
+                (eopl:error 'type-of "Operand of cdr is not list type in ~s" exp1)
+                )
+              )
+             )
+    (list-exp (exp1 exps)
+              (let ([type1 (type-of exp1 tenv)])
+                ; requires every element type to be same
+                (map (lambda (exp) (check-equal-type! (type-of exp tenv) type1 exp)) exps)
+                (list-type type1)
+                )
               )
 
+    ; class
     (new-object-exp (class-name rands)
                     (let ([arg-types (type-of-exps rands tenv)] [c (lookup-static-class class-name)])
                       (cases static-class c
