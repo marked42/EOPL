@@ -36,9 +36,9 @@
   (cons-exp (exp1 expression?) (exp2 expression?))
   (car-exp (exp1 expression?))
   (cdr-exp (exp1 expression?))
-  (emptylist-exp)
+  (emptylist-exp (element-type type?))
   (null?-exp (exp1 expression?))
-  (list-exp (exps (list-of expression?)))
+  (list-exp (exp1 expression?) (exps (list-of expression?)))
 
   (new-object-exp
    (class-name symbol?)

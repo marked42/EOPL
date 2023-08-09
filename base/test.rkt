@@ -635,10 +635,8 @@ let x = 0
    )
   )
 
-(define test-cases-exer-7.9
-  (append
-   test-cases-checked-lang
-   (list
+(define test-cases-exer-7.9-list
+  (list
     (list "let a = emptylist_ int in null?(a)" #t "null? returns true for emptylist")
     (list "let a = 1 in null?(a)" 'error "throws error when null? receives non list type value")
 
@@ -651,6 +649,12 @@ let x = 0
     (list "list()" 'error "list throws error when containing no elements")
     (list "list(1, zero(1))" 'error "throws error element type are not same")
     )
+  )
+
+(define test-cases-exer-7.9
+  (append
+   test-cases-checked-lang
+   test-cases-exer-7.9-list
    )
   )
 
@@ -3602,6 +3606,19 @@ let make-base = proc()
             " 42 "support object inheritance throught keyword 'inherits'")
     )
    )
+  )
+
+(define test-cases-typed-list
+  (append
+    test-cases-exer-7.9-list
+    (list
+      (list "car(cons(1, emptylist_ int))" 1 "car-exp")
+      (list "car(emptylist_ int)" '() "car-exp")
+
+      (list "cdr(cons(1, emptylist_ int))" '() "cdr-exp")
+      (list "cdr(emptylist_ int)" '() "cdr-exp")
+      )
+    )
   )
 
 (define test-cases-typed-oo
