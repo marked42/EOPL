@@ -101,8 +101,7 @@
                           (list method-name (a-method vars body super-name field-names))
                           )
            (an-abstract-method-decl (result-type method-name vars var-types)
-                                    ;  TODO:
-                                    1
+                                    (eopl:error 'method-decls->method-env "Invalid abstract method decl on class ~s" m-decl)
                                     )
            )
          ) m-decls)
@@ -152,7 +151,7 @@
       #t
       (let ([super-name (class->super-name (lookup-class class1))])
         (if super-name
-            (is-subclass? class1 class2)
+            (is-subclass? super-name class2)
             #f
             )
         )
