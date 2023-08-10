@@ -637,18 +637,18 @@ let x = 0
 
 (define test-cases-exer-7.9-list
   (list
-    (list "let a = emptylist_ int in null?(a)" #t "null? returns true for emptylist")
-    (list "let a = 1 in null?(a)" 'error "throws error when null? receives non list type value")
+   (list "let a = emptylist_ int in null?(a)" #t "null? returns true for emptylist")
+   (list "let a = 1 in null?(a)" 'error "throws error when null? receives non list type value")
 
-    (list "cons(1, emptylist_ int)" '(1) "cons builds a int list from an int and another empty int list type")
-    (list "cons(1, emptylist_ bool)" 'error "cons throws error when element type and list element type is not same")
+   (list "cons(1, emptylist_ int)" '(1) "cons builds a int list from an int and another empty int list type")
+   (list "cons(1, emptylist_ bool)" 'error "cons throws error when element type and list element type is not same")
 
-    (list "null?(cons(1, emptylist_ int))" #f "null? returns false for non empty list")
+   (list "null?(cons(1, emptylist_ int))" #f "null? returns false for non empty list")
 
-    (list "list(1, 2)" '(1 2) "list builds a list of int")
-    (list "list()" 'error "list throws error when containing no elements")
-    (list "list(1, zero(1))" 'error "throws error element type are not same")
-    )
+   (list "list(1, 2)" '(1 2) "list builds a list of int")
+   (list "list()" 'error "list throws error when containing no elements")
+   (list "list(1, zero(1))" 'error "throws error element type are not same")
+   )
   )
 
 (define test-cases-exer-7.9
@@ -3610,15 +3610,15 @@ let make-base = proc()
 
 (define test-cases-typed-list
   (append
-    test-cases-exer-7.9-list
-    (list
-      (list "car(cons(1, emptylist_ int))" 1 "car-exp")
-      (list "car(emptylist_ int)" '() "car-exp")
+   test-cases-exer-7.9-list
+   (list
+    (list "car(cons(1, emptylist_ int))" 1 "car-exp")
+    (list "car(emptylist_ int)" '() "car-exp")
 
-      (list "cdr(cons(1, emptylist_ int))" '() "cdr-exp")
-      (list "cdr(emptylist_ int)" '() "cdr-exp")
-      )
+    (list "cdr(cons(1, emptylist_ int))" '() "cdr-exp")
+    (list "cdr(emptylist_ int)" '() "cdr-exp")
     )
+   )
   )
 
 (define test-cases-typed-oo
@@ -3764,5 +3764,71 @@ let n1 = new summable_node(1)
         in let tree = new summable_general_tree(l1)
           in list(send n1 sum(), send n2 sum(), send n3 sum(), send tree sum())
             " '(1 2 3 6) "summable general tree")
+   )
   )
+
+(define test-cases-9.32
+  (list
+   (list "
+interface tree
+  method int sum()
+  method bool equal(t: tree)
+  method bool equal_with_interior_node(t: interior-node)
+  method bool equal_with_leaf_node(t: leaf-node)
+
+class interior-node extends object implements tree
+  field tree left
+  field tree right
+  method void initialize(l: tree, r: tree)
+    begin
+      set left = l;
+      set right = r
+    end
+
+  method tree getleft() left
+  method tree getright() right
+  method int sum()
+    +(send left sum(), send right sum())
+
+  method bool equal(t: tree)
+    send t equal_with_interior_node (self)
+
+  method bool equal_with_interior_node (t: interior-node)
+    if send left equal (send t getleft())
+    then send right equal (send t getright())
+    else zero?(1)
+
+  method bool equal_with_leaf_node (t: leaf-node)
+    zero?(1)
+
+class leaf-node extends object implements tree
+  field int value
+  method void initialize(v: int)
+    set value = v
+  method int sum() value
+  method int getvalue() value
+
+  method bool equal(t: tree)
+    send t equal_with_leaf_node (self)
+
+  method bool equal_with_interior_node(t: interior-node)
+    zero?(1)
+
+  method bool equal_with_leaf_node(t: leaf-node)
+    zero?(-(value, send t getvalue()))
+
+let l1 = new leaf-node(1)
+in let l2 = new leaf-node(2)
+in let i1 = new interior-node(l1, l2)
+in let i2 = new interior-node(l1, i1)
+in list(
+  send l1 equal (l1),
+  send l1 equal (l2),
+  send l1 equal (i1),
+  send i1 equal (i1),
+  send i1 equal (i2),
+  send i1 equal (l1)
 )
+            " '(#t #f #f #t #f #f) "equal method by double dispatch")
+   )
+  )
