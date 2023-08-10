@@ -3832,3 +3832,100 @@ in list(
             " '(#t #f #f #t #f #f) "equal method by double dispatch")
    )
   )
+
+(define test-cases-instanceof
+  (list
+   (list "
+class parent extends object
+  method int initialize() 1
+
+class child extends parent
+  method int initialize() 2
+  method int value() 2
+
+let c = new child()
+in instanceof c child
+             " #t "child is instance of its class")
+
+   (list "
+class parent extends object
+  method int initialize() 1
+
+class child extends parent
+  method int initialize() 2
+  method int value() 2
+
+let c = new child()
+in instanceof c parent
+             " #t "child is instance of its ancestor class")
+
+   (list "
+class parent extends object
+  method int initialize() 1
+
+class child extends parent
+  method int initialize() 2
+  method int value() 2
+
+let p = new parent()
+in instanceof p child
+             " #f "p is not instance of its sub class")
+   )
+  )
+
+(define test-cases-cast
+  (list
+   (list "
+class parent extends object
+  method int initialize() 1
+
+class child extends parent
+  method int initialize() 2
+  method int value() 2
+
+let c = new child()
+in let test-cast = proc (p: parent) send cast p child value()
+in list((test-cast c))
+             " '(2) "cast parent to child")
+
+   (list "
+class parent extends object
+  method int initialize() 1
+
+class child extends parent
+  method int initialize() 2
+  method int value() 2
+
+let c = new child()
+in cast c parent
+            " 'error "no need to cast to parent type, error on this")
+
+   (list "
+class Animal extends object
+  method int initialize() 1
+
+class Fruit extends object
+  method int initialize() 2
+
+let f = new Fruit()
+in cast f Animal
+            " 'error "error when cast to class type with no inheritance relationship")
+
+   (list "
+class Animal extends object
+  method int initialize() 1
+
+class Fruit extends object
+  method int initialize() 2
+
+cast 1 Animal
+            " 'error "can only cast object")
+   )
+  )
+
+(define test-cases-9.33-9.34
+  (append
+   test-cases-instanceof
+   test-cases-cast
+   )
+  )

@@ -296,6 +296,32 @@
    )
   )
 
+; 1. true when name1 is subclass of name2 or name2 is subclass of name1
+; 2. true when name1 is a class which implements interface name2
+; 3. true when name2 is a class which implements interface name1
+; 4. error when name1/name2 both is interface, current language doesn't support inheritance between interfaces,
+; so we don't handle this case.
+(define (statically-is-instanceofable? name1 name2)
+  (cases static-class (lookup-static-class name1)
+    (a-static-class (super-name interface-names field-names field-types method-tenv)
+                    (or
+                     (statically-is-subclass? name1 name2)
+                     (statically-is-subclass? name2 name1)
+                     )
+                    )
+    (an-interface (method-tenv)
+                  (cases static-class (lookup-static-class name2)
+                    (a-static-class (super-name interface-names field-names field-types method-tenv)
+                                    (statically-is-subclass? name2 name1)
+                                    )
+                    (an-interface (method-tenv)
+                                  (eopl:error 'statically-is-compatible? "type ~s is not compatible with type ~s" name1 name2)
+                                  )
+                    )
+                  )
+    )
+  )
+
 (define (lookup-static-class name)
   (let ([maybe-pair (assq name the-static-class-env)])
     (if maybe-pair

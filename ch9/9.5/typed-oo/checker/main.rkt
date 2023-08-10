@@ -1,10 +1,6 @@
 #lang eopl
 
 (require racket/lazy-require racket/list "type.rkt" "../expression.rkt" "type-environment.rkt" "static-class.rkt")
-(lazy-require
- ["type.rkt" (type->class-name check-is-subtype! class-type? list-type->element-type list-type?)]
- )
-
 (provide (all-defined-out))
 
 (define (type-of-program pgm)
@@ -102,16 +98,16 @@
               )
     (car-exp (exp1)
              (let ([ty1 (type-of exp1 tenv)])
-              (list-type->element-type ty1)
-              )
+               (list-type->element-type ty1)
+               )
              )
     (cdr-exp (exp1)
              (let ([ty1 (type-of exp1 tenv)])
-              (if (list-type? ty1)
-                ty1
-                (eopl:error 'type-of "Operand of cdr is not list type in ~s" exp1)
-                )
-              )
+               (if (list-type? ty1)
+                   ty1
+                   (eopl:error 'type-of "Operand of cdr is not list type in ~s" exp1)
+                   )
+               )
              )
     (list-exp (exp1 exps)
               (let ([type1 (type-of exp1 tenv)])
@@ -164,18 +160,23 @@
     (self-exp () (apply-tenv tenv '%self))
 
     (cast-exp (obj-exp class-name)
-              (let ([obj-type (type-of obj-exp tenv)])
-                ; TODO: not checking obj-type is subtype of class
-                (if (class-type? obj-type)
-                    (class-type class-name)
-                    (report-bad-type-to-cast obj-type exp)
+              (let* ([obj-type (type-of obj-exp tenv)] [obj-class-name (type->class-name obj-type)])
+                ; can only cast to subclass, no need to cast to super class
+                (if (statically-is-subclass? class-name obj-class-name)
+                    (if (class-type? obj-type)
+                        (class-type class-name)
+                        (report-bad-type-to-cast obj-type exp)
+                        )
+                    (eopl:error 'cast "can't cast from ~s to ~s, not subtype" obj-class-name class-name)
                     )
                 )
               )
     (instanceof-exp (obj-exp class-name)
-                    (let ([obj-type (type-of obj-exp tenv)])
-                      ; TODO: not checking obj-type is subtype of class
-                      (if (class-type? obj-type)
+                    (let* ([obj-type (type-of obj-exp tenv)] [obj-class-name (type->class-name obj-type)])
+                      (if (and (class-type? obj-type)
+                               ; disallow when object class and target class has no inheritance relationship
+                               (statically-is-instanceofable? obj-class-name class-name)
+                               )
                           (bool-type)
                           (report-bad-type-to-instanceof obj-type exp)
                           )
@@ -249,7 +250,7 @@
   )
 
 (define (report-bad-type-to-cast type exp)
-  (eopl:error 'bad-type-to-case
+  (eopl:error 'bad-type-to-cast
               "can't cast non-object; ~s had type ~s"
               exp
               (type-to-external-form type)
@@ -257,7 +258,7 @@
   )
 
 (define (report-bad-type-to-instanceof type exp)
-  (eopl:error 'bad-type-to-case
+  (eopl:error 'bad-type-to-instanceof
               "can't apply instanceof to non-object; ~s had type ~s"
               exp
               (type-to-external-form type)
