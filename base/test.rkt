@@ -3833,7 +3833,7 @@ in list(
    )
   )
 
-(define test-cases-instanceof
+(define test-cases-9.33-9.34-instanceof
   (list
    (list "
 class parent extends object
@@ -3873,7 +3873,7 @@ in instanceof p child
    )
   )
 
-(define test-cases-cast
+(define test-cases-9.33-9.34-cast
   (list
    (list "
 class parent extends object
@@ -3925,7 +3925,7 @@ cast 1 Animal
 
 (define test-cases-9.33-9.34
   (append
-   test-cases-instanceof
-   test-cases-cast
+   test-cases-9.33-9.34-instanceof
+   test-cases-9.33-9.34-cast
    )
   )
