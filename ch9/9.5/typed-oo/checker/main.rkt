@@ -137,14 +137,17 @@
                       )
                     )
     (method-call-exp (obj-exp method-name rands)
-                     (let ([arg-types (type-of-exps rands tenv)] [obj-type (type-of obj-exp tenv)])
-                       (type-of-call
-                        (find-method-type (type->class-name obj-type) method-name)
-                        arg-types
-                        rands
-                        exp
+                     (if (eqv? method-name 'initialize)
+                      (report-invalid-initialize-call exp)
+                      (let ([arg-types (type-of-exps rands tenv)] [obj-type (type-of obj-exp tenv)])
+                        (type-of-call
+                          (find-method-type (type->class-name obj-type) method-name)
+                          arg-types
+                          rands
+                          exp
+                          )
                         )
-                       )
+                      )
                      )
     (super-call-exp (method-name rands)
                     (let ([arg-types (type-of-exps rands tenv)])
@@ -264,3 +267,7 @@
               (type-to-external-form type)
               )
   )
+
+(define (report-invalid-initialize-call exp)
+  (eopl:error 'report-invalid-initialize-call "invalid initialize method call in ~s, use new operator" exp)
+)

@@ -3929,3 +3929,35 @@ cast 1 Animal
    test-cases-9.33-9.34-cast
    )
   )
+
+(define test-cases-exer-9.35
+  (list
+   (list "
+class animal extends object
+  method int initialize() 1
+
+let a = new animal()
+  in 1
+             " 1 "ok to use new operator calls initialize implicitly")
+
+   (list "
+class animal extends object
+  method int initialize() 1
+
+let a = new animal()
+  in send a initialize()
+             " 'error "invalid initialize in normal method call")
+
+   (list "
+class animal extends object
+  method int initialize() 1
+
+class panda extends animal
+  method int initialize()
+    super initialize()
+
+let a = new panda()
+  in 1
+             " 1 "ok to use initialize in super call")
+   )
+  )
