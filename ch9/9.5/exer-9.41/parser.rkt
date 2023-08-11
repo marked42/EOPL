@@ -57,6 +57,9 @@
     (expression ("cast" expression identifier) cast-exp)
     (expression ("instanceof" expression identifier) instanceof-exp)
 
+    (expression ("fieldref" expression identifier) fieldref-exp)
+    (expression ("fieldset" expression identifier "=" expression) fieldset-exp)
+
     (type ("int") int-type)
     (type ("bool") bool-type)
     (type ("void") void-type)

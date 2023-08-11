@@ -363,3 +363,16 @@
       )
     )
   )
+
+(define (find-class-field-type class-name f-name)
+  (let* ([sc (lookup-static-class class-name)]
+         [f-names (static-class->field-names sc)]
+         [f-types (static-class->field-types sc)]
+         [index (index-of f-names f-name)]
+         )
+    (if index
+        (list-ref f-types index)
+        #f
+        )
+    )
+  )

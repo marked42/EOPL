@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/lazy-require "parser.rkt" "expression.rkt")
+(require racket/lazy-require racket/list "parser.rkt" "expression.rkt")
 
 (lazy-require
  ["store.rkt" (reference? newref)]
@@ -33,4 +33,15 @@
     (class->field-names (lookup-class class-name))
     )
    )
+  )
+
+(define (object->field obj field-name)
+  (let* ([obj-class (lookup-class (object->class-name obj))]
+         [field-names (class->field-names obj-class)]
+         [index (index-of field-names field-name)])
+    (if index
+        (list-ref (object->fields obj) index)
+        (eopl:error 'object->field "Field ~s not found on object ~s" field-name obj)
+        )
+    )
   )
