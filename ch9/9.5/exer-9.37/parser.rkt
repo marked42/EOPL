@@ -23,6 +23,7 @@
     (class-decl ("interface" identifier (arbno abstract-method-decl)) an-interface-decl)
 
     (method-decl ("method" type identifier "("(separated-list identifier ":" type ",")")" expression) a-method-decl)
+    (method-decl ("staticmethod" type identifier "("(separated-list identifier ":" type ",")")" expression) a-static-method-decl)
     (abstract-method-decl ("method" type identifier "("(separated-list identifier ":" type ",")")") an-abstract-method-decl)
 
     (expression ("-" "(" expression "," expression ")") diff-exp)

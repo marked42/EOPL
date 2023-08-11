@@ -169,6 +169,9 @@
            (a-method-decl (result-type method-name vars var-types body)
                           (list method-name (proc-type var-types result-type))
                           )
+           (a-static-method-decl (result-type method-name vars var-types body)
+                                 (list method-name (proc-type var-types result-type))
+                                 )
            (an-abstract-method-decl (result-type method-name vars var-types)
                                     (eopl:error 'method-decls->method-tenv "Expect method decl, get ~s." m-decl)
                                     )
@@ -181,6 +184,9 @@
            (a-method-decl (result-type method-name vars var-types body)
                           (eopl:error 'abs-method-decls->method-tenv "Expect abstract method decl, get ~s." m-decl)
                           )
+           (a-static-method-decl (result-type method-name vars var-types body)
+                                 (eopl:error 'abs-method-decls->method-tenv "Expect abstract method decl, get ~s." m-decl)
+                                 )
            (an-abstract-method-decl (result-type method-name vars var-types)
                                     (list method-name (proc-type var-types result-type))
                                     )
@@ -242,6 +248,15 @@
                          )
                      )
                    )
+    (a-static-method-decl (res-type m-name vars var-types body)
+                          (let* ([tenv1 (extend-tenv* field-names field-types (init-tenv))]
+                                  [tenv2 (extend-tenv-with-self-and-super (class-type class-name) super-name tenv1)]
+                                  [tenv3 (extend-tenv* vars var-types tenv2)]
+                                  [body-type (type-of body tenv3)])
+                            (check-is-subtype! body-type res-type m-decl)
+                            ; static method doesn't override ancestor method, so no need to check method type
+                            )
+                          )
     (an-abstract-method-decl (res-type method-name vars var-types)
                              (eopl:error 'check-method-decl "Expect a-method-decl, get ~s" m-decl)
                              )

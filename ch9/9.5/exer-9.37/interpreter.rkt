@@ -7,14 +7,16 @@
                      apply-env
                      extend-env*
                      extend-env-rec*
+                     find-var-type
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
  ["class.rkt" (initialize-class-env! find-method is-subclass?)]
- ["method.rkt" (apply-method)]
+ ["method.rkt" (apply-method is-static-method?)]
  ["object.rkt" (object->class-name new-object)]
  ["checker/main.rkt" (type-of-program)]
+ ["checker/type.rkt" (void-type type->class-name)]
  )
 
 (provide (all-defined-out))
@@ -78,11 +80,12 @@
             )
     (let-exp (vars exps body)
              (let ([vals (value-of-exps exps env)])
-               (value-of-exp body (extend-env* vars (map newref vals) env))
+               ; use void types as stub for let-exp env, never used
+               (value-of-exp body (extend-env* vars (map newref vals) (map (lambda (var) (void-type)) vars) env))
                )
              )
     (proc-exp (vars types body)
-              (proc-val (procedure vars body env))
+              (proc-val (procedure vars types body env))
               )
     (call-exp (rator rands)
               (let ((rator-val (value-of-exp rator env)) (rand-vals (value-of-exps rands env)))
@@ -167,9 +170,16 @@
                       )
                     )
     (method-call-exp (obj-exp method-name rands)
-                     (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
+                     (let* ([args (value-of-exps rands env)]
+                            [obj (value-of-exp obj-exp env)]
+                            [obj-class-name (object->class-name obj)]
+                            [method (find-method obj-class-name method-name)])
+                       ; find type of obj
                        (apply-method
-                        (find-method (object->class-name obj) method-name)
+                        (if (is-static-method? method)
+                            (find-method (find-obj-exp-static-class obj-exp env) method-name)
+                            method
+                            )
                         obj
                         args
                         )
@@ -214,4 +224,11 @@
 
 (define (report-cast-error class-name obj)
   (eopl:error 'report-cast-error "Object ~s is not an instance of ~s, cannot cast to ~s." obj class-name class-name)
+  )
+
+(define (find-obj-exp-static-class obj-exp env)
+  (cases expression obj-exp
+    (var-exp (var) (type->class-name (find-var-type env var)))
+    (else (eopl:error 'find-obj-exp-static-class "requires obj-exp to be var when calling static method, get ~s." obj-exp))
+    )
   )
