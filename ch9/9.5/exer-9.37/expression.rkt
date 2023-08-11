@@ -82,6 +82,13 @@
    (var-types (list-of type?))
    (body expression?)
    )
+  (a-static-method-decl
+   (res-type type?)
+   (method-name symbol?)
+   (vars (list-of symbol?))
+   (var-types (list-of type?))
+   (body expression?)
+   )
   (an-abstract-method-decl
    (res-type type?)
    (method-name symbol?)

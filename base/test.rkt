@@ -3961,3 +3961,23 @@ let a = new panda()
              " 1 "ok to use initialize in super call")
    )
   )
+
+(define test-cases-exer-9.37
+  (list
+   (list "
+class c1 extends object
+  method int initialize() 1
+  method int m1() 11
+  staticmethod int m2() 21
+
+class c2 extends c1
+  method int m1() 12
+  staticmethod int m2() 22
+
+let f = proc(x: c1) send x m1()
+    g = proc(x: c1) send x m2()
+    o = new c2()
+in list((f o), (g o))
+             " '(12 21) "static method uses static dispatch")
+   )
+  )

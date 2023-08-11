@@ -98,8 +98,11 @@
   (map (lambda (m-decl)
          (cases method-decl m-decl
            (a-method-decl (result-type method-name vars var-types body)
-                          (list method-name (a-method vars body super-name field-names))
+                          (list method-name (a-method vars body super-name field-names #f))
                           )
+           (a-static-method-decl (result-type method-name vars var-types body)
+                                 (list method-name (a-method vars body super-name field-names #t))
+                                 )
            (an-abstract-method-decl (result-type method-name vars var-types)
                                     (eopl:error 'method-decls->method-env "Invalid abstract method decl on class ~s" m-decl)
                                     )
