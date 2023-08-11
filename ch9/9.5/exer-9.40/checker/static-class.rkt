@@ -104,7 +104,7 @@
 
 (define (add-class-decl-to-static-env! c-decl)
   (cases class-decl c-decl
-    (a-class-decl (c-name s-name interface-names f-types f-names m-decls)
+    (a-class-decl (c-name s-name interface-names f-types f-names f-exps m-decls)
                   (let* ([static-class (lookup-static-class s-name)]
                          [i-names (append (static-class->interface-names static-class) interface-names)]
                          [f-names (append-field-names (static-class->field-names static-class) f-names)]
@@ -196,7 +196,7 @@
     (an-interface-decl (i-name abs-method-decls)
                        #t
                        )
-    (a-class-decl (class-name super-name i-names field-types field-names method-decls)
+    (a-class-decl (class-name super-name i-names field-types field-names field-exps method-decls)
                   (let ([sc (lookup-static-class class-name)])
                     (for-each
                      (lambda (m-decl)
@@ -207,12 +207,19 @@
                        )
                      method-decls
                      )
+                    (for-each check-field-decl! field-types field-exps)
                     )
                   (for-each
                    (lambda (i-name) (check-if-implements! class-name i-name))
                    i-names
                    )
                   )
+    )
+  )
+
+(define (check-field-decl! field-type field-exp)
+  (let ([field-exp-type (type-of field-exp (init-tenv))])
+    (check-is-subtype! field-exp-type field-type field-exp)
     )
   )
 

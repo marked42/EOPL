@@ -19,7 +19,7 @@
     (expression (number) const-exp)
     (expression (identifier) var-exp)
 
-    (class-decl ("class" identifier "extends" identifier (arbno "implements" identifier) (arbno "field" type identifier) (arbno method-decl)) a-class-decl)
+    (class-decl ("class" identifier "extends" identifier (arbno "implements" identifier) (arbno "field" type identifier "=" expression) (arbno method-decl)) a-class-decl)
     (class-decl ("interface" identifier (arbno abstract-method-decl)) an-interface-decl)
 
     (method-decl ("method" type identifier "("(separated-list identifier ":" type ",")")" expression) a-method-decl)
