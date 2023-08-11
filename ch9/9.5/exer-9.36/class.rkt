@@ -82,9 +82,9 @@
                      )
                     )
                   )
-    (an-interface-decl (name abstract-m-decls)
-                       ; TODO:
-                       1
+    (an-interface-decl (name super-interfaces abstract-m-decls)
+                       ; interface in used in type checking, not used during runtime
+                       #f
                        )
     )
   )

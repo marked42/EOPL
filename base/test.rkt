@@ -3962,6 +3962,63 @@ let a = new panda()
    )
   )
 
+(define test-cases-exer-9.36
+  (list
+   (list "
+interface summable
+  method int sum()
+
+interface diffable
+  method int diff()
+
+interface arithmetic extends summable extends diffable
+  method bool zero-sum?()
+
+class c1 extends object implements arithmetic
+  field int x
+  field int y
+  method void initialize(x1: int, y1: int)
+    begin
+      set x = x1;
+      set y = y1
+    end
+
+  method int sum() +(x, y)
+  method int diff() -(x, y)
+  method bool zero-sum?() zero?(send self sum())
+
+let o1 = new c1(2, 5)
+  in list(send o1 sum(), send o1 diff(), if send o1 zero-sum?() then 1 else 0)
+             " '(7 -3 0) "interface can extend other interfaces")
+
+   (list "
+interface summable
+  method int sum()
+
+interface diffable
+  method int diff()
+
+interface arithmetic extends summable extends diffable
+  method bool zero-sum?()
+
+class c1 extends object implements arithmetic
+  field int x
+  field int y
+  method void initialize(x1: int, y1: int)
+    begin
+      set x = x1;
+      set y = y1
+    end
+
+  method int sum() +(x, y)
+  method int diff() -(x, y)
+
+let o1 = new c1(2, 5)
+  in list(send o1 sum(), send o1 diff())
+             " 'error "missing method zero-sum?()")
+   )
+  )
+
 (define test-cases-exer-9.37
   (list
    (list "

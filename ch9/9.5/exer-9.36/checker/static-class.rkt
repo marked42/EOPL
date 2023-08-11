@@ -123,13 +123,24 @@
                      )
                     )
                   )
-    (an-interface-decl (name abstract-m-decls)
-                       (let ([m-tenv (abs-method-decls->method-tenv abstract-m-decls)])
-                         (check-no-dups! (map car m-tenv) name)
-                         (add-static-class-binding! name (an-interface m-tenv))
+    (an-interface-decl (name super-interfaces abstract-m-decls)
+                       (let ([super-m-tenvs (collect-super-interface-method-env super-interfaces)])
+                         (let ([m-tenv (abs-method-decls->method-tenv abstract-m-decls)])
+                           (check-no-dups! (map car m-tenv) name)
+                           (add-static-class-binding! name (an-interface (append m-tenv super-m-tenvs)))
+                           )
                          )
                        )
     )
+  )
+
+(define (collect-super-interface-method-env super-interfaces)
+  (if (null? super-interfaces)
+      '()
+      (let ([m-tenv (static-class->method-tenv (lookup-static-class (car super-interfaces)))])
+        (append m-tenv (collect-super-interface-method-env (cdr super-interfaces)))
+        )
+      )
   )
 
 (define (check-for-initialize! method-tenv c-name)
@@ -193,7 +204,7 @@
 
 (define (check-class-decl! c-decl)
   (cases class-decl c-decl
-    (an-interface-decl (i-name abs-method-decls)
+    (an-interface-decl (i-name super-interfaces abs-method-decls)
                        #t
                        )
     (a-class-decl (class-name super-name i-names field-types field-names method-decls)
