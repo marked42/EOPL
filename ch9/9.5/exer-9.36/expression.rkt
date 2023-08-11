@@ -70,6 +70,7 @@
    )
   (an-interface-decl
    (name symbol?)
+   (super-interfaces (list-of symbol?))
    (method-decls (list-of method-decl?))
    )
   )
