@@ -3981,3 +3981,31 @@ in list((f o), (g o))
              " '(12 21) "static method uses static dispatch")
    )
   )
+
+(define test-cases-exer-9.42
+  (list
+   (list "
+class c1 extends object
+  method int initialize() 1
+  staticmethod int m1() 11
+
+class c2 extends c1
+  method int initialize() 2
+  method int m1() 12
+
+1
+             " 'error "dynamic method c2.m1 cannot override static method c1.m1")
+
+   (list "
+class c1 extends object
+  method int initialize() 1
+  method int m1() 11
+
+class c2 extends c1
+  method int initialize() 2
+  staticmethod int m1() 12
+
+1
+             " 'error "static method c2.m1 cannot override dynamic method c1.m1")
+   )
+  )
