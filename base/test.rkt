@@ -4009,3 +4009,43 @@ class c2 extends c1
              " 'error "static method c2.m1 cannot override dynamic method c1.m1")
    )
   )
+
+(define test-cases-exer-9.40
+  (list
+   (list "
+class c1 extends object
+  field int val = 1
+  method void initialize(v: int)
+    set val = v
+
+  method int getvalue() val
+
+let o = new c1(3)
+  in send o getvalue()
+             " 3 "field must have initializer expression")
+
+   (list "
+class c1 extends object
+  field int val = zero?(3)
+  method void initialize(v: int)
+    set val = v
+
+  method int getvalue() val
+
+let o = new c1(3)
+  in send o getvalue()
+             " 'error "field val is int, incompatible with initializer expression of bool type.")
+
+   (list "
+class c1 extends object
+  field int val
+  method void initialize(v: int)
+    set val = v
+
+  method int getvalue() val
+
+let o = new c1(3)
+  in send o getvalue()
+             " 'error "field without initializer expression is wrong syntax")
+   )
+  )

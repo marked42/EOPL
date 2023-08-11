@@ -66,6 +66,7 @@
    (interface-names (list-of symbol?))
    (field-types (list-of type?))
    (field-names (list-of symbol?))
+   (field-exps (list-of expression?))
    (method-decls (list-of method-decl?))
    )
   (an-interface-decl

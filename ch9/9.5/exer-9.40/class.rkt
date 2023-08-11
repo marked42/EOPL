@@ -68,7 +68,7 @@
 
 (define (initialize-class-decl! c-decl)
   (cases class-decl c-decl
-    (a-class-decl (c-name s-name interface-names f-types f-names m-decls)
+    (a-class-decl (c-name s-name interface-names f-types f-names f-exps m-decls)
                   (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
                          [f-names (append-field-names super-class-f-names f-names)])
                     (add-to-class-env!
