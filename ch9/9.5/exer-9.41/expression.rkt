@@ -57,6 +57,9 @@
 
   (cast-exp (obj-exp expression?) (class-name symbol?))
   (instanceof-exp (obj-exp expression?) (class-name symbol?))
+
+  (fieldref-exp (obj-exp expression?) (field-name symbol?))
+  (fieldset-exp (obj-exp expression?) (field-name symbol?) (value expression?))
   )
 
 (define-datatype class-decl class-decl?

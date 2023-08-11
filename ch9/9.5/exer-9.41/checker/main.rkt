@@ -138,16 +138,16 @@
                     )
     (method-call-exp (obj-exp method-name rands)
                      (if (eqv? method-name 'initialize)
-                      (report-invalid-initialize-call exp)
-                      (let ([arg-types (type-of-exps rands tenv)] [obj-type (type-of obj-exp tenv)])
-                        (type-of-call
-                          (find-method-type (type->class-name obj-type) method-name)
-                          arg-types
-                          rands
-                          exp
-                          )
-                        )
-                      )
+                         (report-invalid-initialize-call exp)
+                         (let ([arg-types (type-of-exps rands tenv)] [obj-type (type-of obj-exp tenv)])
+                           (type-of-call
+                            (find-method-type (type->class-name obj-type) method-name)
+                            arg-types
+                            rands
+                            exp
+                            )
+                           )
+                         )
                      )
     (super-call-exp (method-name rands)
                     (let ([arg-types (type-of-exps rands tenv)])
@@ -186,7 +186,41 @@
                       )
                     )
 
-    (else (eopl:error 'type-of "Not checking OO now."))
+    (fieldref-exp (obj-exp field-name)
+                  (let ([obj-exp-type (type-of obj-exp tenv)])
+                    (if (class-type? obj-exp-type)
+                        (let ([obj-class-name (type->class-name obj-exp-type)])
+                          (let ([field-type (find-class-field-type obj-class-name field-name)])
+                            (if field-type
+                                field-type
+                                (eopl:error 'type-of "fieldref expression ~s of refs unknown field name ~s in class ~s" exp obj-class-name field-name)
+                                )
+                            )
+                          )
+                        (eopl:error 'type-of "fieldref target expression must be class type, get ~s" obj-exp)
+                        )
+                    )
+                  )
+    (fieldset-exp (obj-exp field-name exp1)
+                  (let ([obj-exp-type (type-of obj-exp tenv)] [exp1-type (type-of exp1 tenv)])
+                    (if (class-type? obj-exp-type)
+                        (let ([obj-class-name (type->class-name obj-exp-type)])
+                          (let ([field-type (find-class-field-type obj-class-name field-name)])
+                            (if field-type
+                                (begin
+                                  (check-is-subtype! exp1-type field-type exp)
+                                  (void-type)
+                                  )
+                                (eopl:error 'type-of "fieldset expression ~s of refs unknown field name ~s in class ~s" exp obj-class-name field-name)
+                                )
+                            )
+                          )
+                        (eopl:error 'type-of "fieldset target expression must be class type, get ~s" obj-exp)
+                        )
+                    )
+                  )
+
+    (else (eopl:error 'type-of "Unsupported expression ~s" exp))
     )
   )
 
@@ -270,4 +304,4 @@
 
 (define (report-invalid-initialize-call exp)
   (eopl:error 'report-invalid-initialize-call "invalid initialize method call in ~s, use new operator" exp)
-)
+  )

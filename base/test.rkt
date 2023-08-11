@@ -4049,3 +4049,136 @@ let o = new c1(3)
              " 'error "field without initializer expression is wrong syntax")
    )
   )
+
+(define test-cases-exer-9.41
+  (list
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+class c2 extends object
+  field int x
+  field int y
+  method void initialize()
+    begin
+      set x = 2;
+      set y = 3
+    end
+
+let o1 = new c1()
+  in fieldref o1 x
+            " 1 "fieldref x of o1 is 1")
+
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+class c2 extends object
+  field int x
+  field int y
+  method void initialize()
+    begin
+      set x = 2;
+      set y = 3
+    end
+
+let o1 = new c1()
+  in fieldref o1 y
+            " 'error "throw error when referencing non exist field y of object")
+
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+class c2 extends object
+  field int x
+  field int y
+  method void initialize()
+    begin
+      set x = 2;
+      set y = 3
+    end
+
+let o2 = new c2()
+  in fieldref o2 x
+            " 2 "fieldref x of o2 is 2, shadowing super class field")
+
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+class c2 extends object
+  field int x
+  field int y
+  method void initialize()
+    begin
+      set x = 2;
+      set y = 3
+    end
+
+let o2 = new c2()
+  in fieldref o2 y
+            " 3 "fieldref y of o2 is 3")
+
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+class c2 extends object
+  field int x
+  field int y
+  method void initialize()
+    begin
+      set x = 2;
+      set y = 3
+    end
+
+let o2 = new c2()
+  in begin
+    fieldset o2 x = 4;
+    fieldset o2 y = 5;
+    list(fieldref o2 x, fieldref o2 y)
+  end
+            " (list 4 5) "fieldset expression")
+
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+let o1 = new c1()
+  in fieldref o1 y
+            " 'error "error when fieldref unkown field")
+
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+let o1 = new c1()
+  in fieldset o1 y = 1
+            " 'error "error when fieldset unkown field")
+
+   (list "
+class c1 extends object
+  field int x
+  method void initialize()
+    set x = 1
+
+let o1 = new c1()
+  in fieldset o1 x = zero?(1)
+            " 'error "error when fieldset imcompatible value type")
+   )
+  )
