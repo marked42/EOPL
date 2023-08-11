@@ -11,9 +11,25 @@
 
 (provide (all-defined-out))
 
+(define-datatype method-type method-type?
+  (a-method-type (is-static boolean?) (ty type?))
+  )
+
+(define (method-type->proc-type m-type)
+  (cases method-type m-type
+    (a-method-type (is-static ty) ty)
+    )
+  )
+
+(define (is-static-method-type? m-type)
+  (cases method-type m-type
+    (a-method-type (is-static ty) is-static)
+    )
+  )
+
 (define method-tenv? (list-of (lambda (p) (and (pair? p)
                                                (symbol? (car p))
-                                               (type? (cadr p))
+                                               (method-type? (cadr p))
                                                ))))
 
 (define-datatype static-class static-class?
@@ -167,10 +183,10 @@
   (map (lambda (m-decl)
          (cases method-decl m-decl
            (a-method-decl (result-type method-name vars var-types body)
-                          (list method-name (proc-type var-types result-type))
+                          (list method-name (a-method-type #f (proc-type var-types result-type)))
                           )
            (a-static-method-decl (result-type method-name vars var-types body)
-                                 (list method-name (proc-type var-types result-type))
+                                 (list method-name (a-method-type #t (proc-type var-types result-type)))
                                  )
            (an-abstract-method-decl (result-type method-name vars var-types)
                                     (eopl:error 'method-decls->method-tenv "Expect method decl, get ~s." m-decl)
@@ -188,7 +204,7 @@
                                  (eopl:error 'abs-method-decls->method-tenv "Expect abstract method decl, get ~s." m-decl)
                                  )
            (an-abstract-method-decl (result-type method-name vars var-types)
-                                    (list method-name (proc-type var-types result-type))
+                                    (list method-name (a-method-type #f (proc-type var-types result-type)))
                                     )
            )) abs-m-decls)
   )
@@ -233,14 +249,20 @@
                      (if (eqv? m-name 'initialize)
                          ; pass check fot initialize
                          #t
-                         (let ([maybe-super-type (maybe-find-method-type (static-class->method-tenv (lookup-static-class super-name)) m-name)])
+                         (let* ([m-tenv (static-class->method-tenv (lookup-static-class super-name))]
+                                [maybe-super-type (maybe-find-method-type m-tenv m-name)])
                            ; check if method type is compatible with parent method type
                            (if maybe-super-type
-                               (check-is-subtype!
-                                (proc-type var-types res-type)
-                                maybe-super-type
-                                m-decl
-                                )
+                               (begin
+                                 (when (find-method-is-static super-name m-name)
+                                   (eopl:error 'check-method-decl "dynamic method ~s.~s override static super method ~s.~s" class-name m-name super-name m-name)
+                                   )
+                                 (check-is-subtype!
+                                  (proc-type var-types res-type)
+                                  maybe-super-type
+                                  m-decl
+                                  )
+                                 )
                                ; pass check for non-overriden method
                                #t
                                )
@@ -250,11 +272,32 @@
                    )
     (a-static-method-decl (res-type m-name vars var-types body)
                           (let* ([tenv1 (extend-tenv* field-names field-types (init-tenv))]
-                                  [tenv2 (extend-tenv-with-self-and-super (class-type class-name) super-name tenv1)]
-                                  [tenv3 (extend-tenv* vars var-types tenv2)]
-                                  [body-type (type-of body tenv3)])
+                                 [tenv2 (extend-tenv-with-self-and-super (class-type class-name) super-name tenv1)]
+                                 [tenv3 (extend-tenv* vars var-types tenv2)]
+                                 [body-type (type-of body tenv3)])
                             (check-is-subtype! body-type res-type m-decl)
-                            ; static method doesn't override ancestor method, so no need to check method type
+                            (if (eqv? m-name 'initialize)
+                                ; pass check fot initialize
+                                #t
+                                (let* ([m-tenv (static-class->method-tenv (lookup-static-class super-name))]
+                                       [maybe-super-type (maybe-find-method-type m-tenv m-name)])
+                                  ; check if method type is compatible with parent method type
+                                  (if maybe-super-type
+                                      (begin
+                                        (when (not (find-method-is-static super-name m-name))
+                                          (eopl:error 'check-method-decl "static method ~s.~s override dynamic super method ~s.~s" class-name m-name super-name m-name)
+                                          )
+                                        (check-is-subtype!
+                                         (proc-type var-types res-type)
+                                         maybe-super-type
+                                         m-decl
+                                         )
+                                        )
+                                      ; pass check for non-overriden method
+                                      #t
+                                      )
+                                  )
+                                )
                             )
                           )
     (an-abstract-method-decl (res-type method-name vars var-types)
@@ -273,7 +316,7 @@
                     (for-each
                      (lambda (method-binding)
                        (let* ([m-name (car method-binding)]
-                              [m-type (cadr method-binding)]
+                              [m-type (method-type->proc-type (cadr method-binding))]
                               [c-method-type (maybe-find-method-type class-method-tenv m-name)])
                          (if c-method-type
                              (check-is-subtype! c-method-type m-type c-name)
@@ -353,10 +396,11 @@
 
 (define (maybe-find-method-type tenv id)
   (cond
-    ([assq id tenv] => cadr)
+    ([assq id tenv] => (lambda (item) (method-type->proc-type (cadr item))))
     (else #f)
     )
   )
+
 
 (define (find-method-type class-name id)
   (let ([m (maybe-find-method-type (static-class->method-tenv (lookup-static-class class-name)) id)])
@@ -364,6 +408,14 @@
         m
         (eopl:error 'find-method-type "unknown method ~s in class ~s" id class-name)
         )
+    )
+  )
+
+(define (find-method-is-static class-name id)
+  (let ([tenv (static-class->method-tenv (lookup-static-class class-name))])
+    (cond
+      ([assq id tenv] => (lambda (item) (is-static-method-type? (cadr item))))
+      (else (eopl:error 'find-method-is-static "unknown method ~s in class ~s" id class-name)))
     )
   )
 
