@@ -3,7 +3,7 @@
 (require racket/lazy-require "parser.rkt" "expression.rkt")
 
 (lazy-require
- ["environment.rkt" (extend-env* extend-env-with-self-and-super empty-env)]
+ ["environment.rkt" (extend-nameless-env extend-env-with-self-and-super empty-env)]
  ["store.rkt" (newref)]
  ["object.rkt" (object->fields lookup-class)]
  ["interpreter.rkt" (value-of-exp)]
@@ -20,17 +20,20 @@
    )
   )
 
+(define self-index '(1 0))
+(define super-index '(1 1))
+
 (define (apply-method m self args)
   (cases method m
     (a-method (vars body super-name field-names)
               (value-of-exp body
-                            (extend-env* vars (map newref args)
-                                         (extend-env-with-self-and-super self super-name
-                                                                         (extend-env* field-names (object->fields self)
-                                                                                      (empty-env)
-                                                                                      )
-                                                                         )
-                                         )
+                            (extend-nameless-env (map newref args)
+                                                 (extend-env-with-self-and-super self super-name
+                                                                                 (extend-nameless-env (object->fields self)
+                                                                                                      (empty-env)
+                                                                                                      )
+                                                                                 )
+                                                 )
                             )
               )
     )
