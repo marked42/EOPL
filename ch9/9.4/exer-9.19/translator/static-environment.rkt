@@ -1,6 +1,6 @@
 #lang eopl
 
-(require racket/list)
+(require racket/list "../var-index.rkt")
 
 (provide (all-defined-out))
 
@@ -30,9 +30,9 @@
   (let loop ([senv senv] [depth 0])
     (if (null? senv)
         (report-unbound-var var)
-        (let* ([top (car senv)] [index (index-where top (lambda (pair) (eqv? (car pair) var)))])
-          (if index
-              (cons depth index)
+        (let* ([top (car senv)] [offset (index-where top (lambda (pair) (eqv? (car pair) var)))])
+          (if offset
+              (a-var-index depth offset)
               (loop (cdr senv) (+ depth 1))
               )
           )
@@ -41,7 +41,7 @@
   )
 
 (define (get-var-by-index senv index)
-  (let ([depth (car index)] [offset (cdr index)])
+  (let ([depth (var-index->depth index)] [offset (var-index->offset index)])
     (list-ref (list-ref senv depth) offset)
     )
   )

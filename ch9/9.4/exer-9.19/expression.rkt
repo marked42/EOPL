@@ -1,5 +1,7 @@
 #lang eopl
 
+(require "./translator/static-environment.rkt" "./var-index.rkt")
+
 (provide (all-defined-out))
 
 (define-datatype expression expression?
@@ -44,13 +46,13 @@
    )
   (self-exp)
 
-  (nameless-var-exp (depth integer?) (offset integer?))
+  (nameless-var-exp (index var-index?))
   (nameless-let-exp (exps (list-of expression?)) (body expression?))
   (nameless-proc-exp (body expression?))
 
-  (nameless-assign-exp (depth integer?) (offset integer?) (exp1 expression?))
+  (nameless-assign-exp (index var-index?) (exp1 expression?))
   (nameless-letrec-exp (p-bodies (list-of expression?)) (body expression?))
-  (nameless-letrec-var-exp (depth integer?) (offset integer?))
+  (nameless-letrec-var-exp (index var-index?))
   )
 
 (define-datatype class-decl class-decl?

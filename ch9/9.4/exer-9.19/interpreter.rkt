@@ -14,6 +14,7 @@
  ["method.rkt" (apply-method self-index super-index)]
  ["object.rkt" (object->class-name new-object)]
  ["translator/main.rkt" (translation-of-program)]
+ ["var-index.rkt" (var-index->depth var-index->offset)]
  )
 
 (provide (all-defined-out))
@@ -132,8 +133,8 @@
               )
 
     ; translation
-    (nameless-var-exp (depth offset)
-                      (let ([ref (apply-nameless-env env depth offset)])
+    (nameless-var-exp (index)
+                      (let ([ref (apply-nameless-env env index)])
                         (deref ref)
                         )
                       )
@@ -145,9 +146,9 @@
     (nameless-proc-exp (body)
                        (proc-val (procedure body env))
                        )
-    (nameless-assign-exp (depth offset exp1)
+    (nameless-assign-exp (index exp1)
                          (let ([val1 (value-of-exp exp1 env)])
-                           (setref! (apply-nameless-env env depth offset) val1)
+                           (setref! (apply-nameless-env env index) val1)
                            )
                          )
     (nameless-letrec-exp (p-bodies body)
@@ -156,11 +157,11 @@
                            )
                          )
     ; refer to exer 3.40
-    (nameless-letrec-var-exp (depth offset)
+    (nameless-letrec-var-exp (index)
                              ; list-tail find tail part of list starting from target element
-                             (let ([new-nameless-env (list-tail env depth)])
+                             (let ([new-nameless-env (list-tail env (var-index->depth index))])
                                ; so car of new-nameless-env is the-proc corresponding to letrec-var
-                               (let ([the-proc (expval->proc (deref (list-ref (car new-nameless-env) offset)))])
+                               (let ([the-proc (expval->proc (deref (list-ref (car new-nameless-env) (var-index->offset index))))])
                                  (proc-val (procedure (proc->body the-proc) new-nameless-env))
                                  )
                                )

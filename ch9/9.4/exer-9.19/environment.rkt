@@ -4,6 +4,7 @@
 (lazy-require
  ["value.rkt" (num-val)]
  ["store.rkt" (newref reference?)]
+ ["var-index.rkt" (var-index->depth var-index->offset)]
  )
 (provide (all-defined-out))
 
@@ -25,8 +26,10 @@
                        )
   )
 
-(define (apply-nameless-env env depth position)
-  (list-ref (list-ref env depth) position)
+(define (apply-nameless-env env index)
+  (let* ([depth (var-index->depth index)] [offset (var-index->offset index)])
+    (list-ref (list-ref env depth) offset)
+    )
   )
 
 (define (report-no-binding-found var)
