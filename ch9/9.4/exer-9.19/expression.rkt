@@ -47,6 +47,8 @@
   (nameless-var-exp (depth integer?) (position integer?))
   (nameless-let-exp (exps (list-of expression?)) (body expression?))
   (nameless-proc-exp (body expression?))
+
+  (nameless-assign-exp (depth integer?) (offset integer?) (exp1 expression?))
   )
 
 (define-datatype class-decl class-decl?

@@ -97,6 +97,15 @@
                (translation-of-exp body (extend-senv vars senv))
                )
               )
+    (assign-exp (var exp1)
+                (let* ([index (apply-senv senv var)] [depth (car index)] [offset (cdr index)])
+                  (nameless-assign-exp
+                   depth
+                   offset
+                   (translation-of-exp exp1 senv)
+                   )
+                  )
+                )
     (else (eopl:error 'translation-of-exp "unsupported expression type ~s" exp))
     )
   )
