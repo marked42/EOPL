@@ -40,14 +40,14 @@
              )
             )
     (var-exp (var)
-             ; new stuf
+             ; new stuff
              (let* ([index (apply-senv senv var)] [type (car (list-ref senv index))])
-              (cond
-                [(eqv? type 'normal) (nameless-var-exp index)]
-                [(eqv? type 'letrec) (nameless-letrec-var-exp index)]
-                [else (eopl:error 'value-of-exp "unsupported var ~s of type ~s, only allow 'normal/letrec" var type)]
-                )
-              )
+               (cond
+                 [(eqv? type 'normal) (nameless-var-exp index)]
+                 [(eqv? type 'letrec) (nameless-letrec-var-exp index)]
+                 [else (eopl:error 'value-of-exp "unsupported var ~s of type ~s, only allow 'normal/letrec" var type)]
+                 )
+               )
              )
     (let-exp (var exp1 body)
              (nameless-let-exp
@@ -70,11 +70,11 @@
     (letrec-exp (p-name b-var p-body body)
                 (let ([proc-env (extend-senv-letrec p-name senv)])
                   (nameless-letrec-exp
-                    ; both p-body and body remembers current senv in their env
-                    ; handle recursive variable behavior in interpreter logic
-                    (translation-of-exp p-body (extend-senv-normal b-var proc-env))
-                    (translation-of-exp body proc-env)
-                    )
+                   ; both p-body and body remembers current senv in their env
+                   ; handle recursive variable behavior in interpreter logic
+                   (translation-of-exp p-body (extend-senv-normal b-var proc-env))
+                   (translation-of-exp body proc-env)
+                   )
                   )
                 )
     (else (eopl:error 'translation-of-exp "unsupported expression type ~s" exp))
