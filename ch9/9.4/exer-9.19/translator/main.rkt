@@ -5,7 +5,9 @@
  ["static-environment.rkt" (
                             init-senv
                             apply-senv
-                            extend-senv
+                            extend-senv-normal
+                            extend-senv-letrec
+                            get-var-type-by-index
                             )]
  )
 
@@ -82,19 +84,24 @@
               )
 
     ; translation
-    (var-exp (var) (let* ([pair (apply-senv senv var)] [depth (car pair)] [position (cdr pair)])
-                     (nameless-var-exp depth position)
-                     )
+    (var-exp (var)
+             (let* ([index (apply-senv senv var)] [type (get-var-type-by-index senv index)])
+               (cond
+                 [(eqv? type 'normal) (nameless-var-exp (car index) (cdr index))]
+                 [(eqv? type 'letrec) (nameless-letrec-var-exp (car index) (cdr index))]
+                 [else (eopl:error 'value-of-exp "unsupported var ~s of type ~s, only allow 'normal/letrec" var type)]
+                 )
+               )
              )
     (let-exp (vars exps body)
              (nameless-let-exp
               (translation-of-exps exps senv)
-              (translation-of-exp body (extend-senv vars senv))
+              (translation-of-exp body (extend-senv-normal vars senv))
               )
              )
     (proc-exp (vars body)
               (nameless-proc-exp
-               (translation-of-exp body (extend-senv vars senv))
+               (translation-of-exp body (extend-senv-normal vars senv))
                )
               )
     (assign-exp (var exp1)
@@ -103,6 +110,14 @@
                    depth
                    offset
                    (translation-of-exp exp1 senv)
+                   )
+                  )
+                )
+    (letrec-exp (p-names b-vars p-bodies body)
+                (let ([new-env (extend-senv-letrec p-names senv)])
+                  (nameless-letrec-exp
+                   (map (lambda (b-var p-body) (translation-of-exp p-body (extend-senv-normal (list b-var) new-env))) b-vars p-bodies)
+                   (translation-of-exp body new-env)
                    )
                   )
                 )

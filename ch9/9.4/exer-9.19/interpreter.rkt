@@ -8,7 +8,7 @@
                      extend-nameless-env
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
- ["procedure.rkt" (procedure apply-procedure)]
+ ["procedure.rkt" (procedure apply-procedure proc->body)]
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method self-index super-index)]
@@ -132,8 +132,8 @@
               )
 
     ; translation
-    (nameless-var-exp (depth position)
-                      (let ([ref (apply-nameless-env env depth position)])
+    (nameless-var-exp (depth offset)
+                      (let ([ref (apply-nameless-env env depth offset)])
                         (deref ref)
                         )
                       )
@@ -150,6 +150,21 @@
                            (setref! (apply-nameless-env env depth offset) val1)
                            )
                          )
+    (nameless-letrec-exp (p-bodies body)
+                         (let ([procs (map (lambda (p-body) (newref (proc-val (procedure p-body env)))) p-bodies)])
+                           (value-of-exp body (extend-nameless-env procs env))
+                           )
+                         )
+    ; refer to exer 3.40
+    (nameless-letrec-var-exp (depth offset)
+                             ; list-tail find tail part of list starting from target element
+                             (let ([new-nameless-env (list-tail env depth)])
+                               ; so car of new-nameless-env is the-proc corresponding to letrec-var
+                               (let ([the-proc (expval->proc (deref (list-ref (car new-nameless-env) offset)))])
+                                 (proc-val (procedure (proc->body the-proc) new-nameless-env))
+                                 )
+                               )
+                             )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
