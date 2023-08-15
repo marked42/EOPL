@@ -87,8 +87,8 @@
     (var-exp (var)
              (let* ([index (apply-senv senv var)] [type (get-var-type-by-index senv index)])
                (cond
-                 [(eqv? type 'normal) (nameless-var-exp (car index) (cdr index))]
-                 [(eqv? type 'letrec) (nameless-letrec-var-exp (car index) (cdr index))]
+                 [(eqv? type 'normal) (nameless-var-exp index)]
+                 [(eqv? type 'letrec) (nameless-letrec-var-exp index)]
                  [else (eopl:error 'value-of-exp "unsupported var ~s of type ~s, only allow 'normal/letrec" var type)]
                  )
                )
@@ -105,13 +105,7 @@
                )
               )
     (assign-exp (var exp1)
-                (let* ([index (apply-senv senv var)] [depth (car index)] [offset (cdr index)])
-                  (nameless-assign-exp
-                   depth
-                   offset
-                   (translation-of-exp exp1 senv)
-                   )
-                  )
+                (nameless-assign-exp (apply-senv senv var) (translation-of-exp exp1 senv))
                 )
     (letrec-exp (p-names b-vars p-bodies body)
                 (let ([new-env (extend-senv-letrec p-names senv)])

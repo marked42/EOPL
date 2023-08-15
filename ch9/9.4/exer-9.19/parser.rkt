@@ -1,6 +1,6 @@
 #lang eopl
 
-(require "expression.rkt")
+(require "expression.rkt" "var-index.rkt")
 (provide (all-defined-out))
 
 (define the-lexical-spec
@@ -51,9 +51,15 @@
     (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
     (expression ("self") self-exp)
 
-    (expression ("%lexref" number number) nameless-var-exp)
+    (expression ("%lexref" var-index) nameless-var-exp)
+    (var-index (number number) a-var-index)
+
     (expression ("%let" (arbno expression) "in" expression) nameless-let-exp)
     (expression ("%lexproc" expression) nameless-proc-exp)
+
+    (expression ("%letrec" (arbno expression) "in" expression) nameless-letrec-exp)
+    (expression ("%letrec-ref" var-index) nameless-letrec-var-exp)
+    (expression ("%set" var-index expression) nameless-assign-exp)
     )
   )
 
