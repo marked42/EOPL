@@ -5,6 +5,7 @@
  ["value.rkt" (num-val)]
  ["store.rkt" (newref reference?)]
  ["var-index.rkt" (var-index->depth var-index->offset)]
+ ["object.rkt" (object?)]
  )
 (provide (all-defined-out))
 
@@ -14,7 +15,17 @@
   (cons vals saved-env)
   )
 
-(define (nameless-environment? env) ((list-of (list-of reference?)) env))
+(define (env-record? val)
+  (or
+    (reference? val)
+    ; for self
+    (object? val)
+    ; for super
+    (symbol? val)
+  )
+)
+
+(define (nameless-environment? env) ((list-of (list-of env-record?)) env))
 
 (define (init-nameless-env)
   (extend-nameless-env (list (newref (num-val 1)))

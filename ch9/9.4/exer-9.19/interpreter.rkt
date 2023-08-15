@@ -166,6 +166,39 @@
                                  )
                                )
                              )
+    (new-object-exp (class-name rands)
+                    (let ([args (value-of-exps rands env)] [obj (new-object class-name)])
+                      (apply-method
+                       ; constructor method
+                       (find-method class-name 'initialize)
+                       obj
+                       args
+                       )
+                      ; return newly created obj
+                      obj
+                      )
+                    )
+    (method-call-exp (obj-exp method-name rands)
+                     (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
+                       (apply-method
+                        (find-method (object->class-name obj) method-name)
+                        obj
+                        args
+                        )
+                       )
+                     )
+    (super-call-exp (method-name rands)
+                    ; use surrounding self
+                    (let ([args (value-of-exps rands env)] [obj (apply-nameless-env env self-index)])
+                      (apply-method
+                       ; find method in super class
+                       (find-method (apply-nameless-env env super-index) method-name)
+                       obj
+                       args
+                       )
+                      )
+                    )
+    (nameless-self-exp () (apply-nameless-env env self-index))
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
