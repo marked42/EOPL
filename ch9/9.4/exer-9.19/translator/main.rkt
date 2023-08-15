@@ -115,6 +115,21 @@
                    )
                   )
                 )
+
+    (new-object-exp (class-name rands)
+                    (new-object-exp class-name (translation-of-exps rands senv))
+                    )
+    (method-call-exp (obj-exp method-name rands)
+                     (method-call-exp
+                      (translation-of-exp obj-exp senv)
+                      method-name
+                      (translation-of-exps rands senv)
+                      )
+                     )
+    (super-call-exp (method-name rands)
+                    (super-call-exp method-name (translation-of-exps rands senv))
+                    )
+    (self-exp () (nameless-self-exp))
     (else (eopl:error 'translation-of-exp "unsupported expression type ~s" exp))
     )
   )
