@@ -16,6 +16,12 @@
    )
   )
 
+(define (proc->body proc1)
+  (cases proc proc1
+    (procedure (body saved-env) body)
+    )
+  )
+
 (define (apply-procedure proc1 args)
   (cases proc proc1
     (procedure (body saved-env)

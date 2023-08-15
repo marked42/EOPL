@@ -6,8 +6,8 @@
 
 (test-lang run sloppy->expval
            (append
-            test-cases-let-exp
-            ; test-cases-implicit-refs-lang
+            test-cases-letrec-exp
+            test-cases-implicit-refs-lang
             test-cases-let-exp-with-multiple-declarations
             test-cases-sum-exp
             test-cases-list-v2
