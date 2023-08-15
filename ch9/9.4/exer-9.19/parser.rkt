@@ -50,6 +50,10 @@
     (expression ("send" expression identifier "("(separated-list expression ",")")") method-call-exp)
     (expression ("super" identifier "("(separated-list expression ",")")") super-call-exp)
     (expression ("self") self-exp)
+
+    (expression ("%lexref" number number) nameless-var-exp)
+    (expression ("%let" (arbno expression) "in" expression) nameless-let-exp)
+    (expression ("%lexproc" expression) nameless-proc-exp)
     )
   )
 

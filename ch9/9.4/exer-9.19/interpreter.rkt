@@ -3,17 +3,17 @@
 (require racket/lazy-require "parser.rkt" "expression.rkt")
 (lazy-require
  ["environment.rkt" (
-                     init-env
-                     apply-env
-                     extend-env*
-                     extend-env-rec*
+                     init-nameless-env
+                     apply-nameless-env
+                     extend-nameless-env
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure)]
  ["store.rkt" (initialize-store! newref deref setref! show-store)]
  ["class.rkt" (initialize-class-env! find-method)]
- ["method.rkt" (apply-method)]
+ ["method.rkt" (apply-method self-index super-index)]
  ["object.rkt" (object->class-name new-object)]
+ ["translator/main.rkt" (translation-of-program)]
  )
 
 (provide (all-defined-out))
@@ -25,19 +25,19 @@
 (define (value-of-program prog)
   ; new stuff
   (initialize-store!)
-  (cases program prog
-    (a-program (class-decls exp1)
-               (initialize-class-env! class-decls)
-               (value-of-exp exp1 (init-env))
-               )
+  (let ([translated-prog (translation-of-program prog)])
+    (cases program translated-prog
+      (a-program (class-decls exp1)
+                 (initialize-class-env! class-decls)
+                 (value-of-exp exp1 (init-nameless-env))
+                 )
+      )
     )
   )
 
 (define (value-of-exp exp env)
   (cases expression exp
     (const-exp (num) (num-val num))
-    ; new stuff
-    (var-exp (var) (deref (apply-env env var)))
     (diff-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)]
                     [val2 (value-of-exp exp2 env)])
@@ -74,14 +74,6 @@
                   )
               )
             )
-    (let-exp (vars exps body)
-             (let ([vals (value-of-exps exps env)])
-               (value-of-exp body (extend-env* vars (map newref vals) env))
-               )
-             )
-    (proc-exp (vars body)
-              (proc-val (procedure vars body env))
-              )
     (call-exp (rator rands)
               (let ((rator-val (value-of-exp rator env)) (rand-vals (value-of-exps rands env)))
                 (let ((proc1 (expval->proc rator-val)))
@@ -89,11 +81,6 @@
                   )
                 )
               )
-    (letrec-exp (p-names b-vars p-bodies body)
-                (let ((new-env (extend-env-rec* p-names b-vars p-bodies env)))
-                  (value-of-exp body new-env)
-                  )
-                )
     (begin-exp (exp1 exps)
                (let value-of-begin-exps ([exps (cons exp1 exps)])
                  (if (null? exps)
@@ -110,11 +97,6 @@
                      )
                  )
                )
-    (assign-exp (var exp1)
-                (let ([val1 (value-of-exp exp1 env)])
-                  (setref! (apply-env env var) val1)
-                  )
-                )
     (cons-exp (exp1 exp2)
               (let ([val1 (value-of-exp exp1 env)] [val2 (value-of-exp exp2 env)])
                 (cell-val val1 val2)
@@ -148,39 +130,21 @@
                   )
                 )
               )
-    (new-object-exp (class-name rands)
-                    (let ([args (value-of-exps rands env)] [obj (new-object class-name)])
-                      (apply-method
-                       ; constructor method
-                       (find-method class-name 'initialize)
-                       obj
-                       args
-                       )
-                      ; return newly created obj
-                      obj
-                      )
-                    )
-    (method-call-exp (obj-exp method-name rands)
-                     (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
-                       (apply-method
-                        (find-method (object->class-name obj) method-name)
-                        obj
-                        args
+
+    ; translation
+    (nameless-var-exp (depth position)
+                      (let ([ref (apply-nameless-env env depth position)])
+                        (deref ref)
                         )
-                       )
-                     )
-    (super-call-exp (method-name rands)
-                    ; use surrounding self
-                    (let ([args (value-of-exps rands env)] [obj (apply-env env '%self)])
-                      (apply-method
-                       ; find method in super class
-                       (find-method (apply-env env '%super) method-name)
-                       obj
-                       args
-                       )
                       )
-                    )
-    (self-exp () (apply-env env '%self))
+    (nameless-let-exp (exps body)
+                      (let ([vals (value-of-exps exps env)])
+                        (value-of-exp body (extend-nameless-env (map newref vals) env))
+                        )
+                      )
+    (nameless-proc-exp (body)
+                       (proc-val (procedure body env))
+                       )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
