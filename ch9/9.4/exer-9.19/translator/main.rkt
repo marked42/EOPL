@@ -9,6 +9,7 @@
                             extend-senv-letrec
                             get-var-type-by-index
                             )]
+ ["class.rkt" (translation-of-class-decls!)]
  )
 
 (provide (all-defined-out))
@@ -17,16 +18,11 @@
   (cases program prog
     (a-program (class-decls exp1)
                (a-program
-                (translation-of-class-decls class-decls (init-senv))
+                (translation-of-class-decls! class-decls (init-senv))
                 (translation-of-exp exp1 (init-senv))
                 )
                )
     )
-  )
-
-(define (translation-of-class-decls class-decls senv)
-  ; TODO:
-  class-decls
   )
 
 (define (translation-of-exp exp senv)

@@ -12,6 +12,6 @@
             test-cases-sum-exp
             test-cases-list-v2
             test-cases-proc-exp-with-multiple-arguments
-            ; test-cases-classes
+            test-cases-classes
             )
            )
