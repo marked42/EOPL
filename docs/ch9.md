@@ -333,7 +333,32 @@ TODO:
 
 ### `instanceof`/`cast`
 
-添加运行时支持，这两个表达式都需要判断对象是否是某个类的实例。区别在于`cast`在不成里的情况下抛出错误，类型转换失败；`instanceof`则返回布尔类型值。
+`instanceof o1 c1`检查对象`o1`是否是类`c1`的实例。
+
+```typed-oo
+class c1 extends object
+  method initialize() 1
+
+let o1 = new c1()
+  in instanceof o1 c1
+```
+
+`test-cast`函数接收`parent`类型的参数，`c`是`child`类型的，在`test-cast`中使用`cast p child`将对象`p`从`parent`类型转换为`child`类型。
+
+```typed-oo
+class parent extends object
+  method int initialize() 1
+
+class child extends parent
+  method int initialize() 2
+  method int value() 2
+
+let c = new child()
+in let test-cast = proc (p: parent) send cast p child value()
+in list((test-cast c))
+```
+
+添加运行时支持，这两个表达式都需要判断对象是否是某个类的实例。区别在于`cast`在不成立的情况下抛出错误，类型转换失败；`instanceof`则返回布尔类型值。
 
 ```scheme
 (define (value-of-exp exp env)
@@ -563,7 +588,7 @@ TODO:
 
 ### 方法调用检查
 
-使用[type-of-call](../ch9/9.5/typed-oo/checker/main.rkt#L219)对类的`new-object-exp`、`method-call-exp`、`super-call-exp`三种方法调用进行类型检查。要求实参和形参个数相同，每个实参的类型都必需是形参的子类型。
+使用[type-of-call](../ch9/9.5/typed-oo/checker/main.rkt#L219)对类的`new-object-exp`、`method-call-exp`、`super-call-exp`三种方法调用进行类型检查。要求实参和形参**个数相同**，每个实参的类型都必需是形参的**子类型**。
 
 ```scheme
 (define (type-of-call rator-type rand-types rands exp)
