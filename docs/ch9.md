@@ -4,9 +4,9 @@
 
 ### 不带继承的对象
 
-若干个互相**关联**的变量组合在一起称为对象（object），对象变量之间存在约束关系，使用一组方法（method）来查询操作对象保证对象始终处于合法状态。变量被称为对象的字段（field）。
+若干个互相**关联**的变量组合在一起称为对象（object），变量被称为对象的字段（field），字段之间存在约束，使用一组方法（method）来操作对象保证对象始终处于合法状态。
 
-下面例子中类`c1`封装了两个数字类型的字段`i/j`，两个数字是**相反数**的关系，也就是和为零。对字段的修改必须始终保持这个关系，使用`countup`方法封装了满足关系的修改操作，禁止使用其他方式修改字段值。
+下面例子中类`c1`封装了两个数字类型的字段`i`和`j`，两个数字是**相反数**的关系，和为零。`countup`方法修改字段始终满足这个约束，禁止使用其他方式修改字段值。
 
 ```classes
 class c1 extends object
@@ -38,7 +38,7 @@ let t1 = 0
 
 基于类（class）的面向对象中，对象不能单独存在，必须从属于某一个类，对象是类的实例（instance）。创建对象并设置对象字段初始值的过程称之为初始化（initialization），初始化使用的对象方法称为构造函数（constructor），上述代码中固定使用`initialize`方法作为构造函数。表达式`new c1(3)`创建对象实例内部隐式的调用构造函数。
 
-从一个类中可以新建多个对象，这些对象具有相同名称的字段和方法，但是实例之间的字段值是独立的，对象`o1`和`o2`的字段互相独立。
+一个类可以新建多个对象，这些对象具有相同名称的字段和方法，但是实例之间的字段值是独立的，对象`o1`和`o2`的字段互相独立。
 
 `send o1 getstate()`调用对象方法获取对象的状态，也可以将方法调用理解为向一个对象传递消息，消息包含方法名称和参数。对象接收到消息后进行相应的计算得到并返回结果，这个视角称为消息传递（message-passing）。这里的语法`send`使用了消息传递的视角，Java等语言中方法调用使用`o1.getstate()`的语法。
 
@@ -46,9 +46,11 @@ let t1 = 0
 
 ### 闭包与对象等价
 
+> Closure are poor man's object.
+
 闭包同样可以将若干变量与关联的方法封装在一起，实现与对象[等价](https://stackoverflow.com/questions/2497801/closures-are-poor-mans-objects-and-vice-versa-what-does-this-mean)的效果。
 
-> Closure are poor man's object.
+例子中定义函数`c1`，其中封装了两个局部变量`i`和`j`，使用参数`x`进行初始化，相当于构造函数，返回两个闭包函数`countup`和`getstate`。局部变量对外界不可见，通过闭包函数进行操作。
 
 ```proc
 let c1 = proc (x)
@@ -69,11 +71,9 @@ let c1 = proc (x)
                end
 ```
 
-上面例子中定义函数`c1`，其中封装了两个局部变量`i/j`，使用参数`x`进行初始化，相当于构造函数，返回两个闭包函数`countup`和`getstate`。局部变量对外界不可见，通过闭包函数进行操作。
-
 ### 继承与多态
 
-开闭原则（[Open-closed principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)）指导我们使用**拓展**而不是**修改**的方式对现有系统增加功能支持，类的继承特性符合这一原则。类通过**继承**其他类的方式**复用**基类（base class）的功能，如`class c1 extends object`，被继承的基类`object`也称为父类（parent class）、超类（superclass）；相应地`c1`被称为派生类（derived class），也被称为子类（child class/subclass）。继承可以是多层的，如`c2`继承了`c1`，`c1`继承了`object`，`object`被称为`c2`的 ancestor class，`c2`被称为`object`的 descendant class。ancestor class也包括父类，因此`c1`也是`c2`的ancestor class；类似的descendant class也包括子类。
+开闭原则（[Open-closed principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)）指导我们使用**拓展**而不是**修改**的方式对现有系统增加功能支持，类的继承特性符合这一原则。类通过**继承**其他类的方式**复用**基类（base class）的功能，如`class c1 extends object`，被继承的基类`object`也称为父类（parent class）、超类（superclass）；相应地`c1`被称为派生类（derived class），也被称为子类（child class/subclass）。继承可以是多层的，如`c2`继承了`c1`，`c1`继承了`object`，`object`被称为`c2`的 祖先类（ancestor class），`c2`被称为`object`的 祖先类（descendant class）。祖先类也包括父类，因此`c1`也是`c2`的祖先类；类似的后代类也包括子类。
 
 ```classes
 class c1 extends object
@@ -92,9 +92,9 @@ class c2 extends c1
   method gety2 () y
 ```
 
-子类中的字段和方法可能与父类**重名**，子类中的同名字段和方法**覆盖（shadowing）**父类。例如`c2`的方法`sety2`中字段`y`引用的是子类`c2`而不是父类`c1`的字段。
+子类中的字段和方法可能与父类**重名**，子类的字段和方法**覆盖（override）**父类同名字段和方法。例如`c2`的方法`sety2`中字段`y`引用的是子类`c2`而不是父类`c1`的字段。
 
-多态是指子类同名的方法覆盖父类，子类对象被当做父类型使用的时候，实际调用的是子类的方法，这样实现了不改变父类与使用代码的情况下扩展了代码逻辑。对象`o2`是类`c2`的实例，在函数`get-m1`中被当做`c1`类型使用，调用了方法`m1`，实际上执行的是`c2`的`m1`方法。对于`send o m1()`来说`m1`方法由运行时对象`o`的具体类型决定，而不是编译时静态决定，这叫做方法的动态分发（dynamic dispatch）。
+多态是指子类同名的方法覆盖父类方法，子类对象被当做父类类型型使用的时候，实际调用的是子类的方法，这样实现了不改变父类与使用代码的情况下扩展了代码逻辑。对象`o2`是类`c2`的实例，在函数`get-m1`中被当做`c1`类型使用，调用了方法`m1`，实际上执行的是`c2`的`m1`方法。对于`send o m1()`来说`m1`方法由运行时对象`o`的具体类型决定，而不是编译时静态决定，这叫做方法的动态分发（dynamic dispatch）。
 
 ```classes
 class c1 extends object
@@ -113,18 +113,13 @@ let get-m1 = proc (o: c1) send o m1()
 
 `super`代表当前类的父类，用来在被覆盖的情况下引用父类的同名方法，`c2`的`initialize`方法复用父类`c1`的构造函数进行初始化。`self`关键字代表当前方法关联的对象。
 
-### 基于原型的面向对象
-
-基于类、原型的面向对象
-TODO:
-
 ## 简单实现
 
-支持基于类的面向对象功能[classes](../ch9/9.4/classes/interpreter.rkt#L30)。
+实现基于类的面向对象[classes](../ch9/9.4/classes/interpreter.rkt#L30)。
 
 ### 语法定义
 
-增加新的语法结构支持面向对象，包括类的定义、对象创建`new-object-exp`、方法调用`method-call-exp`、父类方法调用`super-call-exp`和`self`等表达式。
+增加新的语法支持面向对象，包括类的定义、对象创建`new-object-exp`、方法调用`method-call-exp`、父类方法调用`super-call-exp`和`self`等表达式。
 
 ```clases
 (define the-grammar
@@ -142,7 +137,7 @@ TODO:
 
 ### 类与对象模型
 
-在程序表达式计算之前，首先要对类定义进行解析并保存[initialize-class-env](../ch9/9.4/classes/interpreter.rkt#L30)，方便后续使用。
+在程序表达式计算之前，首先要对类定义进行解析并保存[initialize-class-env!](../ch9/9.4/classes/interpreter.rkt#L30)，方便后续使用。
 
 ```scheme
 (define (value-of-program prog)
@@ -157,7 +152,7 @@ TODO:
   )
 ```
 
-类的定义位于程序开头，可以有多个，是全局的，使用关联列表（association list）类型的全局变量[the-class-env](../ch9/9.4/classes/classes.rkt#L42)来表示，键是类名称，值是类定义。初始环境中包含类`object`的定义，它没有父类、字段、方法。
+类的定义位于程序开头，可以有多个，是**全局的**，使用关联列表（association list）类型的变量[the-class-env](../ch9/9.4/classes/classes.rkt#L42)表示，键是类名称，值是类定义。初始环境中包含`object`类的定义，它作为所有类的基类，自身没有父类。
 
 ```scheme
 (define the-class-env '())
@@ -168,7 +163,7 @@ TODO:
   )
 ```
 
-一个[类](../ch9/9.4/classes/classes.rkt#L16)包括父类（super-name）、字段名称（field-names）、方法定义（method-env）等三部分信息。
+[类](../ch9/9.4/classes/classes.rkt#L16)包括父类（super-name）、字段名称（field-names）、方法定义（method-env）等三部分信息。
 
 ```scheme
 (define-datatype class class?
@@ -180,7 +175,7 @@ TODO:
   )
 ```
 
-一个类有若干个方法，同样使用关联列表表示，键是方法的名称，值是方法的定义。类的方法包括参数名称列表、方法体、父类名称、字段名称列表。
+一个类有若干个方法，使用关联列表表示，键是方法的名称，值是方法的定义。类的方法包括参数名称列表、方法体、父类名称、字段名称列表。
 
 ```scheme
 (define-datatype method method?
@@ -201,9 +196,9 @@ TODO:
 )
 ```
 
-类继承带来的同名字段和方法**覆盖问题**需要在类环境的初始化中进行处理。对象的字段列表中父类对象的字段位于子类对象的**前边**，顺序排列的好处是子类对象的字段列表中属于父类的部分和父类对象的字段列表完全一致。因此可以被将子类对象直接当做父类对象使用，字段顺序不需要调整。
+类继承带来的同名字段和方法**覆盖问题**需要在类环境的初始化过程处理。对象的字段列表中父类对象的字段位于子类对象的**前边**，顺序排列的好处是子类对象的字段列表中属于父类的部分和父类对象的字段列表完全一致。因此可以被将子类对象直接当做父类对象使用，字段顺序不需要调整。
 
-参考类`c1`定义了字段`x/y`；类`c2`继承`c1`，定义字段`y`；类`c3`继承`c2`，定义字段`x/z`。
+参考类`c1`定义了字段`x`和`y`；类`c2`继承`c1`，定义字段`y`；类`c3`继承`c2`，定义字段`x`和`z`。
 
 | 类  | 字段 | 字段列表    | 处理后的字段名称列表 |
 | --- | ---- | ----------- | -------------------- |
@@ -211,7 +206,7 @@ TODO:
 | c2  | y    | (x y y)     | (x y%1 y)            |
 | c3  | x, z | (x y y x z) | (x%1 y%1 y x z)      |
 
-类`c2`的字段列表`(x y y)`包含两个`y`，第一个属于`c1`，第二个属于`c2`。类`c3`的字段列表`(x y y x z)`包含两个`x`，第一个属于`c1`，第二个属于`c3`。在字段列表中**从左到右**对字段按名称查找时，重名的情况下会首先查找到父类的字段。因此需要对字段列表做处理，将同名的字段中除了最后一个都进行重命名，这样从左到右查找字段时能够找到当前类的字段，也就是字段列表中同名的最后一个。重命名的字段名称包含`%`，避免与用户定义字段名称重复。[initialize-class-decl](../ch9/9.4/classes/classes.rkt#L72)`中调用[append-field-names](../ch9/9.4/classes/classes.rkt#L116)将子类字段名称列表与父类字段名称列表做合并重命名。
+类`c2`的字段列表`(x y y)`包含两个`y`，第一个属于`c1`，第二个属于`c2`。类`c3`的字段列表`(x y y x z)`包含两个`x`，第一个属于`c1`，第二个属于`c3`。在字段列表中**从左到右**对字段按名称查找时，重名的情况下会首先查找到父类的字段。因此需要对字段列表做处理，将同名的字段中除了最后一个都进行重命名，这样从左到右查找字段时能够找到当前类的字段，也就是字段列表中同名的最后一个。重命名的字段名称包含`%`，避免与用户定义字段名称重复。[initialize-class-decl!](../ch9/9.4/classes/classes.rkt#L72)`中调用[append-field-names](../ch9/9.4/classes/classes.rkt#L116)将子类字段名称列表与父类字段名称列表做合并重命名。
 
 ```scheme
 (define (initialize-class-decl! c-decl)
@@ -260,7 +255,7 @@ TODO:
 
 ### 类表达式求值
 
-新增的类表达式[求值](../ch9/9.4/classes/interpreter.rkt#L151)包括新建对象（new-object-exp）、方法调用（method-call-exp）、父类方法调用（super-call-exp）和self表达式（self-exp）。其中前三个内部都是调用一个类方法，区别在于`new-object-exp`调用的是类的构造函数`initialize`；`method-call-exp`调用的方法动态分发，是对象`obj`所属类的方法`method-name`；`super-call-exp`调用的方法静态分发，是父类`super-name`的方法`method-name`。`self-exp`访问环境变量中的变量`%self`，代表方法对应的当前对象。
+新增的类[表达式](../ch9/9.4/classes/interpreter.rkt#L151)包括新建对象（new-object-exp）、方法调用（method-call-exp）、父类方法调用（super-call-exp）和self表达式（self-exp）。其中前三个内部都是调用一个类方法，区别在于`new-object-exp`调用的是类的构造函数`initialize`；`method-call-exp`调用的方法动态方法，是对象`obj`所属类的方法`method-name`；`super-call-exp`调用的方法静态方法，是父类`super-name`的方法`method-name`。`self-exp`访问环境变量中的变量`%self`，代表方法对应的当前对象。
 
 ```scheme
 (define (value-of-exp exp env)
@@ -303,21 +298,19 @@ TODO:
   )
 ```
 
-对象方法中可以使用`super`、`self`两个特殊信息，需要在[apply-method](../ch9/9.4/classes/method.rkt#L23)调用方法时使用`extend-env-with-self-and-super`保存到环境变量中。
+对象方法中可以使用`super`、`self`两个特殊变量，需要在[apply-method](../ch9/9.4/classes/method.rkt#L23)调用方法时使用`extend-env-with-self-and-super`保存到环境变量中。方法的调用包含了方法参数、`self/super`、对象字段列表等三层环境变量。
 
 ```scheme
 (define (apply-method m self args)
   (cases method m
     (a-method (vars body super-name field-names)
               (value-of-exp body
-                        (extend-env* vars (map newref args)
-                                     (extend-env-with-self-and-super self super-name
-                                                                     (extend-env* field-names (object->fields self)
-                                                                                  (empty-env)
-                                                                                  )
-                                                                     )
-                                     )
-                        )
+               (extend-env* vars (map newref args)
+                (extend-env-with-self-and-super self super-name
+                 (extend-env* field-names (object->fields self) (empty-env))
+                 )
+                )
+               )
               )
     )
   )
@@ -327,7 +320,7 @@ TODO:
 
 为面向对象添加类型检查[typed-oo](../ch9/9.5/typed-oo/checker/main.rkt#L16)，包括三部分内容。
 
-1. `instanceof`表达式可以检查对象是否是类的实例，`cast`表达式将对象转换为指定类型。
+1. `instanceof`表达式检查对象是否为目标类的实例，`cast`表达式将对象转换为指定类型。
 2. 增加接口功能，接口声明若干方法，实现了接口的类需要具有接口要求的所有方法。
 3. 类字段和方法的类型检查，包括新增的几种类相关表达式类型。
 
@@ -471,7 +464,7 @@ in list((test-cast c))
   )
 ```
 
-收集完整接口与类型信息后可以对类的定义做更多的检查。[check-method-decl!](../ch9/9.5/typed-oo/checker/static-class.rkt#L219)检查类的方法定义，方法的返回类型和标注的返回类型是否兼容。如果方法覆盖了父类同名方法，子类方法的类型需要和父类方法类型兼容。
+由于函数定义中会使用到`self`，类型就是当前类，为了检查函数定义的类型必须要有`self`的完整类型信息。所以类方法定义的检查要分成[两趟](../ch9/9.5/exer-9.38/README.md)，第一趟搜集类的完整定义，第二趟才能对方法定义进行检查。[check-method-decl!](../ch9/9.5/typed-oo/checker/static-class.rkt#L219)检查类的方法定义，方法的返回类型和标注的返回类型是否兼容。如果方法覆盖了父类同名方法，子类方法的类型需要和父类方法类型兼容。
 
 ```scheme
 (define (check-method-decl! m-decl class-name super-name field-names field-types)
@@ -609,31 +602,610 @@ in list((test-cast c))
   )
 ```
 
-## 更多特性
+## 字段读写
 
-### 父类方法
+`fieldref obj field-name`读取对象字段，`fieldset obj field-name = exp`写入对象字段。
 
-1. single-inheritance/dynamic dispatch/subclass polymorphism
-   1. Exer 9.2
-   1. final method 9.13
-1. instanceof Exer 9.6
-1. class/static field / method Exer 9.15
-1. overloading name mangling Exer 9.16/Exer 9.22
-1. local class Exer 9.17
-1. shadowing/static dispatch
-   1. Exer 9.8 fieldref/set
-   1. Exer 9.9 superfieldref/set
-   1. Exer 9.10 named send
-1. encapsulation/visibility
-   1. Exer 9.11 method
-   1. Exer 9.12 field
-1. compile time optimization
-   1. Exer 9.18 constant time method searching
-   1. Exer 9.19/20 lexical addressing
-   1. Exer 9.22 overloading resolution at compile time
-   1. Exer 9.23 super call
-   1. Exer 9.24 named send method
-1. binary method problem Exer 9.25
-1. double dispatch
-1. multiple inheritance Exer 9.26 diamond problem
-1. prototype based oo Exer 9.27/9.28/9.29
+```classes
+class c1 extends object
+  field x
+  method initialize()
+    set x = 1
+
+class c2 extends object
+  field x
+  field y
+  method initialize()
+    begin
+      set x = 2;
+      set y = 3
+    end
+
+let o1 = new c1()
+  in fieldref o1 x
+```
+
+[object->field](../ch9/9.4/exer-9.8/object.rkt#L38)在对象**类的字段列表**中查找指定名称的字段的下标，**对象字段列表**对应下标得到字段值的引用。
+
+```scheme
+(define (object->field obj field-name)
+  (let* ([obj-class (lookup-class (object->class-name obj))]
+         [field-names (class->field-names obj-class)]
+         [index (index-of field-names field-name)])
+    (if index
+        (list-ref (object->fields obj) index)
+        (eopl:error 'object->field "Field ~s not found on object ~s" field-name obj)
+        )
+    )
+  )
+```
+
+对字段引用进行[读写](../ch9/9.4/exer-9.8/interpreter.rkt#L184)即可。
+
+```scheme
+(define (value-of-exp exp env)
+  (cases expression exp
+    (fieldref-exp (obj-exp field-name)
+                  (let* ([obj (value-of-exp obj-exp env)] [field (object->field obj field-name)])
+                    (deref field)
+                    )
+                  )
+    (fieldset-exp (obj-exp field-name exp1)
+                  (let* ([obj (value-of-exp obj-exp env)] [field (object->field obj field-name)])
+                    (setref! field (value-of-exp exp1 env))
+                    )
+                  )
+  )
+)
+```
+
+为`fieldref/fieldset`添加[类型检查](../ch9/9.5/exer-9.41/checker/main.rkt#L189)，要求`obj-exp`必须是对象类型，字段`field-name`必须存在，值的类型`exp1-type`必须是字段类型`field-type`的子类型。
+
+```scheme
+(define (type-of exp tenv)
+  (cases expression exp
+    ; ...
+    (fieldref-exp (obj-exp field-name)
+                  (let ([obj-exp-type (type-of obj-exp tenv)])
+                    (if (class-type? obj-exp-type)
+                        (let ([obj-class-name (type->class-name obj-exp-type)])
+                          (let ([field-type (find-class-field-type obj-class-name field-name)])
+                            (if field-type
+                                field-type
+                                (eopl:error 'type-of "fieldref expression ~s of refs unknown field name ~s in class ~s" exp obj-class-name field-name)
+                                )
+                            )
+                          )
+                        (eopl:error 'type-of "fieldref target expression must be class type, get ~s" obj-exp)
+                        )
+                    )
+                  )
+    (fieldset-exp (obj-exp field-name exp1)
+                  (let ([obj-exp-type (type-of obj-exp tenv)] [exp1-type (type-of exp1 tenv)])
+                    (if (class-type? obj-exp-type)
+                        (let ([obj-class-name (type->class-name obj-exp-type)])
+                          (let ([field-type (find-class-field-type obj-class-name field-name)])
+                            (if field-type
+                                (begin
+                                  (check-is-subtype! exp1-type field-type exp)
+                                  (void-type)
+                                  )
+                                (eopl:error 'type-of "fieldset expression ~s of refs unknown field name ~s in class ~s" exp obj-class-name field-name)
+                                )
+                            )
+                          )
+                        (eopl:error 'type-of "fieldset target expression must be class type, get ~s" obj-exp)
+                        )
+                    )
+                  )
+    )
+  )
+```
+
+对于父类的同名字段使用`superfieldref/superfieldset`语法支持读写，唯一的区别[object->super-field](../ch9/9.4/exer-9.9/object.rkt#L49)是在对象类的**父类字段列表**查找字段下标。
+
+```scheme
+(define (object->super-field obj super-field-name)
+  (let* ([host-class (lookup-class (object->class-name obj))]
+         [super-name (class->super-name host-class)]
+         [super-class (lookup-class super-name)]
+         [super-field-names (class->field-names super-class)]
+         [index (index-of super-field-names super-field-name)])
+    (if index
+        (list-ref (object->fields obj) index)
+        (eopl:error 'object->super-field "Super field ~s not found on object ~s" super-field-name obj)
+        )
+    )
+  )
+```
+
+## 指定函数调用
+
+使用`super`可以调用父类的同名函数，但是更上层的类同名函数仍然不可见，设计命名语法`named-send c1 o m1()`调用指定类`c1`的方法`m1`。
+在指定的类`class-name`而不是对象`obj`的类上查找函数`method-name`，被调用的函数在编译时确定，属于静态分发（static dispatch）。
+
+```scheme
+(define (value-of-exp exp env)
+  (cases expression exp
+    ; ...
+    (named-method-call-exp (class-name obj-exp method-name rands)
+                           (let ([args (value-of-exps rands env)] [obj (value-of-exp obj-exp env)])
+                             (apply-method
+                              (find-method class-name method-name)
+                              obj
+                              args
+                              )
+                             )
+                           )
+  )
+)
+```
+
+## 可见性
+
+对象的**字段**和**方法**需要控制可见性，保证内部的数据对外界不可见，防止抽象泄露（leaky abstraction）。
+
+对象字段和方法支持设置三种可见性。
+
+1. `public` 公开的，在任意地方可用。
+1. `private` 私有的，只能在类本身的方法中可用。
+1. `protected` 保护的，在类和子类的方法中可见。
+
+对可见性进行检查需要两个信息，一个是字段和方法的可见性，更新语法使用[method-modifier](../ch9/9.4/exer-9.11/parser.rkt#L25)表示，设计了可选的语法形式支持向前兼容；另一个是字段和方法使用的环境信息（类外全局环境、类内部、子类内部），新增[extend-env-method*](../ch9/9.4/exer-9.11/method.rkt#L29)将**方法调用**和**普通函数调用**区分开。
+
+可见性的需要的信息都是**静态的**，因此可以在**运行前**进行，这里为了实现方便在运行时进行。
+
+```scheme
+(define (apply-method class-name method-name m self args)
+  (cases method m
+    (a-method (modifier vars body super-name field-names)
+              (value-of-exp body
+                            (extend-env-method* class-name method-name vars (map newref args)
+                                                (extend-env-with-self-and-super self super-name
+                                                                                (extend-env* field-names (object->fields self)
+                                                                                             (empty-env)
+                                                                                             )
+                                                                                )
+                                                )
+                            )
+              )
+    )
+  )
+```
+
+然后在方法调用[method-call-exp](../ch9/9.4/exer-9.11/modifier.rkt#L18)之前进行检查。`public`不做检查；`private`检查方法调用所在的类是否为方法的宿主类（host class）；`protected`检查方法调用所在类是不是宿主类或者宿主类的子类。
+
+```scheme
+(define (check-method-call-visibility class-name method-name env)
+  (let* ([method (find-method class-name method-name)]
+         [caller-class-method (find-caller-class-method env)]
+         [modifier (method->modifier method)])
+    (cases method-modifier modifier
+      (public-modifier () #t)
+      (protected-modifier ()
+                          (if (not caller-class-method)
+                              (eopl:error 'check-method-call-visibility "Protected method ~s.~s called in global environment, can only be called in ~s" class-name method-name class-name)
+                              (let ([caller-class-name (car caller-class-method)] [caller-method-name (cdr caller-class-method)])
+                                (if (is-sub-class caller-class-name class-name)
+                                    #t
+                                    (eopl:error 'check-method-call-visibility "Proteced method ~s.~s called in ~s.~s, can only be called in class ~s or its descendants." class-name method-name caller-class-name caller-method-name class-name)
+                                    )
+                                )
+                              )
+                          )
+      (private-modifier ()
+                        (if (not caller-class-method)
+                            (eopl:error 'check-method-call-visibility "Private method ~s.~s called in global environment, can only be called in ~s" class-name method-name class-name)
+                            (let ([caller-class-name (car caller-class-method)] [caller-method-name (cdr caller-class-method)])
+                              (if (eqv? class-name caller-class-name)
+                                  #t
+                                  (eopl:error 'check-method-call-visibility "Private method ~s.~s called in ~s.~s, can only be called inside class ~s." class-name method-name caller-class-name caller-method-name class-name)
+                                  )
+                              )
+                            )
+                        )
+      )
+    )
+  )
+
+```
+
+字段读写的可见性检查[check-field-visibility](../ch9/9.4/exer-9.12/modifier.rkt#L57)实心类似。
+
+```scheme
+(define (check-field-visibility obj field-name env)
+  (let* ([p (find-field-class-modifier-pair (object->class-name obj) field-name)]
+         [class-name (car p)]
+         [f-modifier (cdr p)]
+         [caller-class-method (find-caller-class-method env)]
+         [caller-class-name (car caller-class-method)]
+         [caller-method-name (cdr caller-class-method)])
+    (cases field-modifier f-modifier
+      (public-field () #t)
+      (protected-field ()
+                       (if (is-sub-class caller-class-name class-name)
+                           #t
+                           (eopl:error 'check-field-visibility "Proteced field ~s.~s accessed in ~s.~s, can only be accessed in class ~s or its descendants." class-name field-name caller-class-name caller-method-name class-name)
+                       )
+      )
+      (private-field ()
+        (if (eqv? class-name caller-class-name)
+          #t
+          (eopl:error 'check-field-visibility "Private field ~s.~s accessed in ~s.~s, can only accessed inside class ~s" class-name field-name caller-class-name caller-method-name class-name)
+        )
+      )
+    )
+  )
+)
+```
+
+## 方法重载
+
+支持一个类定义多个同名的方法，但是要求方法的参数个数和类型（method signature）不能完全相同，否则无法进行区分。方法重载可以通过保存多个具有不同签名的同名函数实现，根据实参和函数签名进行重载决议（overloading resolution），也可以通过名称修饰（[name mangling](https://en.wikipedia.org/wiki/Name_mangling)）实现。名称修饰是根据方法签名生成唯一的方法名，避免重名。
+
+[Exer 9.16](../ch9/9.4/exer-9.16/overloading.rkt#L6)在运行时进行名称修饰（m%n）。[Exer 9.22](../ch9/9.4/exer-9.22/interpreter.rkt#L114)在运行前将方法的定义和使用处都转换为修饰后的唯一名称（m@n）。这里只考虑了参数的个数，没有考虑参数类型。
+
+```scheme
+(define (mangle-method-name name arity)
+    (string->symbol
+        (string-append
+            (symbol->string name)
+            "@:"
+            (number->string arity)
+        )
+    )
+)
+
+(define (translation-of-exp exp)
+  (cases expression exp
+    (method-call-exp (obj-exp method-name rands)
+                     (method-call-exp
+                        (translation-of-exp obj-exp)
+                        (mangle-method-name method-name (length rands))
+                        (translation-of-exps rands)
+                        )
+                     )
+    (super-call-exp (method-name rands)
+                    (super-call-exp
+                        (mangle-method-name method-name (length rands))
+                        (translation-of-exps rands)
+                        )
+                    )
+    (else exp)
+    )
+)
+```
+
+## 静态成员
+
+类静字段性通常用于保存跟类有关，但是所有实例共享的数据。在初始化类环境的时机[initialize-class-decl!](../ch9/9.4/exer-9.15/class.rkt#L80)中保存即可，为了方便对静态字段初始化只支持编译时可以确定值的表达式。
+
+```scheme
+(define (initialize-class-decl! c-decl)
+  (cases class-decl c-decl
+    (a-class-decl (c-name s-name static-field-names static-field-initializers f-names m-decls)
+                  (let* ([super-class-f-names (class->field-names (lookup-class s-name))]
+                         [class-static-fields (evaluate-class-static-fields static-field-names static-field-initializers)]
+                         [f-names (append-filed-names super-class-f-names f-names)])
+                    (add-to-class-env!
+                     c-name
+                     (a-class s-name
+                              f-names
+                              (merge-method-envs
+                               (class->method-env (lookup-class s-name))
+                               (method-decls->method-env m-decls s-name f-names class-static-fields)
+                               )
+                              )
+                     )
+                    )
+                  )
+    )
+  )
+```
+
+在方法中可以访问类静态字段，所以方法调用时需要将静态字段放到[方法环境](../ch9/9.4/exer-9.15/method.rkt#L38)中。
+
+```scheme
+(define (apply-method m self args)
+  (cases method m
+    (a-method (vars body super-name field-names class-static-fields)
+              (value-of-exp
+               body
+               (extend-env*
+                vars (map newref args)
+                (extend-env-with-self-and-super
+                 self
+                 super-name
+                 (extend-env*
+                  field-names
+                  (object->fields self)
+                  (extend-env*
+                   (map car class-static-fields)
+                   (map cdr class-static-fields)
+                   (empty-env)
+                   )
+                  )
+                 )
+                )
+               )
+              )
+    )
+  )
+
+```
+
+静态方法的支持比较简单，方法信息保存到类中，设计静态方法调用语法支持即可。需要注意的是类型检查中静态方法和普通方法要做区分，类普通方法采用动态分发，静态方法是静态分发，所以一个方法在父类、子类中应该[保持一致](../ch9/9.5/exer-9.37/checker/static-class.rkt#L287)。
+
+```scheme
+(define (check-method-decl! m-decl class-name super-name field-names field-types)
+  (cases method-decl m-decl
+    ; ...
+    (a-static-method-decl (res-type m-name vars var-types body)
+                          (let* ([tenv1 (extend-tenv* field-names field-types (init-tenv))]
+                                 [tenv2 (extend-tenv-with-self-and-super (class-type class-name) super-name tenv1)]
+                                 [tenv3 (extend-tenv* vars var-types tenv2)]
+                                 [body-type (type-of body tenv3)])
+                            (check-is-subtype! body-type res-type m-decl)
+                            (if (eqv? m-name 'initialize)
+                                ; pass check fot initialize
+                                #t
+                                (let* ([m-tenv (static-class->method-tenv (lookup-static-class super-name))]
+                                       [maybe-super-type (maybe-find-method-type m-tenv m-name)])
+                                  ; check if method type is compatible with parent method type
+                                  (if maybe-super-type
+                                      (begin
+                                        (when (not (find-method-is-static super-name m-name))
+                                          (eopl:error 'check-method-decl "static method ~s.~s override dynamic super method ~s.~s" class-name m-name super-name m-name)
+                                          )
+                                        (check-is-subtype!
+                                         (proc-type var-types res-type)
+                                         maybe-super-type
+                                         m-decl
+                                         )
+                                        )
+                                      ; pass check for non-overriden method
+                                      #t
+                                      )
+                                  )
+                                )
+                            )
+                          )
+    )
+  )
+```
+
+## 局部类
+
+当前类的定义是全局的（global），Java中支持嵌套类（[nested class](https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html)）和内部类（[inner class](https://www.geeksforgeeks.org/inner-class-java/)）。
+
+设计新的语法`letclass c = ... in e`支持局部类，类`c`只在表达式`e`中可见。新增[extend-env-with-class](../ch9/9.4/exer-9.17/environment.rkt#L31)类型的环境记录，支持记录类的定义。
+
+全局的类环境修改为嵌套的环境，对`letclass-exp`表达式求值的时候，[extend-env-with-class-component](../ch9/9.4/exer-9.17/interpreter.rkt#L190)将类的定义保存到环境中。
+
+```scheme
+(define (value-of-exp exp env)
+  (cases expression exp
+    ; ...
+    (letclass-exp (class-name super-name field-names method-decls body)
+                  (let ([new-env (extend-env-with-class-components class-name super-name field-names method-decls env)])
+                    (value-of-exp body new-env)
+                    )
+                  )
+  )
+)
+```
+
+相应地在使用类的时候，根据类名查询类定义的过程[lookup-class](../ch9/9.4/exer-9.17/interpreter.rkt#L190)变成了在嵌套的环境中查找。
+
+```scheme
+(define (lookup-class c-name env)
+  (cases environment env
+    (extend-env* (vars vals saved-env) (lookup-class c-name saved-env))
+    (extend-env-rec* (p-names b-vars p-bodies saved-env) (lookup-class c-name saved-env))
+    (extend-env-with-self-and-super (self super-name saved-env) (lookup-class c-name saved-env))
+    (extend-env-with-class (class-name c saved-env)
+                           (if (eqv? class-name c-name)
+                               c
+                               (lookup-class c-name saved-env)
+                               )
+                           )
+    (else (report-unknown-class-name c-name))
+    )
+  )
+```
+
+## 编译优化
+
+当前使用关联列表的形式保存类的字段和方法，在运行时对字段和方法按照名称取查找，时间复杂度是O(N)。对象的字段在字段列表中的位置是静态确定的，`super-call-exp`调用的[父类方法](../ch9/9.4/exer-9.23/translator/main.rkt#L115)和[指定名称方法调用](../ch9/9.4/exer-9.24/translator/main.rkt#L137)也可以静态确定，还有方法调用中的变量也是静态的，可以进行 [Lexical Addressing](../ch3/3.7/lexical-addressing/translator.rkt#L22) 优化。
+
+对类定义可以在编译时转换，[translation-of-method-decl](../ch9/9.4/exer-9.19/translator/class.rkt#L74)将类方法中的变量表达式转换为使用下标的形式`nameless-var-exp`。
+
+```scheme
+(define (translation-of-method-decl m-decl c-name senv)
+  (cases method-decl m-decl
+    (a-method-decl (method-name vars body)
+                   (let* ([field-names (class->field-names (lookup-class c-name))]
+                          [field-env (extend-senv-normal field-names senv)]
+                          [self-super-env (extend-senv-normal (list '%self '%super) field-env)]
+                          [vars-env (extend-senv-normal vars self-super-env)])
+                     (a-method-decl
+                      method-name
+                      vars
+                      (translation-of-exp body vars-env)
+                      )
+                     )
+                   )
+    )
+  )
+```
+
+运行时执行使用下标版本的表达式实现O(1)的时间复杂度。
+
+```scheme
+(define (value-of-exp exp env)
+  (cases expression exp
+    ; ...
+    ; translation
+    (nameless-var-exp (index)
+                      (let ([ref (apply-nameless-env env index)])
+                       (deref ref)
+                        )
+                      )
+  )
+)
+```
+
+## Binary Method Problem
+
+定义父类`point`有两个字段`x`和`y`，方法`similarpoints`判断两个`point`相等要求字段分别相等。子类`colorpoint`继承`point`，新增一个字段`color`，覆盖`similarpoints`方法要求要求`x/y/color`字段都相等。
+
+在相等性判断的四种组合情况中，类型相同的话`similarpoints`返回正确。类型不同时，`(point colorpoint)`调用`point`类的`similarpoints`方法，将`colorpoint`当成`point`处理也正确。但是`(colorpoints point)`的情况下，调用`colorpoints`的方法，将`point`当成了`colorpoints`处理，这种情况错误。
+
+```classes
+class point extends object
+  field x
+  field y
+  method initialize (initx, inity)
+    begin
+      set x = initx;
+      set y = inity
+    end
+  method getx() x
+  method gety() y
+  method similarpoints(pt)
+    if equal?(send pt getx(), x)
+    then equal?(send pt gety(), y)
+    else zero?(1)
+
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+  method similarpoints (pt)
+    if super similarpoints(pt)
+    then equal?(send pt getcolor(),color)
+    else zero?(1)
+```
+
+要修复避免这个问题，需要在`colorpoint`类的`similarpoints`方法中对参数类型进行检查，确保是`colorpoint`类型。
+
+```classes
+class colorpoint extends point
+  field color
+  method initialize(x, y, c)
+    begin
+      super initialize(x, y);
+      set color = c
+    end
+  method getcolor ()
+    color
+  method similarpoints(pt)
+    if super similarpoints(pt)
+    then
+      % check if pt is colorpoint
+      if instanceof pt colorpoint
+      then equal?(send pt getcolor(), color)
+      else zero?(0)
+    else zero?(1)
+```
+
+判断两个点是否相等时两个参数的地位是等价的，但是面向对象的方法调用时一个作为`self`对象，一个作为参数，动态分发的方法只由`self`的类型决定，这是造成这个问题的根本原因。在支持双重分发机制的语言中，能避免这种不对称造成的问题。也可以使用[函数](../base/test.rkt#L3556)而不是方法定义避免这个问题。
+
+```classes
+let similarpoint = proc (pt1, pt2)
+                      if equal?(send pt1 getx(), send pt2 getx())
+                      then equal?(send pt1 gety(), send pt2 gety())
+                      else zero?(1)
+  in let similarcolorpoint = proc (cpt1, cpt2)
+                              if (similarpoint cpt1 cpt2)
+                              then if instanceof cpt1 colorpoint
+                                   then if instanceof cpt2 colorpoint
+                                        then equal?(send cpt1 getcolor(), send cpt2 getcolor())
+                                        else zero?(0)
+                                   else zero?(0)
+                              else zero?(1)
+    in let c1 = new colorpoint(1, 2, 255)
+           c2 = new point(1, 2)
+          in (similarcolorpoint c1 c2)
+```
+
+## 双重分发实现相等判断
+
+两个节点类`interior-node`和`leaf-node`都实现了接口`tree`，使用[双重分发（double dispatch）](../base/test.rkt#L3796)的方式实现`equal`判断两个`tree`是不是等价的节点。等价的节点必须都是`interior-node`或者`leaf-node`，而且内部数据相同。
+
+不使用`instanceof`判断`tree`的具体类型情况下，在`interior-node`的`equal`函数中调用参数`t: tree`的方法`send t equal_with_interior_node`，动态分发机制会根据对象的具体类型调用该类型的函数，`self`对象的类型信息被函数名称`equal_with_interior_node`表示了。两个节点类对比有四种组合情况，对应了两个类中`equal_with_interior_node/equal_with_leaf_node`的四个方法定义。
+
+```classes
+interface tree
+  method int sum()
+  method bool equal(t: tree)
+  method bool equal_with_interior_node(t: interior-node)
+  method bool equal_with_leaf_node(t: leaf-node)
+
+class interior-node extends object implements tree
+  field tree left
+  field tree right
+  method void initialize(l: tree, r: tree)
+    begin
+      set left = l;
+      set right = r
+    end
+
+  method tree getleft() left
+  method tree getright() right
+  method int sum()
+    +(send left sum(), send right sum())
+
+  method bool equal(t: tree)
+    send t equal_with_interior_node (self)
+
+  method bool equal_with_interior_node (t: interior-node)
+    if send left equal (send t getleft())
+    then send right equal (send t getright())
+    else zero?(1)
+
+  method bool equal_with_leaf_node (t: leaf-node)
+    zero?(1)
+
+class leaf-node extends object implements tree
+  field int value
+  method void initialize(v: int)
+    set value = v
+  method int sum() value
+  method int getvalue() value
+
+  method bool equal(t: tree)
+    send t equal_with_leaf_node (self)
+
+  method bool equal_with_interior_node(t: interior-node)
+    zero?(1)
+
+  method bool equal_with_leaf_node(t: leaf-node)
+    zero?(-(value, send t getvalue()))
+
+let l1 = new leaf-node(1)
+in let l2 = new leaf-node(2)
+in let i1 = new interior-node(l1, l2)
+in let i2 = new interior-node(l1, i1)
+in list(
+  send l1 equal (l1),
+  send l1 equal (l2),
+  send l1 equal (i1),
+  send i1 equal (i1),
+  send i1 equal (i2),
+  send i1 equal (l1)
+)
+```
+
+## 多继承
+
+多继承（Exer 9.26）带来的问题要远大于其好处，Java选择只支持单继承。
+
+## 基于原型的面向对象
+
+基于原型也可以支持面向对象的特性，不需要类定义，而是直接在对象中保存字段和方法。对象可以直接继承另外一个对象，复用被继承对象的字段和方法，可参考练习[Exer 9.27](../ch9/9.4/exer-9.27/prototype.rkt)、[Exer 9.28](../ch9/9.4/exer-9.29/prototype.rkt)。

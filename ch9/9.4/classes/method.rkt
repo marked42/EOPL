@@ -23,15 +23,22 @@
 (define (apply-method m self args)
   (cases method m
     (a-method (vars body super-name field-names)
-              (value-of-exp body
-                            (extend-env* vars (map newref args)
-                                         (extend-env-with-self-and-super self super-name
-                                                                         (extend-env* field-names (object->fields self)
-                                                                                      (empty-env)
-                                                                                      )
-                                                                         )
-                                         )
-                            )
+              (value-of-exp
+               body
+               (extend-env*
+                vars
+                (map newref args)
+                (extend-env-with-self-and-super
+                 self
+                 super-name
+                 (extend-env*
+                  field-names
+                  (object->fields self)
+                  (empty-env)
+                  )
+                 )
+                )
+               )
               )
     )
   )
