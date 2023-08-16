@@ -7,6 +7,7 @@
  ["store.rkt" (newref)]
  ["object.rkt" (object->fields lookup-class)]
  ["interpreter.rkt" (value-of-exp)]
+ ["var-index.rkt" (a-var-index)]
  )
 
 (provide (all-defined-out))
@@ -20,8 +21,8 @@
    )
   )
 
-(define self-index '(1 0))
-(define super-index '(1 1))
+(define (self-index) (a-var-index 1 0))
+(define (super-index) (a-var-index 1 1))
 
 (define (apply-method m self args)
   (cases method m
@@ -30,8 +31,8 @@
                             (extend-nameless-env (map newref args)
                                                  (extend-nameless-env (list self super-name)
                                                                       (extend-nameless-env (object->fields self)
-                                                                                          (empty-nameless-env)
-                                                                                          )
+                                                                                           (empty-nameless-env)
+                                                                                           )
                                                                       )
                                                  )
                             )

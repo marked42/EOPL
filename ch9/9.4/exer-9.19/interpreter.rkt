@@ -9,7 +9,7 @@
                      )]
  ["value.rkt" (num-val expval->num bool-val expval->bool proc-val expval->proc null-val null-val? cell-val cell-val->first cell-val->second)]
  ["procedure.rkt" (procedure apply-procedure proc->body)]
- ["store.rkt" (initialize-store! newref deref setref! show-store)]
+ ["store.rkt" (initialize-store! newref deref setref!)]
  ["class.rkt" (initialize-class-env! find-method)]
  ["method.rkt" (apply-method self-index super-index)]
  ["object.rkt" (object->class-name new-object)]
@@ -189,16 +189,18 @@
                      )
     (super-call-exp (method-name rands)
                     ; use surrounding self
-                    (let ([args (value-of-exps rands env)] [obj (apply-nameless-env env self-index)])
+                    (let ([args (value-of-exps rands env)] [obj (apply-nameless-env env (self-index))])
                       (apply-method
                        ; find method in super class
-                       (find-method (apply-nameless-env env super-index) method-name)
+                       (find-method (apply-nameless-env env (super-index)) method-name)
                        obj
                        args
                        )
                       )
                     )
-    (nameless-self-exp () (apply-nameless-env env self-index))
+    (nameless-self-exp ()
+                       (apply-nameless-env env (self-index))
+                       )
     (else (eopl:error 'value-of-exp "unsupported expression type ~s" exp))
     )
   )
